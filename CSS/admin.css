@@ -1,0 +1,501 @@
+/* ==========================================================
+   NovaCart – Admin Panel Stylesheet
+   ========================================================== */
+
+/* ---------- Colors and basic settings ---------- */
+:root {
+  --sidebar-bg: #2d1b69;
+  --sidebar-dark: #231452;
+  --primary: #5b2fd1;
+  --primary-light: #ede7fb;
+  --page-bg: #f3effd;
+  --white: #ffffff;
+  --text: #1f1a3d;
+  --text-light: #6b6685;
+  --border: #e2dbf5;
+  --green: #1a9e55;
+  --green-light: #dff5e8;
+  --red: #e0443e;
+  --red-light: #fde4e2;
+  --shadow: 0 4px 14px rgba(70, 40, 150, 0.10);
+  --radius: 16px;
+  --sidebar-width: 250px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--page-bg);
+  color: var(--text);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+/* ---------- Page layout ---------- */
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  min-width: 0;
+}
+
+/* ==========================================================
+   SIDEBAR
+   ========================================================== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background: linear-gradient(180deg, var(--sidebar-bg), var(--sidebar-dark));
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 14px;
+  z-index: 100;
+  transition: transform 0.3s;
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo-name {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.logo-badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.menu {
+  flex: 1;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 6px;
+  background: transparent;
+  color: #d9d0f5;
+  font-size: 15px;
+  text-align: left;
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.menu-item.active {
+  background: #6d44e0;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.menu-icon {
+  width: 22px;
+  text-align: center;
+}
+
+.logout {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0 0 12px 12px;
+  margin-top: 10px;
+  padding-top: 18px;
+}
+
+/* ==========================================================
+   TOP BAR
+   ========================================================== */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 28px;
+}
+
+.hamburger {
+  display: none;
+  background: var(--white);
+  color: var(--primary);
+  font-size: 20px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.welcome {
+  flex: 1;
+}
+
+.welcome h2 {
+  font-size: 20px;
+}
+
+.welcome p {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Notification bell */
+.bell {
+  position: relative;
+  background: transparent;
+  font-size: 24px;
+}
+
+.bell-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: var(--red);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  border-radius: 50%;
+  text-align: center;
+}
+
+/* Admin profile and dropdown */
+.profile {
+  position: relative;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  line-height: 38px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--white);
+  text-align: center;
+  font-weight: 700;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 48px;
+  min-width: 170px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  z-index: 50;
+}
+
+.dropdown.show {
+  display: block;
+}
+
+.dropdown a {
+  display: block;
+  padding: 11px 16px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.dropdown a:hover {
+  background: var(--primary-light);
+}
+
+/* ==========================================================
+   CONTENT AREA
+   ========================================================== */
+.content {
+  padding: 0 28px 28px;
+}
+
+/* Only the active section is visible */
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.page-icon {
+  width: 64px;
+  height: 64px;
+  line-height: 64px;
+  text-align: center;
+  font-size: 30px;
+  background: var(--primary-light);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.page-header h1 {
+  font-size: 24px;
+}
+
+.page-header p {
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+.card h3 {
+  font-size: 17px;
+  margin-bottom: 14px;
+}
+
+.placeholder {
+  text-align: center;
+  color: var(--text-light);
+  padding: 60px 20px;
+}
+
+/* ---------- Statistics cards ---------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  text-align: center;
+  font-size: 26px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stat-icon.purple { background: var(--primary-light); }
+.stat-icon.green  { background: var(--green-light); }
+.stat-icon.red    { background: var(--red-light); }
+
+.stat-label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.stat-value {
+  display: block;
+  font-size: 26px;
+  margin: 2px 0;
+}
+
+.stat-change {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.stat-change.up   { color: var(--green); }
+.stat-change.down { color: var(--red); }
+
+/* ---------- Overview and activity ---------- */
+.two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.overview-list,
+.activity-list {
+  list-style: none;
+}
+
+.overview-list li,
+.activity-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.overview-list li:last-child,
+.activity-list li:last-child {
+  border-bottom: none;
+}
+
+.overview-list strong {
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 4px 14px;
+  border-radius: 20px;
+}
+
+.activity-list .time {
+  color: var(--text-light);
+  font-size: 13px;
+}
+
+/* ---------- Toast message ---------- */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--sidebar-bg);
+  color: var(--white);
+  padding: 12px 22px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 300;
+}
+
+.toast.show {
+  opacity: 1;
+}
+
+/* ---------- Overlay (mobile sidebar) ---------- */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 90;
+}
+
+.overlay.show {
+  display: block;
+}
+
+/* ==========================================================
+   RESPONSIVE LAYOUT
+   ========================================================== */
+
+/* Tablets */
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Small screens: sidebar slides in and out */
+@media (max-width: 800px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main {
+    margin-left: 0;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar,
+  .content {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .profile-name {
+    display: none;
+  }
+}
+
+/* Phones */
+@media (max-width: 520px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .welcome p {
+    display: none;
+  }
+}
