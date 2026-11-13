@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NovaCart – Admin Panel</title>
+  <!-- External stylesheet -->
+  <link rel="stylesheet" href="../CSS/admin.css">
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">
+        <div class="logo-name"><span class="logo-icon">🛒</span> NovaCart</div>
+        <span class="logo-badge">Admin Panel</span>
+      </div>
+
+      <nav class="menu">
+        <button class="menu-item active" data-section="dashboard"><span class="menu-icon">🏠</span> Dashboard</button>
+        <button class="menu-item" data-section="users"><span class="menu-icon">👥</span> User Management</button>
+        <button class="menu-item" data-section="moderation"><span class="menu-icon">🛡️</span> Seller Verification</button>
+        <button class="menu-item" data-section="moderation"><span class="menu-icon">📦</span> Product Moderation</button>
+        <button class="menu-item" data-section="platform"><span class="menu-icon">⚙️</span> Platform Settings</button>
+        <button class="menu-item" data-section="platform"><span class="menu-icon">📊</span> Analytics &amp; Reports</button>
+      </nav>
+
+      <button class="menu-item logout" id="logoutBtn"><span class="menu-icon">🚪</span> Log Out</button>
+    </aside>
+
+    <!-- ===================== MAIN AREA ===================== -->
+    <div class="main">
+
+      <!-- Top navigation bar -->
+      <header class="topbar">
+        <button class="hamburger" id="menuToggle" aria-label="Toggle sidebar">☰</button>
+
+        <div class="welcome">
+          <h2>Welcome back, Admin!</h2>
+          <p id="topbarDescription">Overview of users, sellers and platform activity.</p>
+        </div>
+
+        <div class="topbar-right">
+          <button class="bell" id="notificationBtn" aria-label="Notifications">🔔<span class="bell-count">3</span></button>
+
+          <div class="profile" id="profileBox">
+            <button class="profile-btn" id="profileBtn">
+              <span class="avatar">A</span>
+              <span class="profile-name">Admin</span>
+              <span class="arrow">▾</span>
+            </button>
+            <div class="dropdown" id="profileDropdown">
+              <a href="#">My Profile</a>
+              <a href="#">Change Password</a>
+              <a href="#" id="dropdownLogout">Log Out</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page content -->
+      <main class="content">
+
+        <!-- ========== DASHBOARD SECTION ========== -->
+        <section class="section active" id="section-dashboard">
+
+          <div class="page-header">
+            <div class="page-icon">📋</div>
+            <div>
+              <h1>Admin Dashboard</h1>
+              <p>A quick overview of NovaCart. (All figures are demonstration data.)</p>
+            </div>
+          </div>
+
+          <!-- Statistics cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon purple">👥</div>
+              <div>
+                <span class="stat-label">Total Users</span>
+                <strong class="stat-value" id="statTotalUsers">0</strong>
+                <span class="stat-change up">↑ +8%</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon purple">🏪</div>
+              <div>
+                <span class="stat-label">Total Sellers</span>
+                <strong class="stat-value" id="statTotalSellers">0</strong>
+                <span class="stat-change up">↑ +12%</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">✔️</div>
+              <div>
+                <span class="stat-label">Active Accounts</span>
+                <strong class="stat-value" id="statActive">0</strong>
+                <span class="stat-change up">↑ +6%</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon red">⛔</div>
+              <div>
+                <span class="stat-label">Suspended</span>
+                <strong class="stat-value" id="statSuspended">0</strong>
+                <span class="stat-change down">↓ -2%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lower area: overview + recent activity -->
+          <div class="two-columns">
+            <div class="card">
+              <h3>Moderation Overview</h3>
+              <ul class="overview-list">
+                <li><span>Pending seller applications</span><strong id="pendingSellers">0</strong></li>
+                <li><span>Pending product reviews</span><strong id="pendingProducts">0</strong></li>
+                <li><span>Reported products</span><strong id="reportedProducts">0</strong></li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>Recent Activity</h3>
+              <ul class="activity-list" id="activityList">
+                <!-- Filled by admin.js -->
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== USER MANAGEMENT SECTION (Part 2) ========== -->
+        <section class="section" id="section-users">
+          <div class="page-header">
+            <div class="page-icon">👥</div>
+            <div>
+              <h1>User &amp; Role Management</h1>
+              <p>View and manage all registered users on NovaCart.</p>
+            </div>
+          </div>
+          <div class="card placeholder">This module will be added in Part 2.</div>
+        </section>
+
+        <!-- ========== SELLER VERIFICATION & PRODUCT MODERATION (Part 3) ========== -->
+        <section class="section" id="section-moderation">
+          <div class="page-header">
+            <div class="page-icon">🛡️</div>
+            <div>
+              <h1>Seller Verification &amp; Product Moderation</h1>
+              <p>Ensure trusted sellers and maintain content quality.</p>
+            </div>
+          </div>
+          <div class="card placeholder">This module will be added in Part 3.</div>
+        </section>
+
+        <!-- ========== PLATFORM SETTINGS & ANALYTICS (Part 4) ========== -->
+        <section class="section" id="section-platform">
+          <div class="page-header">
+            <div class="page-icon">⚙️</div>
+            <div>
+              <h1>Platform Configuration &amp; Revenue Monitoring</h1>
+              <p>Manage settings and view analytics.</p>
+            </div>
+          </div>
+          <div class="card placeholder">This module will be added in Part 4.</div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Dark overlay used when the sidebar is open on small screens -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Toast message for confirmations -->
+  <div class="toast" id="toast"></div>
+
+  <!-- External JavaScript -->
+  <script src="../JS/admin.js"></script>
+</body>
+</html>
