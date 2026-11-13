@@ -21,10 +21,10 @@
       <nav class="menu">
         <button class="menu-item active" data-section="dashboard"><span class="menu-icon">🏠</span> Dashboard</button>
         <button class="menu-item" data-section="users"><span class="menu-icon">👥</span> User Management</button>
-        <button class="menu-item" data-section="moderation" data-tab="sellers"><span class="menu-icon">🛡️</span> Seller Verification</button>
-        <button class="menu-item" data-section="moderation" data-tab="products"><span class="menu-icon">📦</span> Product Moderation</button>
-        <button class="menu-item" data-section="platform"><span class="menu-icon">⚙️</span> Platform Settings</button>
-        <button class="menu-item" data-section="platform"><span class="menu-icon">📊</span> Analytics &amp; Reports</button>
+        <button class="menu-item" data-section="sellers"><span class="menu-icon">🛡️</span> Seller Verification</button>
+        <button class="menu-item" data-section="products"><span class="menu-icon">📦</span> Product Moderation</button>
+        <button class="menu-item" data-section="settings"><span class="menu-icon">⚙️</span> Platform Settings</button>
+        <button class="menu-item" data-section="analytics"><span class="menu-icon">📊</span> Analytics &amp; Reports</button>
       </nav>
 
       <button class="menu-item logout" id="logoutBtn"><span class="menu-icon">🚪</span> Log Out</button>
@@ -43,7 +43,7 @@
         </div>
 
         <div class="topbar-right">
-          <button class="bell" id="notificationBtn" aria-label="Notifications">🔔<span class="bell-count">3</span></button>
+          <button class="bell" id="notificationBtn" aria-label="Notifications">🔔<span class="bell-count" id="bellCount">0</span></button>
 
           <div class="profile" id="profileBox">
             <button class="profile-btn" id="profileBtn">
@@ -220,103 +220,277 @@
           </div>
         </section>
 
-        <!-- ========== SELLER VERIFICATION & PRODUCT MODERATION (Part 3) ========== -->
-        <section class="section" id="section-moderation">
+        <!-- ========== SELLER VERIFICATION SECTION ========== -->
+        <section class="section" id="section-sellers">
           <div class="page-header">
             <div class="page-icon">🛡️</div>
             <div class="page-header-text">
-              <h1>Seller Verification &amp; Product Moderation</h1>
-              <p>Ensure trusted sellers and maintain content quality.</p>
+              <h1>Seller Verification</h1>
+              <p>Review seller applications and verify trusted sellers.</p>
             </div>
+            <button class="btn btn-primary" id="addSellerBtn">+ Add Seller Application</button>
           </div>
 
-          <!-- Moderation overview (calculated from the lists below) -->
+          <!-- Application overview (calculated from the list below) -->
           <div class="card mod-overview">
-            <h3>Moderation Overview</h3>
+            <h3>Application Overview</h3>
             <div class="mod-summary">
               <div class="mod-item">
-                <strong id="modPendingSellers">0</strong>
-                <span>Pending seller applications</span>
+                <strong id="sellerStatPending">0</strong>
+                <span>Pending applications</span>
               </div>
               <div class="mod-item">
-                <strong id="modPendingProducts">0</strong>
-                <span>Pending product reviews</span>
+                <strong id="sellerStatVerified">0</strong>
+                <span>Verified sellers</span>
               </div>
               <div class="mod-item">
-                <strong id="modReported">0</strong>
-                <span>Reported products</span>
+                <strong id="sellerStatRejected">0</strong>
+                <span>Rejected applications</span>
               </div>
             </div>
           </div>
 
           <div class="card">
-            <!-- Two main tabs -->
-            <div class="tabs" id="moderationTabs">
-              <button class="tab active" id="tabSellers" data-mtab="sellers">Seller Applications (0)</button>
-              <button class="tab" id="tabProducts" data-mtab="products">Reported Products (0)</button>
+            <h3>Seller Applications</h3>
+            <div class="table-wrap">
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>Store Name</th>
+                    <th>Applied Date</th>
+                    <th>Store Information</th>
+                    <th>Verification Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="sellerTableBody"></tbody>
+              </table>
             </div>
-
-            <!-- A. Seller applications -->
-            <div class="tab-panel active" id="panelSellers">
-              <div class="panel-toolbar">
-                <p>Review seller applications and verify or reject stores.</p>
-                <button class="btn btn-primary" id="addSellerBtn">+ Add Seller Application</button>
-              </div>
-              <div class="table-wrap">
-                <table class="user-table">
-                  <thead>
-                    <tr>
-                      <th>Store Name</th>
-                      <th>Applied Date</th>
-                      <th>Store Information</th>
-                      <th>Verification Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="sellerTableBody"></tbody>
-                </table>
-              </div>
-              <p class="table-footer" id="sellerCount"></p>
-            </div>
-
-            <!-- B. Reported products -->
-            <div class="tab-panel" id="panelProducts">
-              <div class="panel-toolbar">
-                <p>Review reported products and approve or remove them.</p>
-                <button class="btn btn-primary" id="addProductBtn">+ Add Reported Product</button>
-              </div>
-              <div class="table-wrap">
-                <table class="user-table">
-                  <thead>
-                    <tr>
-                      <th>Product Name</th>
-                      <th>Seller</th>
-                      <th>Report Reason</th>
-                      <th>Report Date</th>
-                      <th>Moderation Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="productTableBody"></tbody>
-                </table>
-              </div>
-              <p class="table-footer" id="productCount"></p>
-            </div>
+            <p class="table-footer" id="sellerCount"></p>
           </div>
 
-          <div class="tip-banner">🛡️ <strong>Keep NovaCart safe!</strong> Review applications and reports carefully to protect customers.</div>
+          <div class="tip-banner">🛡️ <strong>Keep NovaCart safe!</strong> Review applications carefully before verifying a seller.</div>
         </section>
 
-        <!-- ========== PLATFORM SETTINGS & ANALYTICS (Part 4) ========== -->
-        <section class="section" id="section-platform">
+        <!-- ========== PRODUCT MODERATION SECTION ========== -->
+        <section class="section" id="section-products">
           <div class="page-header">
-            <div class="page-icon">⚙️</div>
-            <div>
-              <h1>Platform Configuration &amp; Revenue Monitoring</h1>
-              <p>Manage settings and view analytics.</p>
+            <div class="page-icon">📦</div>
+            <div class="page-header-text">
+              <h1>Product Moderation</h1>
+              <p>Review reported products and maintain content quality.</p>
+            </div>
+            <button class="btn btn-primary" id="addProductBtn">+ Add Reported Product</button>
+          </div>
+
+          <!-- Report overview (calculated from the list below) -->
+          <div class="card mod-overview">
+            <h3>Report Overview</h3>
+            <div class="mod-summary">
+              <div class="mod-item">
+                <strong id="productStatPending">0</strong>
+                <span>Pending product reviews</span>
+              </div>
+              <div class="mod-item">
+                <strong id="productStatApproved">0</strong>
+                <span>Approved products</span>
+              </div>
+              <div class="mod-item">
+                <strong id="productStatRemoved">0</strong>
+                <span>Removed products</span>
+              </div>
             </div>
           </div>
-          <div class="card placeholder">This module will be added in Part 4.</div>
+
+          <div class="card">
+            <h3>Reported Products</h3>
+            <div class="table-wrap">
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>Product Name</th>
+                    <th>Seller</th>
+                    <th>Report Reason</th>
+                    <th>Report Date</th>
+                    <th>Moderation Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="productTableBody"></tbody>
+              </table>
+            </div>
+            <p class="table-footer" id="productCount"></p>
+          </div>
+
+          <div class="tip-banner">🛡️ <strong>Keep NovaCart safe!</strong> Remove products that break platform rules to protect customers.</div>
+        </section>
+
+        <!-- ========== PLATFORM SETTINGS SECTION ========== -->
+        <section class="section" id="section-settings">
+          <div class="page-header">
+            <div class="page-icon">⚙️</div>
+            <div class="page-header-text">
+              <h1>Platform Configuration</h1>
+              <p>Manage commission, product categories and coupon policies.</p>
+            </div>
+          </div>
+
+
+            <div class="card">
+              <h3>Platform Commission</h3>
+              <p class="hint">Percentage the platform keeps from each seller sale.</p>
+              <div class="commission-row">
+                <input type="number" id="commissionInput" class="input" min="0" max="100" step="0.5">
+                <span>%</span>
+                <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+              </div>
+              <div class="form-error" id="settingsError"></div>
+            </div>
+
+            <div class="card section-gap">
+              <div class="card-header">
+                <h3>Product Categories</h3>
+                <button class="btn btn-primary btn-small" id="addCategoryBtn">+ Add Category</button>
+              </div>
+              <div class="table-wrap">
+                <table class="user-table compact-table">
+                  <thead>
+                    <tr><th>ID</th><th>Category Name</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody id="categoryTableBody"></tbody>
+                </table>
+              </div>
+              <p class="table-footer" id="categoryCount"></p>
+            </div>
+
+            <div class="card section-gap">
+              <div class="card-header">
+                <h3>Coupon Policies</h3>
+                <button class="btn btn-primary btn-small" id="addCouponBtn">+ Add Coupon</button>
+              </div>
+              <div class="table-wrap">
+                <table class="user-table compact-table">
+                  <thead>
+                    <tr><th>Code</th><th>Discount Type</th><th>Discount Value</th><th>Expiry Date</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody id="couponTableBody"></tbody>
+                </table>
+              </div>
+              <p class="table-footer" id="couponCount"></p>
+            </div>
+        </section>
+
+        <!-- ========== ANALYTICS & REPORTS SECTION ========== -->
+        <section class="section" id="section-analytics">
+          <div class="page-header">
+            <div class="page-icon">📊</div>
+            <div class="page-header-text">
+              <h1>Revenue Monitoring</h1>
+              <p>Track revenue, notifications and administrator activity.</p>
+            </div>
+          </div>
+
+          <!-- Tabs -->
+          <div class="tabs tabs-standalone" id="analyticsTabs">
+            <button class="tab active" data-atab="analytics">Analytics</button>
+            <button class="tab" data-atab="notifications">Notifications</button>
+            <button class="tab" data-atab="logs">System Logs</button>
+          </div>
+
+          <!-- ===== A. ANALYTICS ===== -->
+          <div class="tab-panel analytics-panel active" id="analyticsPanel-analytics">
+            <p class="demo-note">All revenue and order figures below are demonstration data.</p>
+
+            <div class="stats-grid three">
+              <div class="stat-card">
+                <div class="stat-icon purple">💰</div>
+                <div>
+                  <span class="stat-label">Total Revenue</span>
+                  <strong class="stat-value" id="statRevenue">৳ 0</strong>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon purple">🛒</div>
+                <div>
+                  <span class="stat-label">Total Orders</span>
+                  <strong class="stat-value" id="statOrders">0</strong>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon green">📈</div>
+                <div>
+                  <span class="stat-label">Average Order Value</span>
+                  <strong class="stat-value" id="statAvgOrder">৳ 0</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="two-columns chart-columns">
+              <div class="card">
+                <h3>Revenue Overview</h3>
+                <div class="bar-chart" id="revenueChart"></div>
+              </div>
+              <div class="card">
+                <h3>Recent Activity</h3>
+                <ul class="activity-list" id="analyticsActivityList"></ul>
+              </div>
+            </div>
+
+            <div class="card section-gap">
+              <div class="card-header">
+                <h3>Monthly Revenue Data</h3>
+                <button class="btn btn-primary btn-small" id="addRevenueBtn">+ Add Month</button>
+              </div>
+              <div class="table-wrap">
+                <table class="user-table compact-table">
+                  <thead>
+                    <tr><th>Month</th><th>Revenue</th><th>Orders</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody id="revenueTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== C. NOTIFICATIONS ===== -->
+          <div class="tab-panel analytics-panel" id="analyticsPanel-notifications">
+            <div class="card">
+              <div class="card-header">
+                <h3>Platform Notifications</h3>
+                <button class="btn btn-primary btn-small" id="addNotificationBtn">+ Add Notification</button>
+              </div>
+              <div class="table-wrap">
+                <table class="user-table compact-table">
+                  <thead>
+                    <tr><th>Notification</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody id="notificationTableBody"></tbody>
+                </table>
+              </div>
+              <p class="table-footer" id="notificationCount"></p>
+            </div>
+          </div>
+
+          <!-- ===== D. SYSTEM LOGS ===== -->
+          <div class="tab-panel analytics-panel" id="analyticsPanel-logs">
+            <div class="card">
+              <div class="card-header">
+                <h3>Administrator Activity Log</h3>
+                <button class="btn btn-primary btn-small" id="addLogBtn">+ Add Log Entry</button>
+              </div>
+              <p class="hint">Important actions you perform in this panel are added here automatically.</p>
+              <div class="table-wrap">
+                <table class="user-table compact-table">
+                  <thead>
+                    <tr><th>Activity Description</th><th>Date</th><th>Actions</th></tr>
+                  </thead>
+                  <tbody id="logTableBody"></tbody>
+                </table>
+              </div>
+              <p class="table-footer" id="logCount"></p>
+            </div>
+          </div>
+
         </section>
 
       </main>
@@ -454,6 +628,121 @@
       <div class="modal-buttons">
         <button class="btn btn-light" id="cancelProductBtn">Cancel</button>
         <button class="btn btn-primary" id="saveProductBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit monthly revenue modal -->
+  <div class="modal-backdrop" id="revenueModal">
+    <div class="modal">
+      <h3 id="revenueModalTitle">Add Monthly Data</h3>
+      <div class="form-error" id="revenueError"></div>
+      <input type="hidden" id="revenueId">
+
+      <label for="revenueMonth">Month</label>
+      <input type="text" id="revenueMonth" class="input" maxlength="8" placeholder="e.g. Jul">
+
+      <label for="revenueAmount">Revenue (৳)</label>
+      <input type="number" id="revenueAmount" class="input" min="0" placeholder="0">
+
+      <label for="revenueOrders">Number of Orders</label>
+      <input type="number" id="revenueOrders" class="input" min="0" placeholder="0">
+
+      <div class="modal-buttons">
+        <button class="btn btn-light" id="cancelRevenueBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveRevenueBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit category modal -->
+  <div class="modal-backdrop" id="categoryModal">
+    <div class="modal">
+      <h3 id="categoryModalTitle">Add Category</h3>
+      <div class="form-error" id="categoryError"></div>
+      <input type="hidden" id="categoryId">
+
+      <label for="categoryNameInput">Category Name</label>
+      <input type="text" id="categoryNameInput" class="input" placeholder="e.g. Electronics">
+
+      <div class="modal-buttons">
+        <button class="btn btn-light" id="cancelCategoryBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveCategoryBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit coupon modal -->
+  <div class="modal-backdrop" id="couponModal">
+    <div class="modal">
+      <h3 id="couponModalTitle">Add Coupon</h3>
+      <div class="form-error" id="couponError"></div>
+      <input type="hidden" id="couponId">
+
+      <label for="couponCode">Coupon Code</label>
+      <input type="text" id="couponCode" class="input" placeholder="e.g. WELCOME10">
+
+      <label for="couponType">Discount Type</label>
+      <select id="couponType" class="input">
+        <option value="Percentage">Percentage (%)</option>
+        <option value="Fixed">Fixed Amount (৳)</option>
+      </select>
+
+      <label for="couponValue">Discount Value</label>
+      <input type="number" id="couponValue" class="input" min="0" placeholder="0">
+
+      <label for="couponExpiry">Expiry Date</label>
+      <input type="date" id="couponExpiry" class="input">
+
+      <div class="modal-buttons">
+        <button class="btn btn-light" id="cancelCouponBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveCouponBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit notification modal -->
+  <div class="modal-backdrop" id="notificationModal">
+    <div class="modal">
+      <h3 id="notificationModalTitle">Add Notification</h3>
+      <div class="form-error" id="notificationError"></div>
+      <input type="hidden" id="notificationId">
+
+      <label for="notificationMessage">Notification</label>
+      <input type="text" id="notificationMessage" class="input" placeholder="Enter notification message">
+
+      <label for="notificationDate">Date</label>
+      <input type="date" id="notificationDate" class="input">
+
+      <label for="notificationStatus">Status</label>
+      <select id="notificationStatus" class="input">
+        <option value="Unread">Unread</option>
+        <option value="Read">Read</option>
+      </select>
+
+      <div class="modal-buttons">
+        <button class="btn btn-light" id="cancelNotificationBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveNotificationBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit system log modal -->
+  <div class="modal-backdrop" id="logModal">
+    <div class="modal">
+      <h3 id="logModalTitle">Add Log Entry</h3>
+      <div class="form-error" id="logError"></div>
+      <input type="hidden" id="logId">
+
+      <label for="logDescription">Activity Description</label>
+      <input type="text" id="logDescription" class="input" placeholder="What did the administrator do?">
+
+      <label for="logDate">Date</label>
+      <input type="date" id="logDate" class="input">
+
+      <div class="modal-buttons">
+        <button class="btn btn-light" id="cancelLogBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveLogBtn">Save</button>
       </div>
     </div>
   </div>

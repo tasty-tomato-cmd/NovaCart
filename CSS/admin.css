@@ -900,3 +900,121 @@ textarea.input {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================
+   PART 4 – PLATFORM SETTINGS & ANALYTICS
+   ========================================================== */
+
+.tabs-standalone {
+  margin-bottom: 18px;
+}
+
+.analytics-panel {
+  margin-top: 0;
+}
+
+.section-gap {
+  margin-top: 18px;
+}
+
+.demo-note,
+.hint {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-bottom: 14px;
+}
+
+.stats-grid.three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.chart-columns {
+  grid-template-columns: 2fr 1fr;
+}
+
+.user-table.compact-table {
+  min-width: 0;
+}
+
+/* ---------- Revenue bar chart (CSS only) ---------- */
+.bar-chart {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  height: 240px;
+  padding-top: 8px;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.bar-area {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.bar {
+  width: 100%;
+  max-width: 52px;
+  min-height: 24px;
+  background: linear-gradient(180deg, #7d55e8, var(--primary));
+  border-radius: 8px 8px 0 0;
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  padding-top: 5px;
+}
+
+.bar-label {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+/* ---------- Commission ---------- */
+.commission-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.commission-row .input {
+  width: 130px;
+}
+
+.commission-row + .form-error {
+  margin-top: 12px;
+}
+
+/* ---------- Badges and small text ---------- */
+.status-Unread { background: var(--primary-light); color: var(--primary); }
+.status-Read   { background: #ececf2; color: var(--text-light); }
+
+.expired {
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 800px) {
+  .chart-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .stats-grid.three {
+    grid-template-columns: 1fr;
+  }
+}

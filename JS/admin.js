@@ -4,6 +4,7 @@
    Part 2: user & role management – full CRUD (with localStorage)
    Part 1 CRUD: dashboard recent activity – add, edit, delete
    Part 3: seller verification & product moderation – full CRUD
+   Part 4: platform settings, analytics, notifications, system logs – full CRUD
    ========================================================== */
 
 // ==========================================================
@@ -52,8 +53,10 @@ const sampleActivities = [
 const sectionDescriptions = {
   dashboard: "Overview of users, sellers and platform activity.",
   users: "Manage users, roles and platform access.",
-  moderation: "Review pending verifications and moderate content.",
-  platform: "Configure platform settings and track performance."
+  sellers: "Review seller applications and verify trusted sellers.",
+  products: "Review reported products and moderate content.",
+  settings: "Configure commission, categories and coupon policies.",
+  analytics: "Track revenue, notifications and administrator activity."
 };
 
 // ==========================================================
@@ -104,7 +107,6 @@ menuItems.forEach(function (item) {
   item.addEventListener("click", function () {
     setActiveMenu(item);
     showSection(item.dataset.section);
-    if (item.dataset.tab) showModerationTab(item.dataset.tab);
   });
 });
 
@@ -137,9 +139,11 @@ document.addEventListener("click", function () {
   profileDropdown.classList.remove("show");
 });
 
-// Notification bell
+// Notification bell: opens the Notifications tab (Analytics & Reports)
 document.getElementById("notificationBtn").addEventListener("click", function () {
-  showToast("You have 3 new notifications.");
+  setActiveMenu(document.querySelector('.menu-item[data-section="analytics"]'));
+  showSection("analytics");
+  showAnalyticsTab("notifications");
 });
 
 // Log out (demonstration only)
@@ -156,7 +160,8 @@ document.getElementById("dropdownLogout").addEventListener("click", function (ev
 });
 
 // Toast confirmation message
-function showToast(message) {
+function showToast(message, skipLog) {
+  if (!skipLog) addLog(message);
   toast.textContent = message;
   toast.classList.add("show");
   setTimeout(function () {
@@ -366,11 +371,9 @@ function openModal(modal) {
 }
 
 function closeModals() {
-  userModal.classList.remove("show");
-  viewModal.classList.remove("show");
-  activityModal.classList.remove("show");
-  sellerModal.classList.remove("show");
-  productModal.classList.remove("show");
+  document.querySelectorAll(".modal-backdrop").forEach(function (modal) {
+    modal.classList.remove("show");
+  });
 }
 
 // ----- View user details -----
@@ -514,7 +517,7 @@ document.getElementById("cancelUserBtn").addEventListener("click", closeModals);
 document.getElementById("closeViewBtn").addEventListener("click", closeModals);
 
 // Close a modal by clicking the dark background or pressing Escape
-[userModal, viewModal, activityModal, sellerModal, productModal].forEach(function (modal) {
+document.querySelectorAll(".modal-backdrop").forEach(function (modal) {
   modal.addEventListener("click", function (event) {
     if (event.target === modal) closeModals();
   });
@@ -573,6 +576,8 @@ function renderActivities() {
       "</div>";
     list.appendChild(item);
   });
+
+  renderAnalyticsActivity();
 }
 
 // Open the form: no id = Add Activity, with id = Edit Activity
@@ -721,37 +726,26 @@ function loadModeration() {
   renderProducts();
 }
 
-// Update the overview numbers (moderation page, tab labels and dashboard)
+// Update the overview numbers (dashboard, Seller Verification and Product Moderation pages)
 function updateModerationStats() {
   const pendingSellers = countByStatus(sellers, "Pending");
   const pendingProducts = countByStatus(reportedProducts, "Pending");
-  const reported = reportedProducts.length;
 
-  document.getElementById("modPendingSellers").textContent = pendingSellers;
-  document.getElementById("modPendingProducts").textContent = pendingProducts;
-  document.getElementById("modReported").textContent = reported;
-
+  // Dashboard "Moderation Overview"
   document.getElementById("pendingSellers").textContent = pendingSellers;
   document.getElementById("pendingProducts").textContent = pendingProducts;
-  document.getElementById("reportedProducts").textContent = reported;
+  document.getElementById("reportedProducts").textContent = reportedProducts.length;
 
-  document.getElementById("tabSellers").textContent = "Seller Applications (" + pendingSellers + ")";
-  document.getElementById("tabProducts").textContent = "Reported Products (" + pendingProducts + ")";
+  // Seller Verification page
+  document.getElementById("sellerStatPending").textContent = pendingSellers;
+  document.getElementById("sellerStatVerified").textContent = countByStatus(sellers, "Verified");
+  document.getElementById("sellerStatRejected").textContent = countByStatus(sellers, "Rejected");
+
+  // Product Moderation page
+  document.getElementById("productStatPending").textContent = pendingProducts;
+  document.getElementById("productStatApproved").textContent = countByStatus(reportedProducts, "Approved");
+  document.getElementById("productStatRemoved").textContent = countByStatus(reportedProducts, "Removed");
 }
-
-// ---------- Tabs ----------
-function showModerationTab(tabName) {
-  document.getElementById("tabSellers").classList.toggle("active", tabName === "sellers");
-  document.getElementById("tabProducts").classList.toggle("active", tabName === "products");
-  document.getElementById("panelSellers").classList.toggle("active", tabName === "sellers");
-  document.getElementById("panelProducts").classList.toggle("active", tabName === "products");
-}
-
-document.querySelectorAll("#moderationTabs .tab").forEach(function (tab) {
-  tab.addEventListener("click", function () {
-    showModerationTab(tab.dataset.mtab);
-  });
-});
 
 // ==========================================================
 // A. SELLER APPLICATIONS
@@ -1065,6 +1059,722 @@ document.getElementById("saveProductBtn").addEventListener("click", saveProductF
 document.getElementById("cancelProductBtn").addEventListener("click", closeModals);
 
 // ==========================================================
+// PLATFORM SETTINGS, ANALYTICS, NOTIFICATIONS, LOGS – CRUD (Part 4)
+// ==========================================================
+const REVENUE_KEY = "novacartRevenue";
+const CATEGORIES_KEY = "novacartCategories";
+const COUPONS_KEY = "novacartCoupons";
+const NOTIFICATIONS_KEY = "novacartNotifications";
+const LOGS_KEY = "novacartLogs";
+const SETTINGS_KEY = "novacartSettings";
+
+// ---------- Demonstration data ----------
+// Category and Coupon fields follow the ER diagram (categoryName; code, discountType,
+// discountValue, expiryDate). Revenue, notifications and logs are demo data.
+const sampleRevenue = [
+  { id: 1, month: "Jan", revenue: 165000, orders: 820 },
+  { id: 2, month: "Feb", revenue: 178000, orders: 880 },
+  { id: 3, month: "Mar", revenue: 192500, orders: 940 },
+  { id: 4, month: "Apr", revenue: 210000, orders: 1030 },
+  { id: 5, month: "May", revenue: 238000, orders: 1170 },
+  { id: 6, month: "Jun", revenue: 262000, orders: 1280 }
+];
+
+const sampleCategories = [
+  { id: 1, name: "Electronics" },
+  { id: 2, name: "Fashion" },
+  { id: 3, name: "Home & Kitchen" },
+  { id: 4, name: "Books" },
+  { id: 5, name: "Beauty & Health" },
+  { id: 6, name: "Sports" }
+];
+
+const sampleCoupons = [
+  { id: 1, code: "WELCOME10", type: "Percentage", value: 10,  expiry: "2026-12-31" },
+  { id: 2, code: "FREESHIP",  type: "Fixed",      value: 50,  expiry: "2026-12-31" },
+  { id: 3, code: "STUDENT15", type: "Percentage", value: 15,  expiry: "2027-03-31" },
+  { id: 4, code: "EID100",    type: "Fixed",      value: 100, expiry: "2025-06-30" }
+];
+
+const sampleNotifications = [
+  { id: 1, message: "New seller application received", date: "2025-11-10", status: "Unread" },
+  { id: 2, message: "Product reported: Smart Watch Pro", date: "2025-11-09", status: "Unread" },
+  { id: 3, message: "Monthly revenue report is ready", date: "2025-11-08", status: "Unread" },
+  { id: 4, message: "Commission settings were reviewed", date: "2025-11-05", status: "Read" },
+  { id: 5, message: "System backup completed", date: "2025-11-01", status: "Read" }
+];
+
+const sampleLogs = [
+  { id: 1, description: "Verified seller Home Essentials", date: "2025-11-05" },
+  { id: 2, description: "Suspended a user account",        date: "2025-11-04" },
+  { id: 3, description: "Updated platform commission",     date: "2025-11-03" },
+  { id: 4, description: "Added a new product category",    date: "2025-11-02" }
+];
+
+let revenueData = [];
+let categories = [];
+let coupons = [];
+let notifications = [];
+let logs = [];
+let settings = { commission: 10 };
+
+// ---------- Load everything ----------
+function loadPlatform() {
+  revenueData = loadList(REVENUE_KEY, sampleRevenue);
+  categories = loadList(CATEGORIES_KEY, sampleCategories);
+  coupons = loadList(COUPONS_KEY, sampleCoupons);
+  notifications = loadList(NOTIFICATIONS_KEY, sampleNotifications);
+  logs = loadList(LOGS_KEY, sampleLogs);
+
+  try {
+    const saved = localStorage.getItem(SETTINGS_KEY);
+    if (saved) settings = JSON.parse(saved);
+  } catch (error) {
+    console.log("Could not read saved settings:", error);
+  }
+  document.getElementById("commissionInput").value = settings.commission;
+
+  renderRevenue();
+  renderCategories();
+  renderCoupons();
+  renderNotifications();
+  renderLogs();
+  renderAnalyticsActivity();
+}
+
+// ---------- Tabs (Analytics, Notifications, System Logs) ----------
+function showAnalyticsTab(tabName) {
+  ["analytics", "notifications", "logs"].forEach(function (name) {
+    document.querySelector('#analyticsTabs [data-atab="' + name + '"]').classList.toggle("active", name === tabName);
+    document.getElementById("analyticsPanel-" + name).classList.toggle("active", name === tabName);
+  });
+}
+
+document.querySelectorAll("#analyticsTabs .tab").forEach(function (tab) {
+  tab.addEventListener("click", function () {
+    showAnalyticsTab(tab.dataset.atab);
+  });
+});
+
+// Money like "৳ 1,245,500"
+function formatMoney(amount) {
+  return "৳ " + formatNumber(amount);
+}
+
+// ==========================================================
+// A. ANALYTICS – monthly revenue data (CRUD) + stats + chart
+// ==========================================================
+
+// READ: statistics, chart and table are all built from the monthly data
+function renderRevenue() {
+  let totalRevenue = 0;
+  let totalOrders = 0;
+  let maxRevenue = 0;
+
+  revenueData.forEach(function (item) {
+    totalRevenue += item.revenue;
+    totalOrders += item.orders;
+    if (item.revenue > maxRevenue) maxRevenue = item.revenue;
+  });
+
+  const average = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  document.getElementById("statRevenue").textContent = formatMoney(totalRevenue);
+  document.getElementById("statOrders").textContent = formatNumber(totalOrders);
+  document.getElementById("statAvgOrder").textContent =
+    "৳ " + average.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Bar chart: each bar height is a percentage of the highest month
+  const chart = document.getElementById("revenueChart");
+  chart.innerHTML = "";
+  if (revenueData.length === 0) {
+    chart.innerHTML = "<p class='hint'>No revenue data yet.</p>";
+  }
+  revenueData.forEach(function (item) {
+    const percent = maxRevenue > 0 ? Math.round((item.revenue / maxRevenue) * 100) : 0;
+    const shortText = item.revenue >= 1000 ? Math.round(item.revenue / 1000) + "k" : item.revenue;
+    const column = document.createElement("div");
+    column.className = "bar-col";
+    column.innerHTML =
+      "<div class='bar-area'><div class='bar' style='height:" + percent + "%' title='" + formatMoney(item.revenue) + "'>" + shortText + "</div></div>" +
+      "<span class='bar-label'>" + escapeHtml(item.month) + "</span>";
+    chart.appendChild(column);
+  });
+
+  // Table
+  const body = document.getElementById("revenueTableBody");
+  body.innerHTML = "";
+  if (revenueData.length === 0) {
+    body.innerHTML = "<tr><td colspan='4' class='empty-row'>No monthly data.</td></tr>";
+  }
+  revenueData.forEach(function (item) {
+    const row = document.createElement("tr");
+    row.innerHTML =
+      "<td><strong>" + escapeHtml(item.month) + "</strong></td>" +
+      "<td>" + formatMoney(item.revenue) + "</td>" +
+      "<td>" + formatNumber(item.orders) + "</td>" +
+      "<td><div class='actions'>" +
+        "<button class='action-btn' data-action='edit' data-id='" + item.id + "'>✏️ Edit</button>" +
+        "<button class='action-btn danger' data-action='delete' data-id='" + item.id + "'>🗑️ Delete</button>" +
+      "</div></td>";
+    body.appendChild(row);
+  });
+}
+
+// Analytics "Recent Activity" shows the latest dashboard activities
+function renderAnalyticsActivity() {
+  const list = document.getElementById("analyticsActivityList");
+  list.innerHTML = "";
+
+  if (activities.length === 0) {
+    list.innerHTML = "<li class='time'>No recent activity.</li>";
+  }
+  activities.slice(0, 5).forEach(function (activity) {
+    const item = document.createElement("li");
+    item.innerHTML = "<span class='activity-text'>" + escapeHtml(activity.text) + "</span><span class='time'>" + escapeHtml(activity.time) + "</span>";
+    list.appendChild(item);
+  });
+}
+
+function openRevenueForm(id) {
+  document.getElementById("revenueError").classList.remove("show");
+  if (id) {
+    const item = findById(revenueData, id);
+    document.getElementById("revenueModalTitle").textContent = "Edit Monthly Data";
+    document.getElementById("revenueId").value = item.id;
+    document.getElementById("revenueMonth").value = item.month;
+    document.getElementById("revenueAmount").value = item.revenue;
+    document.getElementById("revenueOrders").value = item.orders;
+  } else {
+    document.getElementById("revenueModalTitle").textContent = "Add Monthly Data";
+    document.getElementById("revenueId").value = "";
+    document.getElementById("revenueMonth").value = "";
+    document.getElementById("revenueAmount").value = "";
+    document.getElementById("revenueOrders").value = "";
+  }
+  openModal(document.getElementById("revenueModal"));
+}
+
+// CREATE / UPDATE
+function saveRevenueForm() {
+  const idValue = document.getElementById("revenueId").value;
+  const month = document.getElementById("revenueMonth").value.trim();
+  const revenueText = document.getElementById("revenueAmount").value;
+  const ordersText = document.getElementById("revenueOrders").value;
+
+  if (month === "") {
+    showError("revenueError", "Please enter the month.");
+    return;
+  }
+  if (revenueText === "" || Number(revenueText) < 0 || ordersText === "" || Number(ordersText) < 0) {
+    showError("revenueError", "Please enter valid revenue and order numbers.");
+    return;
+  }
+
+  if (idValue) {
+    const item = findById(revenueData, Number(idValue));
+    item.month = month;
+    item.revenue = Number(revenueText);
+    item.orders = Math.round(Number(ordersText));
+    showToast("Monthly data for " + month + " updated.");
+  } else {
+    revenueData.push({ id: getNextId(revenueData), month: month, revenue: Number(revenueText), orders: Math.round(Number(ordersText)) });
+    showToast("Monthly data for " + month + " added.");
+  }
+
+  saveList(REVENUE_KEY, revenueData);
+  closeModals();
+  renderRevenue();
+}
+
+// DELETE
+function deleteRevenue(id) {
+  const item = findById(revenueData, id);
+  if (!confirm("Permanently delete the data for " + item.month + "?")) return;
+
+  revenueData = revenueData.filter(function (entry) {
+    return entry.id !== id;
+  });
+  saveList(REVENUE_KEY, revenueData);
+  renderRevenue();
+  showToast("Monthly data for " + item.month + " deleted.");
+}
+
+document.getElementById("revenueTableBody").addEventListener("click", function (event) {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const id = Number(button.dataset.id);
+  if (button.dataset.action === "edit") openRevenueForm(id);
+  if (button.dataset.action === "delete") deleteRevenue(id);
+});
+document.getElementById("addRevenueBtn").addEventListener("click", function () { openRevenueForm(null); });
+document.getElementById("saveRevenueBtn").addEventListener("click", saveRevenueForm);
+document.getElementById("cancelRevenueBtn").addEventListener("click", closeModals);
+
+// ==========================================================
+// B1. COMMISSION SETTINGS
+// ==========================================================
+function saveSettings() {
+  const error = document.getElementById("settingsError");
+  const value = document.getElementById("commissionInput").value;
+
+  if (value === "" || Number(value) < 0 || Number(value) > 100) {
+    error.textContent = "Commission must be a number between 0 and 100.";
+    error.classList.add("show");
+    return;
+  }
+  error.classList.remove("show");
+
+  settings.commission = Number(value);
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch (err) {
+    console.log("Could not save settings:", err);
+  }
+  showToast("Platform settings saved. Commission is now " + settings.commission + "%.");
+}
+
+document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
+
+// ==========================================================
+// B2. PRODUCT CATEGORIES (CRUD)
+// ==========================================================
+
+// READ
+function renderCategories() {
+  const body = document.getElementById("categoryTableBody");
+  body.innerHTML = "";
+
+  if (categories.length === 0) {
+    body.innerHTML = "<tr><td colspan='3' class='empty-row'>No categories.</td></tr>";
+  }
+  categories.forEach(function (category) {
+    const row = document.createElement("tr");
+    row.innerHTML =
+      "<td>#" + String(category.id).padStart(3, "0") + "</td>" +
+      "<td><strong>" + escapeHtml(category.name) + "</strong></td>" +
+      "<td><div class='actions'>" +
+        "<button class='action-btn' data-action='edit' data-id='" + category.id + "'>✏️ Edit</button>" +
+        "<button class='action-btn danger' data-action='delete' data-id='" + category.id + "'>🗑️ Delete</button>" +
+      "</div></td>";
+    body.appendChild(row);
+  });
+  document.getElementById("categoryCount").textContent = "Showing " + categories.length + " categories";
+}
+
+function openCategoryForm(id) {
+  document.getElementById("categoryError").classList.remove("show");
+  if (id) {
+    const category = findById(categories, id);
+    document.getElementById("categoryModalTitle").textContent = "Edit Category";
+    document.getElementById("categoryId").value = category.id;
+    document.getElementById("categoryNameInput").value = category.name;
+  } else {
+    document.getElementById("categoryModalTitle").textContent = "Add Category";
+    document.getElementById("categoryId").value = "";
+    document.getElementById("categoryNameInput").value = "";
+  }
+  openModal(document.getElementById("categoryModal"));
+}
+
+// CREATE / UPDATE
+function saveCategoryForm() {
+  const idValue = document.getElementById("categoryId").value;
+  const name = document.getElementById("categoryNameInput").value.trim();
+
+  if (name === "") {
+    showError("categoryError", "Please enter the category name.");
+    return;
+  }
+  const duplicate = categories.some(function (category) {
+    return category.name.toLowerCase() === name.toLowerCase() && String(category.id) !== idValue;
+  });
+  if (duplicate) {
+    showError("categoryError", "This category already exists.");
+    return;
+  }
+
+  if (idValue) {
+    findById(categories, Number(idValue)).name = name;
+    showToast("Category updated: " + name + ".");
+  } else {
+    categories.push({ id: getNextId(categories), name: name });
+    showToast("Category added: " + name + ".");
+  }
+
+  saveList(CATEGORIES_KEY, categories);
+  closeModals();
+  renderCategories();
+}
+
+// DELETE
+function deleteCategory(id) {
+  const category = findById(categories, id);
+  if (!confirm("Permanently delete the category " + category.name + "?")) return;
+
+  categories = categories.filter(function (item) {
+    return item.id !== id;
+  });
+  saveList(CATEGORIES_KEY, categories);
+  renderCategories();
+  showToast("Category deleted: " + category.name + ".");
+}
+
+document.getElementById("categoryTableBody").addEventListener("click", function (event) {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const id = Number(button.dataset.id);
+  if (button.dataset.action === "edit") openCategoryForm(id);
+  if (button.dataset.action === "delete") deleteCategory(id);
+});
+document.getElementById("addCategoryBtn").addEventListener("click", function () { openCategoryForm(null); });
+document.getElementById("saveCategoryBtn").addEventListener("click", saveCategoryForm);
+document.getElementById("cancelCategoryBtn").addEventListener("click", closeModals);
+
+// ==========================================================
+// B3. COUPON POLICIES (CRUD)
+// ==========================================================
+
+// READ
+function renderCoupons() {
+  const body = document.getElementById("couponTableBody");
+  body.innerHTML = "";
+
+  if (coupons.length === 0) {
+    body.innerHTML = "<tr><td colspan='5' class='empty-row'>No coupons.</td></tr>";
+  }
+  coupons.forEach(function (coupon) {
+    const discountText = coupon.type === "Percentage" ? coupon.value + "%" : formatMoney(coupon.value);
+    const expiredText = coupon.expiry < getToday() ? " <span class='expired'>Expired</span>" : "";
+    const row = document.createElement("tr");
+    row.innerHTML =
+      "<td><strong>" + escapeHtml(coupon.code) + "</strong></td>" +
+      "<td>" + coupon.type + "</td>" +
+      "<td>" + discountText + "</td>" +
+      "<td>" + formatDate(coupon.expiry) + expiredText + "</td>" +
+      "<td><div class='actions'>" +
+        "<button class='action-btn' data-action='edit' data-id='" + coupon.id + "'>✏️ Edit</button>" +
+        "<button class='action-btn danger' data-action='delete' data-id='" + coupon.id + "'>🗑️ Delete</button>" +
+      "</div></td>";
+    body.appendChild(row);
+  });
+  document.getElementById("couponCount").textContent = "Showing " + coupons.length + " coupons";
+}
+
+function openCouponForm(id) {
+  document.getElementById("couponError").classList.remove("show");
+  if (id) {
+    const coupon = findById(coupons, id);
+    document.getElementById("couponModalTitle").textContent = "Edit Coupon";
+    document.getElementById("couponId").value = coupon.id;
+    document.getElementById("couponCode").value = coupon.code;
+    document.getElementById("couponType").value = coupon.type;
+    document.getElementById("couponValue").value = coupon.value;
+    document.getElementById("couponExpiry").value = coupon.expiry;
+  } else {
+    document.getElementById("couponModalTitle").textContent = "Add Coupon";
+    document.getElementById("couponId").value = "";
+    document.getElementById("couponCode").value = "";
+    document.getElementById("couponType").value = "Percentage";
+    document.getElementById("couponValue").value = "";
+    document.getElementById("couponExpiry").value = "";
+  }
+  openModal(document.getElementById("couponModal"));
+}
+
+// CREATE / UPDATE
+function saveCouponForm() {
+  const idValue = document.getElementById("couponId").value;
+  const code = document.getElementById("couponCode").value.trim().toUpperCase();
+  const type = document.getElementById("couponType").value;
+  const valueText = document.getElementById("couponValue").value;
+  const expiry = document.getElementById("couponExpiry").value;
+
+  if (code === "" || expiry === "") {
+    showError("couponError", "Please enter the coupon code and expiry date.");
+    return;
+  }
+  if (code.indexOf(" ") !== -1) {
+    showError("couponError", "The coupon code cannot contain spaces.");
+    return;
+  }
+  const value = Number(valueText);
+  if (valueText === "" || value <= 0) {
+    showError("couponError", "Please enter a discount value greater than 0.");
+    return;
+  }
+  if (type === "Percentage" && value > 100) {
+    showError("couponError", "A percentage discount cannot be more than 100.");
+    return;
+  }
+  const duplicate = coupons.some(function (coupon) {
+    return coupon.code === code && String(coupon.id) !== idValue;
+  });
+  if (duplicate) {
+    showError("couponError", "This coupon code already exists.");
+    return;
+  }
+
+  if (idValue) {
+    const coupon = findById(coupons, Number(idValue));
+    coupon.code = code;
+    coupon.type = type;
+    coupon.value = value;
+    coupon.expiry = expiry;
+    showToast("Coupon " + code + " updated.");
+  } else {
+    coupons.push({ id: getNextId(coupons), code: code, type: type, value: value, expiry: expiry });
+    showToast("Coupon " + code + " added.");
+  }
+
+  saveList(COUPONS_KEY, coupons);
+  closeModals();
+  renderCoupons();
+}
+
+// DELETE
+function deleteCoupon(id) {
+  const coupon = findById(coupons, id);
+  if (!confirm("Permanently delete the coupon " + coupon.code + "?")) return;
+
+  coupons = coupons.filter(function (item) {
+    return item.id !== id;
+  });
+  saveList(COUPONS_KEY, coupons);
+  renderCoupons();
+  showToast("Coupon " + coupon.code + " deleted.");
+}
+
+document.getElementById("couponTableBody").addEventListener("click", function (event) {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const id = Number(button.dataset.id);
+  if (button.dataset.action === "edit") openCouponForm(id);
+  if (button.dataset.action === "delete") deleteCoupon(id);
+});
+document.getElementById("addCouponBtn").addEventListener("click", function () { openCouponForm(null); });
+document.getElementById("saveCouponBtn").addEventListener("click", saveCouponForm);
+document.getElementById("cancelCouponBtn").addEventListener("click", closeModals);
+
+// ==========================================================
+// C. NOTIFICATIONS (CRUD)
+// ==========================================================
+
+// The red number on the bell = unread notifications
+function updateBell() {
+  const unread = countByStatus(notifications, "Unread");
+  const bell = document.getElementById("bellCount");
+  bell.textContent = unread;
+  bell.style.display = unread > 0 ? "" : "none";
+}
+
+// READ
+function renderNotifications() {
+  const body = document.getElementById("notificationTableBody");
+  body.innerHTML = "";
+
+  if (notifications.length === 0) {
+    body.innerHTML = "<tr><td colspan='4' class='empty-row'>No notifications.</td></tr>";
+  }
+  notifications.forEach(function (note) {
+    const toggleText = note.status === "Unread" ? "✔️ Mark Read" : "↩️ Mark Unread";
+    const row = document.createElement("tr");
+    row.innerHTML =
+      "<td>" + escapeHtml(note.message) + "</td>" +
+      "<td>" + formatDate(note.date) + "</td>" +
+      "<td><span class='badge status-" + note.status + "'>" + note.status + "</span></td>" +
+      "<td><div class='actions'>" +
+        "<button class='action-btn success' data-action='toggle' data-id='" + note.id + "'>" + toggleText + "</button>" +
+        "<button class='action-btn' data-action='edit' data-id='" + note.id + "'>✏️ Edit</button>" +
+        "<button class='action-btn danger' data-action='delete' data-id='" + note.id + "'>🗑️ Delete</button>" +
+      "</div></td>";
+    body.appendChild(row);
+  });
+  document.getElementById("notificationCount").textContent =
+    "Showing " + notifications.length + " notifications (" + countByStatus(notifications, "Unread") + " unread)";
+  updateBell();
+}
+
+function openNotificationForm(id) {
+  document.getElementById("notificationError").classList.remove("show");
+  if (id) {
+    const note = findById(notifications, id);
+    document.getElementById("notificationModalTitle").textContent = "Edit Notification";
+    document.getElementById("notificationId").value = note.id;
+    document.getElementById("notificationMessage").value = note.message;
+    document.getElementById("notificationDate").value = note.date;
+    document.getElementById("notificationStatus").value = note.status;
+  } else {
+    document.getElementById("notificationModalTitle").textContent = "Add Notification";
+    document.getElementById("notificationId").value = "";
+    document.getElementById("notificationMessage").value = "";
+    document.getElementById("notificationDate").value = getToday();
+    document.getElementById("notificationStatus").value = "Unread";
+  }
+  openModal(document.getElementById("notificationModal"));
+}
+
+// CREATE / UPDATE
+function saveNotificationForm() {
+  const idValue = document.getElementById("notificationId").value;
+  const message = document.getElementById("notificationMessage").value.trim();
+  const date = document.getElementById("notificationDate").value;
+  const status = document.getElementById("notificationStatus").value;
+
+  if (message === "" || date === "") {
+    showError("notificationError", "Please enter the message and date.");
+    return;
+  }
+
+  if (idValue) {
+    const note = findById(notifications, Number(idValue));
+    note.message = message;
+    note.date = date;
+    note.status = status;
+    showToast("Notification updated.");
+  } else {
+    notifications.unshift({ id: getNextId(notifications), message: message, date: date, status: status });
+    showToast("Notification added.");
+  }
+
+  saveList(NOTIFICATIONS_KEY, notifications);
+  closeModals();
+  renderNotifications();
+}
+
+// UPDATE: mark as read / unread (not written to the log)
+function toggleNotification(id) {
+  const note = findById(notifications, id);
+  note.status = note.status === "Unread" ? "Read" : "Unread";
+  saveList(NOTIFICATIONS_KEY, notifications);
+  renderNotifications();
+  showToast("Notification marked as " + note.status.toLowerCase() + ".", true);
+}
+
+// DELETE
+function deleteNotification(id) {
+  if (!confirm("Permanently delete this notification?")) return;
+
+  notifications = notifications.filter(function (item) {
+    return item.id !== id;
+  });
+  saveList(NOTIFICATIONS_KEY, notifications);
+  renderNotifications();
+  showToast("Notification deleted.");
+}
+
+document.getElementById("notificationTableBody").addEventListener("click", function (event) {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const id = Number(button.dataset.id);
+  if (button.dataset.action === "toggle") toggleNotification(id);
+  if (button.dataset.action === "edit") openNotificationForm(id);
+  if (button.dataset.action === "delete") deleteNotification(id);
+});
+document.getElementById("addNotificationBtn").addEventListener("click", function () { openNotificationForm(null); });
+document.getElementById("saveNotificationBtn").addEventListener("click", saveNotificationForm);
+document.getElementById("cancelNotificationBtn").addEventListener("click", closeModals);
+
+// ==========================================================
+// D. SYSTEM LOGS (CRUD)
+// ==========================================================
+
+// CREATE (automatic): called by showToast() for every important action
+function addLog(description) {
+  logs.unshift({ id: getNextId(logs), description: description, date: getToday() });
+  if (logs.length > 100) logs.pop();   // keep the list small
+  saveList(LOGS_KEY, logs);
+  renderLogs();
+}
+
+// READ
+function renderLogs() {
+  const body = document.getElementById("logTableBody");
+  body.innerHTML = "";
+
+  if (logs.length === 0) {
+    body.innerHTML = "<tr><td colspan='3' class='empty-row'>No log entries.</td></tr>";
+  }
+  logs.forEach(function (log) {
+    const row = document.createElement("tr");
+    row.innerHTML =
+      "<td>" + escapeHtml(log.description) + "</td>" +
+      "<td>" + formatDate(log.date) + "</td>" +
+      "<td><div class='actions'>" +
+        "<button class='action-btn' data-action='edit' data-id='" + log.id + "'>✏️ Edit</button>" +
+        "<button class='action-btn danger' data-action='delete' data-id='" + log.id + "'>🗑️ Delete</button>" +
+      "</div></td>";
+    body.appendChild(row);
+  });
+  document.getElementById("logCount").textContent = "Showing " + logs.length + " log entries";
+}
+
+function openLogForm(id) {
+  document.getElementById("logError").classList.remove("show");
+  if (id) {
+    const log = findById(logs, id);
+    document.getElementById("logModalTitle").textContent = "Edit Log Entry";
+    document.getElementById("logId").value = log.id;
+    document.getElementById("logDescription").value = log.description;
+    document.getElementById("logDate").value = log.date;
+  } else {
+    document.getElementById("logModalTitle").textContent = "Add Log Entry";
+    document.getElementById("logId").value = "";
+    document.getElementById("logDescription").value = "";
+    document.getElementById("logDate").value = getToday();
+  }
+  openModal(document.getElementById("logModal"));
+}
+
+// CREATE / UPDATE (manual)
+function saveLogForm() {
+  const idValue = document.getElementById("logId").value;
+  const description = document.getElementById("logDescription").value.trim();
+  const date = document.getElementById("logDate").value;
+
+  if (description === "" || date === "") {
+    showError("logError", "Please enter the description and date.");
+    return;
+  }
+
+  if (idValue) {
+    const log = findById(logs, Number(idValue));
+    log.description = description;
+    log.date = date;
+    showToast("Log entry updated.", true);
+  } else {
+    logs.unshift({ id: getNextId(logs), description: description, date: date });
+    showToast("Log entry added.", true);
+  }
+
+  saveList(LOGS_KEY, logs);
+  closeModals();
+  renderLogs();
+}
+
+// DELETE
+function deleteLog(id) {
+  if (!confirm("Permanently delete this log entry?")) return;
+
+  logs = logs.filter(function (item) {
+    return item.id !== id;
+  });
+  saveList(LOGS_KEY, logs);
+  renderLogs();
+  showToast("Log entry deleted.", true);
+}
+
+document.getElementById("logTableBody").addEventListener("click", function (event) {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const id = Number(button.dataset.id);
+  if (button.dataset.action === "edit") openLogForm(id);
+  if (button.dataset.action === "delete") deleteLog(id);
+});
+document.getElementById("addLogBtn").addEventListener("click", function () { openLogForm(null); });
+document.getElementById("saveLogBtn").addEventListener("click", saveLogForm);
+document.getElementById("cancelLogBtn").addEventListener("click", closeModals);
+
+// ==========================================================
 // START THE PAGE
 // ==========================================================
 loadUsers();
@@ -1073,3 +1783,4 @@ renderUsers();
 loadModeration();
 loadActivities();
 renderActivities();
+loadPlatform();
