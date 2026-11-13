@@ -81,7 +81,6 @@
               <div>
                 <span class="stat-label">Total Users</span>
                 <strong class="stat-value" id="statTotalUsers">0</strong>
-                <span class="stat-change up">↑ +8%</span>
               </div>
             </div>
             <div class="stat-card">
@@ -89,7 +88,6 @@
               <div>
                 <span class="stat-label">Total Sellers</span>
                 <strong class="stat-value" id="statTotalSellers">0</strong>
-                <span class="stat-change up">↑ +12%</span>
               </div>
             </div>
             <div class="stat-card">
@@ -97,7 +95,6 @@
               <div>
                 <span class="stat-label">Active Accounts</span>
                 <strong class="stat-value" id="statActive">0</strong>
-                <span class="stat-change up">↑ +6%</span>
               </div>
             </div>
             <div class="stat-card">
@@ -105,7 +102,6 @@
               <div>
                 <span class="stat-label">Suspended</span>
                 <strong class="stat-value" id="statSuspended">0</strong>
-                <span class="stat-change down">↓ -2%</span>
               </div>
             </div>
           </div>
@@ -122,7 +118,10 @@
             </div>
 
             <div class="card">
-              <h3>Recent Activity</h3>
+              <div class="card-header">
+                <h3>Recent Activity</h3>
+                <button class="btn btn-primary btn-small" id="addActivityBtn">+ Add Activity</button>
+              </div>
               <ul class="activity-list" id="activityList">
                 <!-- Filled by admin.js -->
               </ul>
@@ -134,12 +133,91 @@
         <section class="section" id="section-users">
           <div class="page-header">
             <div class="page-icon">👥</div>
-            <div>
+            <div class="page-header-text">
               <h1>User &amp; Role Management</h1>
               <p>View and manage all registered users on NovaCart.</p>
             </div>
+            <button class="btn btn-primary" id="addUserBtn">+ Add User</button>
           </div>
-          <div class="card placeholder">This module will be added in Part 2.</div>
+
+          <!-- User statistics (calculated from user data) -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon purple">👥</div>
+              <div>
+                <span class="stat-label">Total Users</span>
+                <strong class="stat-value" id="userStatTotal">0</strong>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon purple">🏪</div>
+              <div>
+                <span class="stat-label">Total Sellers</span>
+                <strong class="stat-value" id="userStatSellers">0</strong>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon green">✔️</div>
+              <div>
+                <span class="stat-label">Active Accounts</span>
+                <strong class="stat-value" id="userStatActive">0</strong>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon red">⛔</div>
+              <div>
+                <span class="stat-label">Suspended</span>
+                <strong class="stat-value" id="userStatSuspended">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <!-- Role tabs, search box and role filter -->
+            <div class="toolbar">
+              <div class="tabs" id="userTabs">
+                <button class="tab active" data-role="All">All Users</button>
+                <button class="tab" data-role="Customer">Customers</button>
+                <button class="tab" data-role="Seller">Sellers</button>
+                <button class="tab" data-role="Manager">Managers</button>
+                <button class="tab" data-role="Administrator">Admins</button>
+                <button class="tab" data-role="Delivery Partner">Delivery Partners</button>
+              </div>
+              <div class="filters">
+                <input type="text" id="userSearch" class="input" placeholder="Search by name, email or ID...">
+                <select id="roleFilter" class="input">
+                  <option value="All">All Roles</option>
+                  <option value="Customer">Customer</option>
+                  <option value="Seller">Seller</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Administrator">Administrator</option>
+                  <option value="Delivery Partner">Delivery Partner</option>
+                </select>
+                <button class="btn btn-primary" id="addUserBtn2">+ Add New User</button>
+              </div>
+            </div>
+
+            <!-- User table -->
+            <div class="table-wrap">
+              <table class="user-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Account Status</th>
+                    <th>Joined Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="userTableBody">
+                  <!-- Rows are created by admin.js -->
+                </tbody>
+              </table>
+            </div>
+            <p class="table-footer" id="userCount"></p>
+          </div>
         </section>
 
         <!-- ========== SELLER VERIFICATION & PRODUCT MODERATION (Part 3) ========== -->
@@ -167,6 +245,72 @@
         </section>
 
       </main>
+    </div>
+  </div>
+
+  <!-- Add / Edit user modal -->
+  <div class="modal-backdrop" id="userModal">
+    <div class="modal">
+      <h3 id="userModalTitle">Add User</h3>
+      <div class="form-error" id="formError"></div>
+      <input type="hidden" id="userId">
+
+      <label for="userName">Full Name</label>
+      <input type="text" id="userName" class="input" placeholder="Enter full name">
+
+      <label for="userEmail">Email</label>
+      <input type="email" id="userEmail" class="input" placeholder="name@novacart.com">
+
+      <label for="userRole">Role</label>
+      <select id="userRole" class="input">
+        <option value="Customer">Customer</option>
+        <option value="Seller">Seller</option>
+        <option value="Manager">Manager</option>
+        <option value="Administrator">Administrator</option>
+        <option value="Delivery Partner">Delivery Partner</option>
+      </select>
+
+      <label for="userStatus">Account Status</label>
+      <select id="userStatus" class="input">
+        <option value="Active">Active</option>
+        <option value="Suspended">Suspended</option>
+      </select>
+
+      <div class="modal-buttons">
+        <button class="btn btn-light" id="cancelUserBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveUserBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View user details modal -->
+  <div class="modal-backdrop" id="viewModal">
+    <div class="modal">
+      <h3>User Details</h3>
+      <div id="viewDetails"></div>
+      <div class="modal-buttons">
+        <button class="btn btn-light" id="closeViewBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit activity modal (dashboard) -->
+  <div class="modal-backdrop" id="activityModal">
+    <div class="modal">
+      <h3 id="activityModalTitle">Add Activity</h3>
+      <div class="form-error" id="activityError"></div>
+      <input type="hidden" id="activityId">
+
+      <label for="activityText">Activity</label>
+      <input type="text" id="activityText" class="input" placeholder="e.g. New order received">
+
+      <label for="activityTime">Time</label>
+      <input type="text" id="activityTime" class="input" placeholder="e.g. 2 min ago">
+
+      <div class="modal-buttons">
+        <button class="btn btn-light" id="cancelActivityBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveActivityBtn">Save</button>
+      </div>
     </div>
   </div>
 
