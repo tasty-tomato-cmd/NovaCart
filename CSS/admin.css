@@ -1,5 +1,6 @@
 /* ==========================================================
    NovaCart – Admin Panel Stylesheet
+   Theme: purple and white
    ========================================================== */
 
 /* ---------- Colors and basic settings ---------- */
@@ -498,4 +499,319 @@ button {
   .welcome p {
     display: none;
   }
+}
+
+/* ==========================================================
+   PART 2 – USER & ROLE MANAGEMENT
+   ========================================================== */
+
+/* ---------- Buttons ---------- */
+.btn {
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background: #4a22b8;
+}
+
+.btn-light {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.page-header-text {
+  flex: 1;
+}
+
+/* ---------- Tabs, search and filter ---------- */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tab {
+  padding: 9px 16px;
+  background: var(--page-bg);
+  color: var(--text-light);
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.tab:hover {
+  background: var(--primary-light);
+}
+
+.tab.active {
+  background: var(--primary);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--white);
+  color: var(--text);
+}
+
+.input:focus {
+  outline: 2px solid var(--primary-light);
+  border-color: var(--primary);
+}
+
+.filters .input {
+  width: auto;
+  min-width: 190px;
+}
+
+/* ---------- User table ---------- */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 760px;
+}
+
+.user-table th {
+  background: var(--primary-light);
+  text-align: left;
+  padding: 12px 14px;
+}
+
+.user-table td {
+  padding: 11px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.user-table tbody tr:hover {
+  background: #faf8ff;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-initials {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.empty-row {
+  text-align: center;
+  color: var(--text-light);
+  padding: 30px;
+}
+
+/* Role and status badges */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.role-Customer         { background: #dbeeff; color: #1a62b3; }
+.role-Seller           { background: #ede7fb; color: #5b2fd1; }
+.role-Manager          { background: #fff1d6; color: #a86a00; }
+.role-Administrator    { background: #fde0f0; color: #b0286e; }
+.role-Delivery-Partner { background: #dff5e8; color: #17804a; }
+
+.status-Active    { background: var(--green-light); color: var(--green); }
+.status-Suspended { background: var(--red-light); color: var(--red); }
+
+/* Action buttons */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 190px;
+}
+
+.action-btn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--primary-light);
+  color: var(--text);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.action-btn:hover        { background: #d9cdf7; }
+.action-btn.danger       { background: var(--red-light); }
+.action-btn.success      { background: var(--green-light); }
+
+.table-footer {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+/* ---------- Modal ---------- */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 10, 50, 0.5);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 200;
+}
+
+.modal-backdrop.show {
+  display: flex;
+}
+
+.modal {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 26px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal h3 {
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+
+.modal label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 12px 0 5px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.form-error {
+  display: none;
+  background: var(--red-light);
+  color: var(--red);
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.form-error.show {
+  display: block;
+}
+
+/* Details list in the view modal */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.detail-row span:first-child {
+  color: var(--text-light);
+}
+
+@media (max-width: 800px) {
+  .filters {
+    width: 100%;
+  }
+
+  .filters .input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .page-header {
+    flex-wrap: wrap;
+  }
+}
+
+/* ==========================================================
+   PART 1 CRUD – DASHBOARD RECENT ACTIVITY
+   ========================================================== */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.card-header h3 {
+  margin-bottom: 0;
+}
+
+.btn-small {
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+.activity-text {
+  flex: 1;
+}
+
+.activity-list .time {
+  margin: 0 12px;
+  white-space: nowrap;
+}
+
+.activity-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.activity-actions .action-btn {
+  padding: 4px 8px;
 }
