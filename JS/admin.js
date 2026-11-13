@@ -3,6 +3,7 @@
    Part 1: sidebar navigation, top bar, dashboard
    Part 2: user & role management – full CRUD (with localStorage)
    Part 1 CRUD: dashboard recent activity – add, edit, delete
+   Part 3: seller verification & product moderation – full CRUD
    ========================================================== */
 
 // ==========================================================
@@ -20,12 +21,25 @@ const sampleUsers = [
   { id: 5, name: "Razeen", email: "razeen@novacart.com", role: "Delivery Partner", status: "Active", joined: "2025-01-10" }
 ];
 
-// Moderation and activity numbers are still demo values (they become real in Part 3)
-const moderationStats = {
-  pendingSellers: 5,
-  pendingProducts: 8,
-  reportedProducts: 3
-};
+// Seller applications. "storeName" and "verificationStatus" come from the ER diagram (Seller);
+// the other fields are extra frontend-only details for this panel.
+const sampleSellers = [
+  { id: 1, storeName: "TechHub BD",      owner: "Rafiq Hasan",  appliedDate: "2025-11-10", storeInfo: "Electronics and mobile accessories", status: "Pending" },
+  { id: 2, storeName: "Fashion World",   owner: "Nusrat Jahan", appliedDate: "2025-11-09", storeInfo: "Clothing and fashion items",        status: "Pending" },
+  { id: 3, storeName: "Gadget Zone",     owner: "Tanvir Ahmed", appliedDate: "2025-11-08", storeInfo: "Smart gadgets and wearables",       status: "Pending" },
+  { id: 4, storeName: "Home Essentials", owner: "Sadia Rahman", appliedDate: "2025-11-05", storeInfo: "Kitchen and home products",         status: "Verified" },
+  { id: 5, storeName: "BookNest",        owner: "Karim Uddin",  appliedDate: "2025-11-02", storeInfo: "Books and stationery",              status: "Rejected" }
+];
+
+// Reported products. "productName", "price" and the seller come from the ER diagram (Product);
+// the report reason, report date and moderation status are frontend-only details.
+const sampleReportedProducts = [
+  { id: 1, productName: "Wireless Earbuds X2",  sellerName: "TechHub BD",      price: 1850, reason: "Misleading product description", reportDate: "2025-11-11", status: "Pending" },
+  { id: 2, productName: "Designer Handbag",     sellerName: "Fashion World",   price: 3200, reason: "Suspected counterfeit item",     reportDate: "2025-11-10", status: "Pending" },
+  { id: 3, productName: "Smart Watch Pro",      sellerName: "Gadget Zone",     price: 4500, reason: "Incorrect price listed",         reportDate: "2025-11-09", status: "Pending" },
+  { id: 4, productName: "Herbal Face Cream",    sellerName: "Home Essentials", price: 650,  reason: "Prohibited ingredient claim",    reportDate: "2025-11-06", status: "Removed" },
+  { id: 5, productName: "Power Bank 20000mAh",  sellerName: "TechHub BD",      price: 2100, reason: "Safety concern reported",        reportDate: "2025-11-04", status: "Approved" }
+];
 
 const sampleActivities = [
   { id: 1, text: "New order received", time: "2 min ago" },
@@ -60,6 +74,8 @@ const userTabs = document.querySelectorAll("#userTabs .tab");
 const userModal = document.getElementById("userModal");
 const viewModal = document.getElementById("viewModal");
 const activityModal = document.getElementById("activityModal");
+const sellerModal = document.getElementById("sellerModal");
+const productModal = document.getElementById("productModal");
 
 // ==========================================================
 // SIDEBAR NAVIGATION (Part 1)
@@ -88,6 +104,7 @@ menuItems.forEach(function (item) {
   item.addEventListener("click", function () {
     setActiveMenu(item);
     showSection(item.dataset.section);
+    if (item.dataset.tab) showModerationTab(item.dataset.tab);
   });
 });
 
@@ -252,12 +269,6 @@ function updateStats() {
   document.getElementById("userStatSuspended").textContent = formatNumber(suspended);
 }
 
-function loadModerationStats() {
-  document.getElementById("pendingSellers").textContent = moderationStats.pendingSellers;
-  document.getElementById("pendingProducts").textContent = moderationStats.pendingProducts;
-  document.getElementById("reportedProducts").textContent = moderationStats.reportedProducts;
-}
-
 // ==========================================================
 // USER TABLE: SEARCH, FILTER, DISPLAY
 // ==========================================================
@@ -358,11 +369,14 @@ function closeModals() {
   userModal.classList.remove("show");
   viewModal.classList.remove("show");
   activityModal.classList.remove("show");
+  sellerModal.classList.remove("show");
+  productModal.classList.remove("show");
 }
 
 // ----- View user details -----
 function viewUser(id) {
   const user = findUser(id);
+  document.getElementById("viewTitle").textContent = "User Details";
   document.getElementById("viewDetails").innerHTML =
     "<div class='detail-row'><span>User ID</span><span>#" + String(user.id).padStart(3, "0") + "</span></div>" +
     "<div class='detail-row'><span>Name</span><span>" + escapeHtml(user.name) + "</span></div>" +
@@ -500,7 +514,7 @@ document.getElementById("cancelUserBtn").addEventListener("click", closeModals);
 document.getElementById("closeViewBtn").addEventListener("click", closeModals);
 
 // Close a modal by clicking the dark background or pressing Escape
-[userModal, viewModal, activityModal].forEach(function (modal) {
+[userModal, viewModal, activityModal, sellerModal, productModal].forEach(function (modal) {
   modal.addEventListener("click", function (event) {
     if (event.target === modal) closeModals();
   });
@@ -645,11 +659,417 @@ document.getElementById("activityList").addEventListener("click", function (even
 });
 
 // ==========================================================
+// SELLER VERIFICATION & PRODUCT MODERATION – CRUD (Part 3)
+// ==========================================================
+const SELLERS_KEY = "novacartSellers";
+const PRODUCTS_KEY = "novacartReportedProducts";
+let sellers = [];
+let reportedProducts = [];
+
+// ---------- Helpers ----------
+function loadList(key, sampleList) {
+  try {
+    const saved = localStorage.getItem(key);
+    if (saved) return JSON.parse(saved);
+  } catch (error) {
+    console.log("Could not read saved data:", error);
+  }
+  saveList(key, sampleList);
+  return sampleList.slice();
+}
+
+function saveList(key, list) {
+  try {
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch (error) {
+    console.log("Could not save data:", error);
+  }
+}
+
+// Next ID = highest ID + 1
+function getNextId(list) {
+  let newId = 1;
+  list.forEach(function (item) {
+    if (item.id >= newId) newId = item.id + 1;
+  });
+  return newId;
+}
+
+function findById(list, id) {
+  return list.find(function (item) {
+    return item.id === id;
+  });
+}
+
+function countByStatus(list, status) {
+  return list.filter(function (item) {
+    return item.status === status;
+  }).length;
+}
+
+function showError(elementId, message) {
+  const error = document.getElementById(elementId);
+  error.textContent = message;
+  error.classList.add("show");
+}
+
+function loadModeration() {
+  sellers = loadList(SELLERS_KEY, sampleSellers);
+  reportedProducts = loadList(PRODUCTS_KEY, sampleReportedProducts);
+  updateModerationStats();
+  renderSellers();
+  renderProducts();
+}
+
+// Update the overview numbers (moderation page, tab labels and dashboard)
+function updateModerationStats() {
+  const pendingSellers = countByStatus(sellers, "Pending");
+  const pendingProducts = countByStatus(reportedProducts, "Pending");
+  const reported = reportedProducts.length;
+
+  document.getElementById("modPendingSellers").textContent = pendingSellers;
+  document.getElementById("modPendingProducts").textContent = pendingProducts;
+  document.getElementById("modReported").textContent = reported;
+
+  document.getElementById("pendingSellers").textContent = pendingSellers;
+  document.getElementById("pendingProducts").textContent = pendingProducts;
+  document.getElementById("reportedProducts").textContent = reported;
+
+  document.getElementById("tabSellers").textContent = "Seller Applications (" + pendingSellers + ")";
+  document.getElementById("tabProducts").textContent = "Reported Products (" + pendingProducts + ")";
+}
+
+// ---------- Tabs ----------
+function showModerationTab(tabName) {
+  document.getElementById("tabSellers").classList.toggle("active", tabName === "sellers");
+  document.getElementById("tabProducts").classList.toggle("active", tabName === "products");
+  document.getElementById("panelSellers").classList.toggle("active", tabName === "sellers");
+  document.getElementById("panelProducts").classList.toggle("active", tabName === "products");
+}
+
+document.querySelectorAll("#moderationTabs .tab").forEach(function (tab) {
+  tab.addEventListener("click", function () {
+    showModerationTab(tab.dataset.mtab);
+  });
+});
+
+// ==========================================================
+// A. SELLER APPLICATIONS
+// ==========================================================
+
+// READ: show all seller applications
+function renderSellers() {
+  const body = document.getElementById("sellerTableBody");
+  body.innerHTML = "";
+
+  if (sellers.length === 0) {
+    body.innerHTML = "<tr><td colspan='5' class='empty-row'>No seller applications.</td></tr>";
+  }
+
+  sellers.forEach(function (seller) {
+    const row = document.createElement("tr");
+    row.innerHTML =
+      "<td><strong>" + escapeHtml(seller.storeName) + "</strong></td>" +
+      "<td>" + formatDate(seller.appliedDate) + "</td>" +
+      "<td class='info-cell'>" + escapeHtml(seller.storeInfo) + "</td>" +
+      "<td><span class='badge status-" + seller.status + "'>" + seller.status + "</span></td>" +
+      "<td><div class='actions'>" +
+        "<button class='action-btn' data-action='view' data-id='" + seller.id + "'>👁️ View</button>" +
+        (seller.status !== "Verified" ? "<button class='action-btn success' data-action='approve' data-id='" + seller.id + "'>✅ Verify</button>" : "") +
+        (seller.status !== "Rejected" ? "<button class='action-btn danger' data-action='reject' data-id='" + seller.id + "'>❌ Reject</button>" : "") +
+        "<button class='action-btn' data-action='edit' data-id='" + seller.id + "'>✏️ Edit</button>" +
+        "<button class='action-btn danger' data-action='delete' data-id='" + seller.id + "'>🗑️ Delete</button>" +
+      "</div></td>";
+    body.appendChild(row);
+  });
+
+  document.getElementById("sellerCount").textContent = "Showing " + sellers.length + " seller applications";
+}
+
+// READ: view details
+function viewSeller(id) {
+  const seller = findById(sellers, id);
+  document.getElementById("viewTitle").textContent = "Seller Application";
+  document.getElementById("viewDetails").innerHTML =
+    "<div class='detail-row'><span>Application ID</span><span>#" + String(seller.id).padStart(3, "0") + "</span></div>" +
+    "<div class='detail-row'><span>Store Name</span><span>" + escapeHtml(seller.storeName) + "</span></div>" +
+    "<div class='detail-row'><span>Applicant</span><span>" + escapeHtml(seller.owner) + "</span></div>" +
+    "<div class='detail-row'><span>Application Date</span><span>" + formatDate(seller.appliedDate) + "</span></div>" +
+    "<div class='detail-row'><span>Store Information</span><span>" + escapeHtml(seller.storeInfo) + "</span></div>" +
+    "<div class='detail-row'><span>Verification Status</span><span>" + seller.status + "</span></div>";
+  openModal(viewModal);
+}
+
+// Open the form: no id = Add, with id = Edit
+function openSellerForm(id) {
+  document.getElementById("sellerError").classList.remove("show");
+
+  if (id) {
+    const seller = findById(sellers, id);
+    document.getElementById("sellerModalTitle").textContent = "Edit Seller Application";
+    document.getElementById("sellerId").value = seller.id;
+    document.getElementById("sellerStoreName").value = seller.storeName;
+    document.getElementById("sellerOwner").value = seller.owner;
+    document.getElementById("sellerDate").value = seller.appliedDate;
+    document.getElementById("sellerInfo").value = seller.storeInfo;
+    document.getElementById("sellerStatus").value = seller.status;
+  } else {
+    document.getElementById("sellerModalTitle").textContent = "Add Seller Application";
+    document.getElementById("sellerId").value = "";
+    document.getElementById("sellerStoreName").value = "";
+    document.getElementById("sellerOwner").value = "";
+    document.getElementById("sellerDate").value = getToday();
+    document.getElementById("sellerInfo").value = "";
+    document.getElementById("sellerStatus").value = "Pending";
+  }
+  openModal(sellerModal);
+}
+
+// CREATE / UPDATE
+function saveSellerForm() {
+  const idValue = document.getElementById("sellerId").value;
+  const storeName = document.getElementById("sellerStoreName").value.trim();
+  const owner = document.getElementById("sellerOwner").value.trim();
+  const appliedDate = document.getElementById("sellerDate").value;
+  const storeInfo = document.getElementById("sellerInfo").value.trim();
+  const status = document.getElementById("sellerStatus").value;
+
+  if (storeName === "" || owner === "" || appliedDate === "" || storeInfo === "") {
+    showError("sellerError", "Please fill in all fields.");
+    return;
+  }
+
+  if (idValue) {
+    const seller = findById(sellers, Number(idValue));
+    seller.storeName = storeName;
+    seller.owner = owner;
+    seller.appliedDate = appliedDate;
+    seller.storeInfo = storeInfo;
+    seller.status = status;
+    showToast("Seller application updated.");
+  } else {
+    sellers.unshift({ id: getNextId(sellers), storeName: storeName, owner: owner, appliedDate: appliedDate, storeInfo: storeInfo, status: status });
+    showToast("Seller application added.");
+  }
+
+  saveList(SELLERS_KEY, sellers);
+  closeModals();
+  renderSellers();
+  updateModerationStats();
+}
+
+// UPDATE: verify or reject an application
+function setSellerStatus(id, status) {
+  const seller = findById(sellers, id);
+  seller.status = status;
+
+  saveList(SELLERS_KEY, sellers);
+  renderSellers();
+  updateModerationStats();
+  showToast(seller.storeName + " has been " + status.toLowerCase() + ".");
+}
+
+// DELETE: permanently remove an application
+function deleteSeller(id) {
+  const seller = findById(sellers, id);
+  if (!confirm("Permanently delete the application of " + seller.storeName + "? This cannot be undone.")) return;
+
+  sellers = sellers.filter(function (item) {
+    return item.id !== id;
+  });
+
+  saveList(SELLERS_KEY, sellers);
+  renderSellers();
+  updateModerationStats();
+  showToast("Seller application deleted.");
+}
+
+document.getElementById("sellerTableBody").addEventListener("click", function (event) {
+  const button = event.target.closest("button");
+  if (!button) return;
+
+  const id = Number(button.dataset.id);
+  const action = button.dataset.action;
+  if (action === "view") viewSeller(id);
+  if (action === "edit") openSellerForm(id);
+  if (action === "approve") setSellerStatus(id, "Verified");
+  if (action === "reject") setSellerStatus(id, "Rejected");
+  if (action === "delete") deleteSeller(id);
+});
+
+document.getElementById("addSellerBtn").addEventListener("click", function () {
+  openSellerForm(null);
+});
+document.getElementById("saveSellerBtn").addEventListener("click", saveSellerForm);
+document.getElementById("cancelSellerBtn").addEventListener("click", closeModals);
+
+// ==========================================================
+// B. REPORTED PRODUCTS
+// ==========================================================
+
+// READ: show all reported products
+function renderProducts() {
+  const body = document.getElementById("productTableBody");
+  body.innerHTML = "";
+
+  if (reportedProducts.length === 0) {
+    body.innerHTML = "<tr><td colspan='6' class='empty-row'>No reported products.</td></tr>";
+  }
+
+  reportedProducts.forEach(function (product) {
+    const row = document.createElement("tr");
+    row.innerHTML =
+      "<td><strong>" + escapeHtml(product.productName) + "</strong></td>" +
+      "<td>" + escapeHtml(product.sellerName) + "</td>" +
+      "<td class='info-cell'>" + escapeHtml(product.reason) + "</td>" +
+      "<td>" + formatDate(product.reportDate) + "</td>" +
+      "<td><span class='badge status-" + product.status + "'>" + product.status + "</span></td>" +
+      "<td><div class='actions'>" +
+        "<button class='action-btn' data-action='view' data-id='" + product.id + "'>👁️ View</button>" +
+        (product.status !== "Approved" ? "<button class='action-btn success' data-action='approve' data-id='" + product.id + "'>✅ Approve</button>" : "") +
+        (product.status !== "Removed" ? "<button class='action-btn danger' data-action='reject' data-id='" + product.id + "'>❌ Remove</button>" : "") +
+        "<button class='action-btn' data-action='edit' data-id='" + product.id + "'>✏️ Edit</button>" +
+        "<button class='action-btn danger' data-action='delete' data-id='" + product.id + "'>🗑️ Delete</button>" +
+      "</div></td>";
+    body.appendChild(row);
+  });
+
+  document.getElementById("productCount").textContent = "Showing " + reportedProducts.length + " reported products";
+}
+
+// READ: view details
+function viewProduct(id) {
+  const product = findById(reportedProducts, id);
+  document.getElementById("viewTitle").textContent = "Reported Product";
+  document.getElementById("viewDetails").innerHTML =
+    "<div class='detail-row'><span>Report ID</span><span>#" + String(product.id).padStart(3, "0") + "</span></div>" +
+    "<div class='detail-row'><span>Product Name</span><span>" + escapeHtml(product.productName) + "</span></div>" +
+    "<div class='detail-row'><span>Seller</span><span>" + escapeHtml(product.sellerName) + "</span></div>" +
+    "<div class='detail-row'><span>Price</span><span>৳ " + formatNumber(product.price) + "</span></div>" +
+    "<div class='detail-row'><span>Report Reason</span><span>" + escapeHtml(product.reason) + "</span></div>" +
+    "<div class='detail-row'><span>Report Date</span><span>" + formatDate(product.reportDate) + "</span></div>" +
+    "<div class='detail-row'><span>Moderation Status</span><span>" + product.status + "</span></div>";
+  openModal(viewModal);
+}
+
+// Open the form: no id = Add, with id = Edit
+function openProductForm(id) {
+  document.getElementById("productError").classList.remove("show");
+
+  if (id) {
+    const product = findById(reportedProducts, id);
+    document.getElementById("productModalTitle").textContent = "Edit Reported Product";
+    document.getElementById("productId").value = product.id;
+    document.getElementById("productName").value = product.productName;
+    document.getElementById("productSellerName").value = product.sellerName;
+    document.getElementById("productPrice").value = product.price;
+    document.getElementById("productReason").value = product.reason;
+    document.getElementById("productDate").value = product.reportDate;
+    document.getElementById("productStatus").value = product.status;
+  } else {
+    document.getElementById("productModalTitle").textContent = "Add Reported Product";
+    document.getElementById("productId").value = "";
+    document.getElementById("productName").value = "";
+    document.getElementById("productSellerName").value = "";
+    document.getElementById("productPrice").value = "";
+    document.getElementById("productReason").value = "";
+    document.getElementById("productDate").value = getToday();
+    document.getElementById("productStatus").value = "Pending";
+  }
+  openModal(productModal);
+}
+
+// CREATE / UPDATE
+function saveProductForm() {
+  const idValue = document.getElementById("productId").value;
+  const productName = document.getElementById("productName").value.trim();
+  const sellerName = document.getElementById("productSellerName").value.trim();
+  const priceText = document.getElementById("productPrice").value;
+  const reason = document.getElementById("productReason").value.trim();
+  const reportDate = document.getElementById("productDate").value;
+  const status = document.getElementById("productStatus").value;
+
+  if (productName === "" || sellerName === "" || reason === "" || reportDate === "") {
+    showError("productError", "Please fill in all fields.");
+    return;
+  }
+  if (priceText === "" || Number(priceText) < 0) {
+    showError("productError", "Please enter a valid price.");
+    return;
+  }
+  const price = Number(priceText);
+
+  if (idValue) {
+    const product = findById(reportedProducts, Number(idValue));
+    product.productName = productName;
+    product.sellerName = sellerName;
+    product.price = price;
+    product.reason = reason;
+    product.reportDate = reportDate;
+    product.status = status;
+    showToast("Reported product updated.");
+  } else {
+    reportedProducts.unshift({ id: getNextId(reportedProducts), productName: productName, sellerName: sellerName, price: price, reason: reason, reportDate: reportDate, status: status });
+    showToast("Reported product added.");
+  }
+
+  saveList(PRODUCTS_KEY, reportedProducts);
+  closeModals();
+  renderProducts();
+  updateModerationStats();
+}
+
+// UPDATE: approve or remove a reported product
+function setProductStatus(id, status) {
+  const product = findById(reportedProducts, id);
+  product.status = status;
+
+  saveList(PRODUCTS_KEY, reportedProducts);
+  renderProducts();
+  updateModerationStats();
+  showToast(product.productName + " has been " + status.toLowerCase() + ".");
+}
+
+// DELETE: permanently remove a report
+function deleteProduct(id) {
+  const product = findById(reportedProducts, id);
+  if (!confirm("Permanently delete the report for " + product.productName + "? This cannot be undone.")) return;
+
+  reportedProducts = reportedProducts.filter(function (item) {
+    return item.id !== id;
+  });
+
+  saveList(PRODUCTS_KEY, reportedProducts);
+  renderProducts();
+  updateModerationStats();
+  showToast("Reported product deleted.");
+}
+
+document.getElementById("productTableBody").addEventListener("click", function (event) {
+  const button = event.target.closest("button");
+  if (!button) return;
+
+  const id = Number(button.dataset.id);
+  const action = button.dataset.action;
+  if (action === "view") viewProduct(id);
+  if (action === "edit") openProductForm(id);
+  if (action === "approve") setProductStatus(id, "Approved");
+  if (action === "reject") setProductStatus(id, "Removed");
+  if (action === "delete") deleteProduct(id);
+});
+
+document.getElementById("addProductBtn").addEventListener("click", function () {
+  openProductForm(null);
+});
+document.getElementById("saveProductBtn").addEventListener("click", saveProductForm);
+document.getElementById("cancelProductBtn").addEventListener("click", closeModals);
+
+// ==========================================================
 // START THE PAGE
 // ==========================================================
 loadUsers();
 updateStats();
 renderUsers();
-loadModerationStats();
+loadModeration();
 loadActivities();
 renderActivities();

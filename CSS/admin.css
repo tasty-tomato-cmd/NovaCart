@@ -815,3 +815,88 @@ button {
 .activity-actions .action-btn {
   padding: 4px 8px;
 }
+
+/* ==========================================================
+   PART 3 – SELLER VERIFICATION & PRODUCT MODERATION
+   ========================================================== */
+
+/* Moderation overview */
+.mod-overview {
+  margin-bottom: 20px;
+}
+
+.mod-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.mod-item {
+  background: var(--primary-light);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.mod-item strong {
+  display: block;
+  font-size: 28px;
+  color: var(--primary);
+}
+
+.mod-item span {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+/* Tab panels (only the active one is shown) */
+.tab-panel {
+  display: none;
+  margin-top: 18px;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.panel-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+/* Status badges */
+.status-Pending  { background: #fff1d6; color: #a86a00; }
+.status-Verified { background: var(--green-light); color: var(--green); }
+.status-Approved { background: var(--green-light); color: var(--green); }
+.status-Rejected { background: var(--red-light); color: var(--red); }
+.status-Removed  { background: var(--red-light); color: var(--red); }
+
+.info-cell {
+  max-width: 220px;
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+/* Tip banner */
+.tip-banner {
+  margin-top: 20px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-size: 14px;
+}
+
+@media (max-width: 520px) {
+  .mod-summary {
+    grid-template-columns: 1fr;
+  }
+}

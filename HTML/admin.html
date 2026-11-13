@@ -21,8 +21,8 @@
       <nav class="menu">
         <button class="menu-item active" data-section="dashboard"><span class="menu-icon">🏠</span> Dashboard</button>
         <button class="menu-item" data-section="users"><span class="menu-icon">👥</span> User Management</button>
-        <button class="menu-item" data-section="moderation"><span class="menu-icon">🛡️</span> Seller Verification</button>
-        <button class="menu-item" data-section="moderation"><span class="menu-icon">📦</span> Product Moderation</button>
+        <button class="menu-item" data-section="moderation" data-tab="sellers"><span class="menu-icon">🛡️</span> Seller Verification</button>
+        <button class="menu-item" data-section="moderation" data-tab="products"><span class="menu-icon">📦</span> Product Moderation</button>
         <button class="menu-item" data-section="platform"><span class="menu-icon">⚙️</span> Platform Settings</button>
         <button class="menu-item" data-section="platform"><span class="menu-icon">📊</span> Analytics &amp; Reports</button>
       </nav>
@@ -224,12 +224,87 @@
         <section class="section" id="section-moderation">
           <div class="page-header">
             <div class="page-icon">🛡️</div>
-            <div>
+            <div class="page-header-text">
               <h1>Seller Verification &amp; Product Moderation</h1>
               <p>Ensure trusted sellers and maintain content quality.</p>
             </div>
           </div>
-          <div class="card placeholder">This module will be added in Part 3.</div>
+
+          <!-- Moderation overview (calculated from the lists below) -->
+          <div class="card mod-overview">
+            <h3>Moderation Overview</h3>
+            <div class="mod-summary">
+              <div class="mod-item">
+                <strong id="modPendingSellers">0</strong>
+                <span>Pending seller applications</span>
+              </div>
+              <div class="mod-item">
+                <strong id="modPendingProducts">0</strong>
+                <span>Pending product reviews</span>
+              </div>
+              <div class="mod-item">
+                <strong id="modReported">0</strong>
+                <span>Reported products</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <!-- Two main tabs -->
+            <div class="tabs" id="moderationTabs">
+              <button class="tab active" id="tabSellers" data-mtab="sellers">Seller Applications (0)</button>
+              <button class="tab" id="tabProducts" data-mtab="products">Reported Products (0)</button>
+            </div>
+
+            <!-- A. Seller applications -->
+            <div class="tab-panel active" id="panelSellers">
+              <div class="panel-toolbar">
+                <p>Review seller applications and verify or reject stores.</p>
+                <button class="btn btn-primary" id="addSellerBtn">+ Add Seller Application</button>
+              </div>
+              <div class="table-wrap">
+                <table class="user-table">
+                  <thead>
+                    <tr>
+                      <th>Store Name</th>
+                      <th>Applied Date</th>
+                      <th>Store Information</th>
+                      <th>Verification Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sellerTableBody"></tbody>
+                </table>
+              </div>
+              <p class="table-footer" id="sellerCount"></p>
+            </div>
+
+            <!-- B. Reported products -->
+            <div class="tab-panel" id="panelProducts">
+              <div class="panel-toolbar">
+                <p>Review reported products and approve or remove them.</p>
+                <button class="btn btn-primary" id="addProductBtn">+ Add Reported Product</button>
+              </div>
+              <div class="table-wrap">
+                <table class="user-table">
+                  <thead>
+                    <tr>
+                      <th>Product Name</th>
+                      <th>Seller</th>
+                      <th>Report Reason</th>
+                      <th>Report Date</th>
+                      <th>Moderation Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="productTableBody"></tbody>
+                </table>
+              </div>
+              <p class="table-footer" id="productCount"></p>
+            </div>
+          </div>
+
+          <div class="tip-banner">🛡️ <strong>Keep NovaCart safe!</strong> Review applications and reports carefully to protect customers.</div>
         </section>
 
         <!-- ========== PLATFORM SETTINGS & ANALYTICS (Part 4) ========== -->
@@ -286,7 +361,7 @@
   <!-- View user details modal -->
   <div class="modal-backdrop" id="viewModal">
     <div class="modal">
-      <h3>User Details</h3>
+      <h3 id="viewTitle">User Details</h3>
       <div id="viewDetails"></div>
       <div class="modal-buttons">
         <button class="btn btn-light" id="closeViewBtn">Close</button>
@@ -310,6 +385,75 @@
       <div class="modal-buttons">
         <button class="btn btn-light" id="cancelActivityBtn">Cancel</button>
         <button class="btn btn-primary" id="saveActivityBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit seller application modal -->
+  <div class="modal-backdrop" id="sellerModal">
+    <div class="modal">
+      <h3 id="sellerModalTitle">Add Seller Application</h3>
+      <div class="form-error" id="sellerError"></div>
+      <input type="hidden" id="sellerId">
+
+      <label for="sellerStoreName">Store Name</label>
+      <input type="text" id="sellerStoreName" class="input" placeholder="Enter store name">
+
+      <label for="sellerOwner">Applicant Name</label>
+      <input type="text" id="sellerOwner" class="input" placeholder="Enter applicant name">
+
+      <label for="sellerDate">Application Date</label>
+      <input type="date" id="sellerDate" class="input">
+
+      <label for="sellerInfo">Store Information</label>
+      <textarea id="sellerInfo" class="input" rows="3" placeholder="What does the store sell?"></textarea>
+
+      <label for="sellerStatus">Verification Status</label>
+      <select id="sellerStatus" class="input">
+        <option value="Pending">Pending</option>
+        <option value="Verified">Verified</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+
+      <div class="modal-buttons">
+        <button class="btn btn-light" id="cancelSellerBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveSellerBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit reported product modal -->
+  <div class="modal-backdrop" id="productModal">
+    <div class="modal">
+      <h3 id="productModalTitle">Add Reported Product</h3>
+      <div class="form-error" id="productError"></div>
+      <input type="hidden" id="productId">
+
+      <label for="productName">Product Name</label>
+      <input type="text" id="productName" class="input" placeholder="Enter product name">
+
+      <label for="productSellerName">Seller / Store Name</label>
+      <input type="text" id="productSellerName" class="input" placeholder="Enter seller name">
+
+      <label for="productPrice">Price (৳)</label>
+      <input type="number" id="productPrice" class="input" min="0" placeholder="0">
+
+      <label for="productReason">Report Reason</label>
+      <input type="text" id="productReason" class="input" placeholder="Why was it reported?">
+
+      <label for="productDate">Report Date</label>
+      <input type="date" id="productDate" class="input">
+
+      <label for="productStatus">Moderation Status</label>
+      <select id="productStatus" class="input">
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Removed">Removed</option>
+      </select>
+
+      <div class="modal-buttons">
+        <button class="btn btn-light" id="cancelProductBtn">Cancel</button>
+        <button class="btn btn-primary" id="saveProductBtn">Save</button>
       </div>
     </div>
   </div>
