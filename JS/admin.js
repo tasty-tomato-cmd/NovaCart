@@ -1,10 +1,11 @@
 /* ==========================================================
-   NovaCart – Admin Panel Script (Parts 1 and 2)
-   Part 1: sidebar navigation, top bar, dashboard
-   Part 2: user & role management – full CRUD (with localStorage)
-   Part 1 CRUD: dashboard recent activity – add, edit, delete
+   NovaCart – Admin Panel Script (final version)
+   Part 1: sidebar navigation, top bar, dashboard (recent activity CRUD)
+   Part 2: user & role management – full CRUD
    Part 3: seller verification & product moderation – full CRUD
    Part 4: platform settings, analytics, notifications, system logs – full CRUD
+   Part 5: final integration and cleanup
+   All data is demonstration data, saved with localStorage.
    ========================================================== */
 
 // ==========================================================
@@ -144,6 +145,14 @@ document.getElementById("notificationBtn").addEventListener("click", function ()
   setActiveMenu(document.querySelector('.menu-item[data-section="analytics"]'));
   showSection("analytics");
   showAnalyticsTab("notifications");
+});
+
+// "My Profile" and "Change Password" are demonstration links only
+document.querySelectorAll(".demo-link").forEach(function (link) {
+  link.addEventListener("click", function (event) {
+    event.preventDefault();
+    showToast(link.textContent + " is not part of this demo.", true);
+  });
 });
 
 // Log out (demonstration only)
