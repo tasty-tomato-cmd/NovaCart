@@ -310,12 +310,6 @@ button {
   margin-bottom: 14px;
 }
 
-.placeholder {
-  text-align: center;
-  color: var(--text-light);
-  padding: 60px 20px;
-}
-
 /* ---------- Statistics cards ---------- */
 .stats-grid {
   display: grid;
@@ -360,14 +354,6 @@ button {
   font-size: 26px;
   margin: 2px 0;
 }
-
-.stat-change {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.stat-change.up   { color: var(--green); }
-.stat-change.down { color: var(--red); }
 
 /* ---------- Overview and activity ---------- */
 .two-columns {
@@ -857,17 +843,6 @@ button {
 
 .tab-panel.active {
   display: block;
-}
-
-.panel-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-  color: var(--text-light);
-  font-size: 14px;
 }
 
 /* Status badges */
