@@ -1,13 +1,7 @@
-/* ==========================================================
-   NovaCart – Admin Panel (JavaScript)
-   All data is demonstration data kept in arrays.
-   Every module has Create, Read, Update and Delete (CRUD).
-   ========================================================== */
+// NovaCart Admin Panel (ES6): data is kept in arrays and every module has CRUD
 
-// ==========================================================
-// DATA
-// ==========================================================
-let users = [
+// DATA (arrays of objects)
+const users = [
   { id: 1, name: "Lubaba", email: "lubaba@novacart.com", role: "Customer", status: "Active", joined: "2025-01-15" },
   { id: 2, name: "Sazin", email: "sazin@novacart.com", role: "Seller", status: "Active", joined: "2025-01-14" },
   { id: 3, name: "Fahad", email: "fahad@novacart.com", role: "Manager", status: "Active", joined: "2025-01-11" },
@@ -15,14 +9,14 @@ let users = [
   { id: 5, name: "Razeen", email: "razeen@novacart.com", role: "Delivery Partner", status: "Active", joined: "2025-01-10" }
 ];
 
-let activities = [
+const activities = [
   { id: 1, text: "New order received", time: "2 min ago" },
   { id: 2, text: "Seller verified", time: "5 min ago" },
   { id: 3, text: "Product reported", time: "12 min ago" },
   { id: 4, text: "New user registered", time: "1 hour ago" }
 ];
 
-let sellers = [
+const sellers = [
   { id: 1, storeName: "TechHub BD", owner: "Rafiq Hasan", date: "2025-11-10", info: "Electronics and mobile accessories", status: "Pending" },
   { id: 2, storeName: "Fashion World", owner: "Nusrat Jahan", date: "2025-11-09", info: "Clothing and fashion items", status: "Pending" },
   { id: 3, storeName: "Gadget Zone", owner: "Tanvir Ahmed", date: "2025-11-08", info: "Smart gadgets and wearables", status: "Pending" },
@@ -30,7 +24,7 @@ let sellers = [
   { id: 5, storeName: "BookNest", owner: "Karim Uddin", date: "2025-11-02", info: "Books and stationery", status: "Rejected" }
 ];
 
-let products = [
+const products = [
   { id: 1, name: "Wireless Earbuds X2", seller: "TechHub BD", price: 1850, reason: "Misleading product description", date: "2025-11-11", status: "Pending" },
   { id: 2, name: "Designer Handbag", seller: "Fashion World", price: 3200, reason: "Suspected counterfeit item", date: "2025-11-10", status: "Pending" },
   { id: 3, name: "Smart Watch Pro", seller: "Gadget Zone", price: 4500, reason: "Incorrect price listed", date: "2025-11-09", status: "Pending" },
@@ -38,9 +32,15 @@ let products = [
   { id: 5, name: "Power Bank 20000mAh", seller: "TechHub BD", price: 2100, reason: "Safety concern reported", date: "2025-11-04", status: "Approved" }
 ];
 
-let commission = 10;
+// An object with a method: "this" means the object that owns the method
+const settings = {
+  commission: 10,
+  summary() {
+    return `Commission is now ${this.commission}%.`;
+  }
+};
 
-let categories = [
+const categories = [
   { id: 1, name: "Electronics" },
   { id: 2, name: "Fashion" },
   { id: 3, name: "Home & Kitchen" },
@@ -49,14 +49,14 @@ let categories = [
   { id: 6, name: "Sports" }
 ];
 
-let coupons = [
+const coupons = [
   { id: 1, code: "WELCOME10", type: "Percentage", value: 10, expiry: "2026-12-31" },
   { id: 2, code: "FREESHIP", type: "Fixed", value: 50, expiry: "2026-12-31" },
   { id: 3, code: "STUDENT15", type: "Percentage", value: 15, expiry: "2027-03-31" },
   { id: 4, code: "EID100", type: "Fixed", value: 100, expiry: "2025-06-30" }
 ];
 
-let revenueData = [
+const revenueData = [
   { id: 1, month: "Jan", revenue: 165000, orders: 820 },
   { id: 2, month: "Feb", revenue: 178000, orders: 880 },
   { id: 3, month: "Mar", revenue: 192500, orders: 940 },
@@ -65,7 +65,7 @@ let revenueData = [
   { id: 6, month: "Jun", revenue: 262000, orders: 1280 }
 ];
 
-let notifications = [
+const notifications = [
   { id: 1, message: "New seller application received", date: "2025-11-10", status: "Unread" },
   { id: 2, message: "Product reported: Smart Watch Pro", date: "2025-11-09", status: "Unread" },
   { id: 3, message: "Monthly revenue report is ready", date: "2025-11-08", status: "Unread" },
@@ -73,7 +73,7 @@ let notifications = [
   { id: 5, message: "System backup completed", date: "2025-11-01", status: "Read" }
 ];
 
-let logs = [
+const logs = [
   { id: 1, description: "Verified seller Home Essentials", date: "2025-11-05" },
   { id: 2, description: "Suspended a user account", date: "2025-11-04" },
   { id: 3, description: "Updated platform commission", date: "2025-11-03" },
@@ -93,82 +93,54 @@ let editingLogId = 0;
 
 let currentRole = "All";
 
-// ==========================================================
-// SMALL HELPER FUNCTIONS
-// ==========================================================
-function getValue(id) {
-  return document.getElementById(id).value;
-}
+// SMALL HELPER FUNCTIONS (arrow functions)
+const getValue = id => document.getElementById(id).value;
+const setValue = (id, value) => { document.getElementById(id).value = value; };
+const setText = (id, text) => { document.getElementById(id).innerText = text; };
+const show = id => { document.getElementById(id).style.display = "block"; };
+const hide = id => { document.getElementById(id).style.display = "none"; };
 
-function setValue(id, value) {
-  document.getElementById(id).value = value;
-}
+// Pop-up forms: the CSS class "show" makes the overlay visible
+const openModal = id => document.getElementById(id).classList.add("show");
+const closeModal = id => document.getElementById(id).classList.remove("show");
+const closeAllModals = () => {
+  document.querySelectorAll(".overlay").forEach(overlay => overlay.classList.remove("show"));
+};
 
-function setText(id, text) {
-  document.getElementById(id).innerText = text;
-}
+// Radio buttons that share one name form a group
+const getRadio = name => {
+  const checked = [...document.getElementsByName(name)].find(radio => radio.checked);
+  return checked ? checked.value : "";
+};
+const setRadio = (name, value) => {
+  [...document.getElementsByName(name)].forEach(radio => {
+    radio.checked = (radio.value === value);
+  });
+};
 
-function show(id) {
-  document.getElementById(id).style.display = "block";
-}
-
-function hide(id) {
-  document.getElementById(id).style.display = "none";
-}
+// Show a validation error in red next to its field
+const showError = (id, text) => {
+  const error = document.getElementById(id);
+  error.innerText = text;
+  error.style.color = "red";
+};
+const clearErrors = ids => ids.forEach(id => setText(id, ""));
 
 // Confirmation message at the top of the page
-function showMessage(text) {
-  setText("message", text);
-}
+const showMessage = (text = "") => setText("message", text);
 
-// Find an item in an array using its id
-function findById(list, id) {
-  for (let item of list) {
-    if (item.id === id) {
-      return item;
-    }
-  }
-}
+// Working with arrays of objects
+const findById = (list, id) => list.find(item => item.id === id);
+const getNextId = list => Math.max(0, ...list.map(item => item.id)) + 1;
+const removeItem = (list, id) => list.splice(list.indexOf(findById(list, id)), 1);
+const countStatus = (list, status) => list.filter(item => item.status === status).length;
 
-// Next id = highest id + 1
-function getNextId(list) {
-  let highest = 0;
-  for (let item of list) {
-    if (item.id > highest) {
-      highest = item.id;
-    }
-  }
-  return highest + 1;
-}
+const money = amount => `৳ ${amount}`;
 
-// Delete an item from an array
-function removeItem(list, id) {
-  let item = findById(list, id);
-  let index = list.indexOf(item);
-  list.splice(index, 1);
-}
-
-// Count the items that have a given status
-function countStatus(list, status) {
-  let count = 0;
-  for (let item of list) {
-    if (item.status === status) {
-      count++;
-    }
-  }
-  return count;
-}
-
-function money(amount) {
-  return "৳ " + amount;
-}
-
-// ==========================================================
 // SIDEBAR AND TOP BAR
-// ==========================================================
-let sectionNames = ["dashboard", "users", "sellers", "products", "settings", "analytics"];
+const sectionNames = ["dashboard", "users", "sellers", "products", "settings", "analytics"];
 
-let descriptions = {
+const descriptions = {
   dashboard: "Overview of users, sellers and platform activity.",
   users: "Manage users, roles and platform access.",
   sellers: "Review seller applications and verify trusted sellers.",
@@ -179,34 +151,30 @@ let descriptions = {
 
 // Show one section and hide the others (no page reload)
 function showSection(name) {
-  for (let section of sectionNames) {
-    document.getElementById("section-" + section).style.display = "none";
-    document.getElementById("menu-" + section).className = "menu-item";
-  }
-  document.getElementById("section-" + name).style.display = "block";
-  document.getElementById("menu-" + name).className = "menu-item active";
+  sectionNames.forEach(section => {
+    document.getElementById(`section-${section}`).style.display = "none";
+    document.getElementById(`menu-${section}`).className = "menu-item";
+  });
+  document.getElementById(`section-${name}`).style.display = "block";
+  document.getElementById(`menu-${name}`).className = "menu-item active";
   setText("description", descriptions[name]);
   hide("profileMenu");
-  showMessage("");
+  showMessage();
 }
 
 function toggleProfile() {
-  let menu = document.getElementById("profileMenu");
-  if (menu.style.display === "block") {
-    menu.style.display = "none";
-  } else {
-    menu.style.display = "block";
-  }
+  const menu = document.getElementById("profileMenu");
+  menu.style.display = (menu.style.display === "block") ? "none" : "block";
 }
 
 function profileLink(name) {
   hide("profileMenu");
-  showMessage(name + " is not part of this demo.");
+  showMessage(`${name} is not available yet.`);
 }
 
 function logOut() {
   hide("profileMenu");
-  showMessage("Logged out (demo only).");
+  showMessage("You have been logged out.");
 }
 
 // The bell opens the Notifications tab
@@ -217,80 +185,68 @@ function openNotifications() {
 
 // The number on the bell = unread notifications
 function updateBell() {
-  let unread = countStatus(notifications, "Unread");
+  const unread = countStatus(notifications, "Unread");
   setText("bellCount", unread);
-  if (unread === 0) {
-    hide("bellCount");
-  } else {
-    document.getElementById("bellCount").style.display = "inline";
-  }
+  document.getElementById("bellCount").style.display = (unread === 0) ? "none" : "inline";
 }
 
-// ==========================================================
 // DASHBOARD – RECENT ACTIVITY (CRUD)
-// ==========================================================
 
 // READ
 function showActivities() {
-  let html = "<tr><th>Activity</th><th>Time</th><th>Actions</th></tr>";
-  let listHtml = "";
+  const rows = activities.map(activity => `
+    <tr>
+      <td>${activity.text}</td>
+      <td>${activity.time}</td>
+      <td>
+        <button class="small" name="edit" value="${activity.id}">Edit</button>
+        <button class="small danger" name="delete" value="${activity.id}">Delete</button>
+      </td>
+    </tr>`).join("");
 
-  for (let activity of activities) {
-    html += "<tr><td>" + activity.text + "</td><td>" + activity.time + "</td><td>" +
-      "<button class='small' onclick='openActivityForm(" + activity.id + ")'>Edit</button>" +
-      "<button class='small danger' onclick='deleteActivity(" + activity.id + ")'>Delete</button>" +
-      "</td></tr>";
-    listHtml += "<li>" + activity.text + " (" + activity.time + ")</li>";
-  }
-
-  if (activities.length === 0) {
-    html += "<tr><td colspan='3'>No recent activity.</td></tr>";
-  }
-  document.getElementById("activityTable").innerHTML = html;
-  document.getElementById("analyticsActivity").innerHTML = listHtml;
+  document.getElementById("activityBody").innerHTML = rows || `<tr><td colspan="3">No recent activity.</td></tr>`;
+  document.getElementById("analyticsActivity").innerHTML =
+    activities.map(activity => `<li>${activity.text} (${activity.time})</li>`).join("");
 }
 
 // Open the form: id 0 = Add, otherwise Edit
 function openActivityForm(id) {
   editingActivityId = id;
-  setText("activityError", "");
+  clearErrors(["activityTextError"]);
 
   if (id === 0) {
     setText("activityLegend", "Add Activity");
     setValue("activityText", "");
     setValue("activityTime", "Just now");
   } else {
-    let activity = findById(activities, id);
+    const activity = findById(activities, id);
     setText("activityLegend", "Edit Activity");
     setValue("activityText", activity.text);
     setValue("activityTime", activity.time);
   }
-  show("activityForm");
+  openModal("activityModal");
 }
 
 // CREATE and UPDATE
 function saveActivity() {
-  let text = getValue("activityText").trim();
-  let time = getValue("activityTime").trim();
+  clearErrors(["activityTextError"]);
+  const text = getValue("activityText").trim();
+  const time = getValue("activityTime").trim() || "Just now";
 
   if (text === "") {
-    setText("activityError", "Please enter the activity description.");
+    showError("activityTextError", "Activity must be filled out");
     return;
-  }
-  if (time === "") {
-    time = "Just now";
   }
 
   if (editingActivityId === 0) {
-    activities.unshift({ id: getNextId(activities), text: text, time: time });
+    activities.unshift({ id: getNextId(activities), text, time });
     showMessage("Activity added successfully.");
   } else {
-    let activity = findById(activities, editingActivityId);
-    activity.text = text;
-    activity.time = time;
+    Object.assign(findById(activities, editingActivityId), { text, time });
     showMessage("Activity updated successfully.");
   }
-  hide("activityForm");
+  console.log(activities);
+  closeModal("activityModal");
   showActivities();
 }
 
@@ -298,24 +254,17 @@ function saveActivity() {
 function deleteActivity(id) {
   removeItem(activities, id);
   showMessage("Activity deleted.");
+  console.log(activities);
   showActivities();
 }
 
-// ==========================================================
 // USER MANAGEMENT (CRUD)
-// ==========================================================
 
 // Statistics cards (dashboard and user page) come from the users array
 function updateStats() {
-  let sellerCount = 0;
-  let active = countStatus(users, "Active");
-  let suspended = countStatus(users, "Suspended");
-
-  for (let user of users) {
-    if (user.role === "Seller") {
-      sellerCount++;
-    }
-  }
+  const sellerCount = users.filter(user => user.role === "Seller").length;
+  const active = countStatus(users, "Active");
+  const suspended = countStatus(users, "Suspended");
 
   setText("statTotalUsers", users.length);
   setText("statTotalSellers", sellerCount);
@@ -330,40 +279,39 @@ function updateStats() {
 
 // READ: show the table (uses the selected role and the search box)
 function showUsers() {
-  let search = getValue("userSearch").toLowerCase();
-  let html = "<tr><th>ID</th><th>User Name</th><th>Email</th><th>Role</th><th>Account Status</th><th>Joined Date</th><th>Actions</th></tr>";
-  let count = 0;
+  const search = getValue("userSearch").toLowerCase();
 
-  for (let user of users) {
-    let roleMatches = currentRole === "All" || user.role === currentRole;
-    let searchMatches = user.name.toLowerCase().indexOf(search) !== -1 ||
-      user.email.toLowerCase().indexOf(search) !== -1;
+  const matches = users.filter(user => {
+    const roleMatches = currentRole === "All" || user.role === currentRole;
+    const searchMatches = user.name.toLowerCase().includes(search) ||
+      user.email.toLowerCase().includes(search);
+    return roleMatches && searchMatches;
+  });
 
-    if (roleMatches && searchMatches) {
-      count++;
-      let suspendButton = "<button class='small danger' onclick='toggleUser(" + user.id + ")'>Suspend</button>";
-      if (user.status === "Suspended") {
-        suspendButton = "<button class='small good' onclick='toggleUser(" + user.id + ")'>Reactivate</button>";
-      }
+  const rows = matches.map(user => {
+    const suspendButton = (user.status === "Active")
+      ? `<button class="small danger" name="toggle" value="${user.id}">Suspend</button>`
+      : `<button class="small good" name="toggle" value="${user.id}">Reactivate</button>`;
 
-      html += "<tr><td>#" + user.id + "</td>" +
-        "<td>" + user.name + "</td>" +
-        "<td>" + user.email + "</td>" +
-        "<td>" + user.role + "</td>" +
-        "<td><span class='badge status-" + user.status + "'>" + user.status + "</span></td>" +
-        "<td>" + user.joined + "</td>" +
-        "<td><button class='small' onclick='viewUser(" + user.id + ")'>View</button>" +
-        "<button class='small' onclick='openUserForm(" + user.id + ")'>Edit</button>" +
-        suspendButton +
-        "<button class='small danger' onclick='deleteUser(" + user.id + ")'>Delete</button></td></tr>";
-    }
-  }
+    return `
+    <tr>
+      <td>#${user.id}</td>
+      <td>${user.name}</td>
+      <td>${user.email}</td>
+      <td>${user.role}</td>
+      <td><span class="badge status-${user.status}">${user.status}</span></td>
+      <td>${user.joined}</td>
+      <td>
+        <button class="small" name="view" value="${user.id}">View</button>
+        <button class="small" name="edit" value="${user.id}">Edit</button>
+        ${suspendButton}
+        <button class="small danger" name="delete" value="${user.id}">Delete</button>
+      </td>
+    </tr>`;
+  }).join("");
 
-  if (count === 0) {
-    html += "<tr><td colspan='7'>No users found.</td></tr>";
-  }
-  document.getElementById("userTable").innerHTML = html;
-  setText("userCount", "Showing " + count + " of " + users.length + " users");
+  document.getElementById("userBody").innerHTML = rows || `<tr><td colspan="7">No users found.</td></tr>`;
+  setText("userCount", `Showing ${matches.length} of ${users.length} users`);
   updateStats();
 }
 
@@ -372,155 +320,141 @@ function filterRole(role) {
   currentRole = role;
   setValue("roleFilter", role);
 
-  let tabs = document.querySelectorAll("#roleTabs button");
-  for (let tab of tabs) {
-    if (tab.value === role) {
-      tab.className = "tab active";
-    } else {
-      tab.className = "tab";
-    }
-  }
+  document.querySelectorAll("#roleTabs button").forEach(tab => {
+    tab.className = (tab.value === role) ? "tab active" : "tab";
+  });
   showUsers();
 }
 
 // READ: view details
 function viewUser(id) {
-  let user = findById(users, id);
-  document.getElementById("userDetailsText").innerHTML = "<strong>User Details</strong><br>" +
-    "ID: #" + user.id + "<br>Name: " + user.name + "<br>Email: " + user.email +
-    "<br>Role: " + user.role + "<br>Account Status: " + user.status + "<br>Joined Date: " + user.joined;
+  const user = findById(users, id);
+  document.getElementById("userDetailsText").innerHTML = `<strong>User Details</strong><br>
+    ID: #${user.id}<br>Name: ${user.name}<br>Email: ${user.email}<br>
+    Role: ${user.role}<br>Account Status: ${user.status}<br>Joined Date: ${user.joined}`;
   show("userDetails");
 }
 
 // Open the form: id 0 = Add, otherwise Edit
 function openUserForm(id) {
   editingUserId = id;
-  setText("userError", "");
+  clearErrors(["userNameError", "userEmailError"]);
 
   if (id === 0) {
     setText("userLegend", "Add User");
     setValue("userName", "");
     setValue("userEmail", "");
-    setValue("userRole", "Customer");
-    setValue("userStatus", "Active");
+    setValue("userRole", "");
+    setRadio("userStatus", "Active");
     setValue("userJoined", "");
   } else {
-    let user = findById(users, id);
+    const user = findById(users, id);
     setText("userLegend", "Edit User");
     setValue("userName", user.name);
     setValue("userEmail", user.email);
     setValue("userRole", user.role);
-    setValue("userStatus", user.status);
+    setRadio("userStatus", user.status);
     setValue("userJoined", user.joined);
   }
-  show("userForm");
+  openModal("userModal");
 }
 
-// CREATE and UPDATE
+// CREATE and UPDATE (the browser checks required and email, here we check duplicates)
 function saveUser() {
-  let name = getValue("userName").trim();
-  let email = getValue("userEmail").trim();
-  let role = getValue("userRole");
-  let status = getValue("userStatus");
-  let joined = getValue("userJoined");
+  clearErrors(["userNameError", "userEmailError"]);
+  const name = getValue("userName").trim();
+  const email = getValue("userEmail").trim();
+  const role = getValue("userRole");
+  const status = getRadio("userStatus");
+  const joined = getValue("userJoined");
+  let valid = true;
 
-  // Validation
   if (name === "") {
-    setText("userError", "Please enter the user's name.");
-    return;
+    showError("userNameError", "Name must be filled out");
+    valid = false;
   }
-  if (email.indexOf("@") === -1 || email.indexOf(".") === -1) {
-    setText("userError", "Please enter a valid email address.");
-    return;
+  if (!email.includes("@")) {
+    showError("userEmailError", "Email must contain an @");
+    valid = false;
   }
-  for (let user of users) {
-    if (user.email.toLowerCase() === email.toLowerCase() && user.id !== editingUserId) {
-      setText("userError", "This email is already used by another user.");
-      return;
-    }
+  const emailTaken = users.some(user =>
+    user.email.toLowerCase() === email.toLowerCase() && user.id !== editingUserId);
+  if (emailTaken) {
+    showError("userEmailError", "This email is already used by another user");
+    valid = false;
   }
-  if (joined === "") {
-    setText("userError", "Please select the joined date.");
+  if (!valid) {
     return;
   }
 
   if (editingUserId === 0) {
-    users.push({ id: getNextId(users), name: name, email: email, role: role, status: status, joined: joined });
+    users.push({ id: getNextId(users), name, email, role, status, joined });
     showMessage("New user added successfully.");
   } else {
-    let user = findById(users, editingUserId);
-    user.name = name;
-    user.email = email;
-    user.role = role;
-    user.status = status;
-    user.joined = joined;
+    Object.assign(findById(users, editingUserId), { name, email, role, status, joined });
     showMessage("User updated successfully.");
   }
-  hide("userForm");
+  console.log(users);
+  closeModal("userModal");
   showUsers();
+  return;
 }
 
 // UPDATE: suspend or reactivate
 function toggleUser(id) {
-  let user = findById(users, id);
-  if (user.status === "Active") {
-    user.status = "Suspended";
-    showMessage(user.name + "'s account has been suspended.");
-  } else {
-    user.status = "Active";
-    showMessage(user.name + "'s account has been reactivated.");
-  }
+  const user = findById(users, id);
+  user.status = (user.status === "Active") ? "Suspended" : "Active";
+  showMessage(user.status === "Suspended"
+    ? `${user.name}'s account has been suspended.`
+    : `${user.name}'s account has been reactivated.`);
   showUsers();
 }
 
 // DELETE
 function deleteUser(id) {
-  let user = findById(users, id);
+  const { name } = findById(users, id);   // destructuring: take only the name
   removeItem(users, id);
-  showMessage(user.name + " has been permanently deleted.");
+  showMessage(`${name} has been permanently deleted.`);
+  console.log(users);
   showUsers();
 }
 
-// ==========================================================
 // SELLER VERIFICATION (CRUD)
-// ==========================================================
 
 // READ
 function showSellers() {
-  let html = "<tr><th>Store Name</th><th>Applied Date</th><th>Store Information</th><th>Verification Status</th><th>Actions</th></tr>";
+  const rows = sellers.map(seller => `
+    <tr>
+      <td><strong>${seller.storeName}</strong></td>
+      <td>${seller.date}</td>
+      <td>${seller.info}</td>
+      <td><span class="badge status-${seller.status}">${seller.status}</span></td>
+      <td>
+        <button class="small" name="view" value="${seller.id}">View</button>
+        <button class="small good" name="verify" value="${seller.id}">Verify</button>
+        <button class="small danger" name="reject" value="${seller.id}">Reject</button>
+        <button class="small" name="edit" value="${seller.id}">Edit</button>
+        <button class="small danger" name="delete" value="${seller.id}">Delete</button>
+      </td>
+    </tr>`).join("");
 
-  for (let seller of sellers) {
-    html += "<tr><td><strong>" + seller.storeName + "</strong></td>" +
-      "<td>" + seller.date + "</td>" +
-      "<td>" + seller.info + "</td>" +
-      "<td><span class='badge status-" + seller.status + "'>" + seller.status + "</span></td>" +
-      "<td><button class='small' onclick='viewSeller(" + seller.id + ")'>View</button>" +
-      "<button class='small good' onclick='verifySeller(" + seller.id + ")'>Verify</button>" +
-      "<button class='small danger' onclick='rejectSeller(" + seller.id + ")'>Reject</button>" +
-      "<button class='small' onclick='openSellerForm(" + seller.id + ")'>Edit</button>" +
-      "<button class='small danger' onclick='deleteSeller(" + seller.id + ")'>Delete</button></td></tr>";
-  }
-
-  if (sellers.length === 0) {
-    html += "<tr><td colspan='5'>No seller applications.</td></tr>";
-  }
-  document.getElementById("sellerTable").innerHTML = html;
-  setText("sellerCount", "Showing " + sellers.length + " seller applications");
+  document.getElementById("sellerBody").innerHTML = rows || `<tr><td colspan="5">No seller applications.</td></tr>`;
+  setText("sellerCount", `Showing ${sellers.length} seller applications`);
   updateModerationStats();
 }
 
 function viewSeller(id) {
-  let seller = findById(sellers, id);
-  document.getElementById("sellerDetailsText").innerHTML = "<strong>Seller Application</strong><br>" +
-    "Application ID: #" + seller.id + "<br>Store Name: " + seller.storeName + "<br>Applicant: " + seller.owner +
-    "<br>Application Date: " + seller.date + "<br>Store Information: " + seller.info +
-    "<br>Verification Status: " + seller.status;
+  const seller = findById(sellers, id);
+  document.getElementById("sellerDetailsText").innerHTML = `<strong>Seller Application</strong><br>
+    Application ID: #${seller.id}<br>Store Name: ${seller.storeName}<br>Applicant: ${seller.owner}<br>
+    Application Date: ${seller.date}<br>Store Information: ${seller.info}<br>
+    Verification Status: ${seller.status}`;
   show("sellerDetails");
 }
 
 function openSellerForm(id) {
   editingSellerId = id;
-  setText("sellerError", "");
+  clearErrors(["sellerStoreNameError", "sellerOwnerError", "sellerInfoError"]);
 
   if (id === 0) {
     setText("sellerLegend", "Add Seller Application");
@@ -530,7 +464,7 @@ function openSellerForm(id) {
     setValue("sellerInfo", "");
     setValue("sellerStatus", "Pending");
   } else {
-    let seller = findById(sellers, id);
+    const seller = findById(sellers, id);
     setText("sellerLegend", "Edit Seller Application");
     setValue("sellerStoreName", seller.storeName);
     setValue("sellerOwner", seller.owner);
@@ -538,50 +472,59 @@ function openSellerForm(id) {
     setValue("sellerInfo", seller.info);
     setValue("sellerStatus", seller.status);
   }
-  show("sellerForm");
+  openModal("sellerModal");
 }
 
 // CREATE and UPDATE
 function saveSeller() {
-  let storeName = getValue("sellerStoreName").trim();
-  let owner = getValue("sellerOwner").trim();
-  let date = getValue("sellerDate");
-  let info = getValue("sellerInfo").trim();
-  let status = getValue("sellerStatus");
+  clearErrors(["sellerStoreNameError", "sellerOwnerError", "sellerInfoError"]);
+  const storeName = getValue("sellerStoreName").trim();
+  const owner = getValue("sellerOwner").trim();
+  const date = getValue("sellerDate");
+  const info = getValue("sellerInfo").trim();
+  const status = getValue("sellerStatus");
+  let valid = true;
 
-  if (storeName === "" || owner === "" || date === "" || info === "") {
-    setText("sellerError", "Please fill in all fields.");
+  if (storeName === "") {
+    showError("sellerStoreNameError", "Store name must be filled out");
+    valid = false;
+  }
+  if (owner === "") {
+    showError("sellerOwnerError", "Applicant name must be filled out");
+    valid = false;
+  }
+  if (info === "") {
+    showError("sellerInfoError", "Store information must be filled out");
+    valid = false;
+  }
+  if (!valid) {
     return;
   }
 
   if (editingSellerId === 0) {
-    sellers.unshift({ id: getNextId(sellers), storeName: storeName, owner: owner, date: date, info: info, status: status });
+    sellers.unshift({ id: getNextId(sellers), storeName, owner, date, info, status });
     showMessage("Seller application added.");
   } else {
-    let seller = findById(sellers, editingSellerId);
-    seller.storeName = storeName;
-    seller.owner = owner;
-    seller.date = date;
-    seller.info = info;
-    seller.status = status;
+    Object.assign(findById(sellers, editingSellerId), { storeName, owner, date, info, status });
     showMessage("Seller application updated.");
   }
-  hide("sellerForm");
+  closeModal("sellerModal");
   showSellers();
+  return;
 }
 
 // UPDATE: verify or reject
 function verifySeller(id) {
-  let seller = findById(sellers, id);
+  const seller = findById(sellers, id);
   seller.status = "Verified";
-  showMessage(seller.storeName + " has been verified.");
+  showMessage(`${seller.storeName} has been verified.`);
   showSellers();
 }
 
 function rejectSeller(id) {
-  let seller = findById(sellers, id);
+  const seller = findById(sellers, id);
   seller.status = "Rejected";
-  showMessage(seller.storeName + " has been rejected.");
+  showMessage(`${seller.storeName} has been rejected.`);
   showSellers();
 }
 
@@ -592,47 +535,43 @@ function deleteSeller(id) {
   showSellers();
 }
 
-// ==========================================================
 // PRODUCT MODERATION (CRUD)
-// ==========================================================
 
 // READ
 function showProducts() {
-  let html = "<tr><th>Product Name</th><th>Seller</th><th>Report Reason</th><th>Report Date</th><th>Moderation Status</th><th>Actions</th></tr>";
+  const rows = products.map(product => `
+    <tr>
+      <td><strong>${product.name}</strong></td>
+      <td>${product.seller}</td>
+      <td>${product.reason}</td>
+      <td>${product.date}</td>
+      <td><span class="badge status-${product.status}">${product.status}</span></td>
+      <td>
+        <button class="small" name="view" value="${product.id}">View</button>
+        <button class="small good" name="approve" value="${product.id}">Approve</button>
+        <button class="small danger" name="remove" value="${product.id}">Remove</button>
+        <button class="small" name="edit" value="${product.id}">Edit</button>
+        <button class="small danger" name="delete" value="${product.id}">Delete</button>
+      </td>
+    </tr>`).join("");
 
-  for (let product of products) {
-    html += "<tr><td><strong>" + product.name + "</strong></td>" +
-      "<td>" + product.seller + "</td>" +
-      "<td>" + product.reason + "</td>" +
-      "<td>" + product.date + "</td>" +
-      "<td><span class='badge status-" + product.status + "'>" + product.status + "</span></td>" +
-      "<td><button class='small' onclick='viewProduct(" + product.id + ")'>View</button>" +
-      "<button class='small good' onclick='approveProduct(" + product.id + ")'>Approve</button>" +
-      "<button class='small danger' onclick='removeProduct(" + product.id + ")'>Remove</button>" +
-      "<button class='small' onclick='openProductForm(" + product.id + ")'>Edit</button>" +
-      "<button class='small danger' onclick='deleteProduct(" + product.id + ")'>Delete</button></td></tr>";
-  }
-
-  if (products.length === 0) {
-    html += "<tr><td colspan='6'>No reported products.</td></tr>";
-  }
-  document.getElementById("productTable").innerHTML = html;
-  setText("productCount", "Showing " + products.length + " reported products");
+  document.getElementById("productBody").innerHTML = rows || `<tr><td colspan="6">No reported products.</td></tr>`;
+  setText("productCount", `Showing ${products.length} reported products`);
   updateModerationStats();
 }
 
 function viewProduct(id) {
-  let product = findById(products, id);
-  document.getElementById("productDetailsText").innerHTML = "<strong>Reported Product</strong><br>" +
-    "Report ID: #" + product.id + "<br>Product Name: " + product.name + "<br>Seller: " + product.seller +
-    "<br>Price: " + money(product.price) + "<br>Report Reason: " + product.reason +
-    "<br>Report Date: " + product.date + "<br>Moderation Status: " + product.status;
+  const product = findById(products, id);
+  document.getElementById("productDetailsText").innerHTML = `<strong>Reported Product</strong><br>
+    Report ID: #${product.id}<br>Product Name: ${product.name}<br>Seller: ${product.seller}<br>
+    Price: ${money(product.price)}<br>Report Reason: ${product.reason}<br>
+    Report Date: ${product.date}<br>Moderation Status: ${product.status}`;
   show("productDetails");
 }
 
 function openProductForm(id) {
   editingProductId = id;
-  setText("productError", "");
+  clearErrors(["productNameError", "productSellerError", "productReasonError"]);
 
   if (id === 0) {
     setText("productLegend", "Add Reported Product");
@@ -643,7 +582,7 @@ function openProductForm(id) {
     setValue("productDate", "");
     setValue("productStatus", "Pending");
   } else {
-    let product = findById(products, id);
+    const product = findById(products, id);
     setText("productLegend", "Edit Reported Product");
     setValue("productName", product.name);
     setValue("productSeller", product.seller);
@@ -652,56 +591,60 @@ function openProductForm(id) {
     setValue("productDate", product.date);
     setValue("productStatus", product.status);
   }
-  show("productForm");
+  openModal("productModal");
 }
 
 // CREATE and UPDATE
 function saveProduct() {
-  let name = getValue("productName").trim();
-  let seller = getValue("productSeller").trim();
-  let price = getValue("productPrice");
-  let reason = getValue("productReason").trim();
-  let date = getValue("productDate");
-  let status = getValue("productStatus");
+  clearErrors(["productNameError", "productSellerError", "productReasonError"]);
+  const name = getValue("productName").trim();
+  const seller = getValue("productSeller").trim();
+  const price = Number(getValue("productPrice"));
+  const reason = getValue("productReason").trim();
+  const date = getValue("productDate");
+  const status = getValue("productStatus");
+  let valid = true;
 
-  if (name === "" || seller === "" || reason === "" || date === "") {
-    setText("productError", "Please fill in all fields.");
-    return;
+  if (name === "") {
+    showError("productNameError", "Product name must be filled out");
+    valid = false;
   }
-  if (price === "" || Number(price) < 0) {
-    setText("productError", "Please enter a valid price.");
+  if (seller === "") {
+    showError("productSellerError", "Seller name must be filled out");
+    valid = false;
+  }
+  if (reason === "") {
+    showError("productReasonError", "Report reason must be filled out");
+    valid = false;
+  }
+  if (!valid) {
     return;
   }
 
   if (editingProductId === 0) {
-    products.unshift({ id: getNextId(products), name: name, seller: seller, price: Number(price), reason: reason, date: date, status: status });
+    products.unshift({ id: getNextId(products), name, seller, price, reason, date, status });
     showMessage("Reported product added.");
   } else {
-    let product = findById(products, editingProductId);
-    product.name = name;
-    product.seller = seller;
-    product.price = Number(price);
-    product.reason = reason;
-    product.date = date;
-    product.status = status;
+    Object.assign(findById(products, editingProductId), { name, seller, price, reason, date, status });
     showMessage("Reported product updated.");
   }
-  hide("productForm");
+  closeModal("productModal");
   showProducts();
+  return;
 }
 
 // UPDATE: approve or remove
 function approveProduct(id) {
-  let product = findById(products, id);
+  const product = findById(products, id);
   product.status = "Approved";
-  showMessage(product.name + " has been approved.");
+  showMessage(`${product.name} has been approved.`);
   showProducts();
 }
 
 function removeProduct(id) {
-  let product = findById(products, id);
+  const product = findById(products, id);
   product.status = "Removed";
-  showMessage(product.name + " has been removed.");
+  showMessage(`${product.name} has been removed.`);
   showProducts();
 }
 
@@ -714,8 +657,8 @@ function deleteProduct(id) {
 
 // Moderation numbers: dashboard, seller page and product page
 function updateModerationStats() {
-  let pendingSellers = countStatus(sellers, "Pending");
-  let pendingProducts = countStatus(products, "Pending");
+  const pendingSellers = countStatus(sellers, "Pending");
+  const pendingProducts = countStatus(products, "Pending");
 
   setText("pendingSellers", pendingSellers);
   setText("pendingProducts", pendingProducts);
@@ -730,44 +673,40 @@ function updateModerationStats() {
   setText("productStatRemoved", countStatus(products, "Removed"));
 }
 
-// ==========================================================
 // PLATFORM SETTINGS – COMMISSION
-// ==========================================================
 function saveSettings() {
-  let value = getValue("commissionInput");
+  const value = getValue("commissionInput");
+  clearErrors(["commissionError"]);
 
   if (value === "" || Number(value) < 0 || Number(value) > 100) {
-    setText("settingsError", "Commission must be a number between 0 and 100.");
+    showError("commissionError", "Commission must be a number between 0 and 100");
     return;
   }
-  setText("settingsError", "");
-  commission = Number(value);
-  showMessage("Platform settings saved. Commission is now " + commission + "%.");
+  settings.commission = Number(value);
+  showMessage(`Platform settings saved. ${settings.summary()}`);
+  return;
 }
 
-// ==========================================================
 // PLATFORM SETTINGS – CATEGORIES (CRUD)
-// ==========================================================
 
 // READ
 function showCategories() {
-  let html = "<tr><th>ID</th><th>Category Name</th><th>Actions</th></tr>";
+  const rows = categories.map(category => `
+    <tr>
+      <td>#${category.id}</td>
+      <td><strong>${category.name}</strong></td>
+      <td>
+        <button class="small" name="edit" value="${category.id}">Edit</button>
+        <button class="small danger" name="delete" value="${category.id}">Delete</button>
+      </td>
+    </tr>`).join("");
 
-  for (let category of categories) {
-    html += "<tr><td>#" + category.id + "</td><td><strong>" + category.name + "</strong></td>" +
-      "<td><button class='small' onclick='openCategoryForm(" + category.id + ")'>Edit</button>" +
-      "<button class='small danger' onclick='deleteCategory(" + category.id + ")'>Delete</button></td></tr>";
-  }
-
-  if (categories.length === 0) {
-    html += "<tr><td colspan='3'>No categories.</td></tr>";
-  }
-  document.getElementById("categoryTable").innerHTML = html;
+  document.getElementById("categoryBody").innerHTML = rows || `<tr><td colspan="3">No categories.</td></tr>`;
 }
 
 function openCategoryForm(id) {
   editingCategoryId = id;
-  setText("categoryError", "");
+  clearErrors(["categoryNameError"]);
 
   if (id === 0) {
     setText("categoryLegend", "Add Category");
@@ -776,33 +715,35 @@ function openCategoryForm(id) {
     setText("categoryLegend", "Edit Category");
     setValue("categoryName", findById(categories, id).name);
   }
-  show("categoryForm");
+  openModal("categoryModal");
 }
 
 // CREATE and UPDATE
 function saveCategory() {
-  let name = getValue("categoryName").trim();
+  clearErrors(["categoryNameError"]);
+  const name = getValue("categoryName").trim();
 
   if (name === "") {
-    setText("categoryError", "Please enter the category name.");
+    showError("categoryNameError", "Category name must be filled out");
     return;
   }
-  for (let category of categories) {
-    if (category.name.toLowerCase() === name.toLowerCase() && category.id !== editingCategoryId) {
-      setText("categoryError", "This category already exists.");
-      return;
-    }
+  const exists = categories.some(category =>
+    category.name.toLowerCase() === name.toLowerCase() && category.id !== editingCategoryId);
+  if (exists) {
+    showError("categoryNameError", "This category already exists");
+    return;
   }
 
   if (editingCategoryId === 0) {
-    categories.push({ id: getNextId(categories), name: name });
-    showMessage("Category added: " + name + ".");
+    categories.push({ id: getNextId(categories), name });
+    showMessage(`Category added: ${name}.`);
   } else {
     findById(categories, editingCategoryId).name = name;
-    showMessage("Category updated: " + name + ".");
+    showMessage(`Category updated: ${name}.`);
   }
-  hide("categoryForm");
+  closeModal("categoryModal");
   showCategories();
+  return;
 }
 
 // DELETE
@@ -812,95 +753,85 @@ function deleteCategory(id) {
   showCategories();
 }
 
-// ==========================================================
 // PLATFORM SETTINGS – COUPONS (CRUD)
-// ==========================================================
 
 // READ
 function showCoupons() {
-  let html = "<tr><th>Code</th><th>Discount Type</th><th>Discount Value</th><th>Expiry Date</th><th>Actions</th></tr>";
+  const rows = coupons.map(coupon => {
+    const discount = (coupon.type === "Percentage") ? `${coupon.value}%` : money(coupon.value);
+    return `
+    <tr>
+      <td><strong>${coupon.code}</strong></td>
+      <td>${coupon.type}</td>
+      <td>${discount}</td>
+      <td>${coupon.expiry}</td>
+      <td>
+        <button class="small" name="edit" value="${coupon.id}">Edit</button>
+        <button class="small danger" name="delete" value="${coupon.id}">Delete</button>
+      </td>
+    </tr>`;
+  }).join("");
 
-  for (let coupon of coupons) {
-    let discount = money(coupon.value);
-    if (coupon.type === "Percentage") {
-      discount = coupon.value + "%";
-    }
-    html += "<tr><td><strong>" + coupon.code + "</strong></td><td>" + coupon.type + "</td>" +
-      "<td>" + discount + "</td><td>" + coupon.expiry + "</td>" +
-      "<td><button class='small' onclick='openCouponForm(" + coupon.id + ")'>Edit</button>" +
-      "<button class='small danger' onclick='deleteCoupon(" + coupon.id + ")'>Delete</button></td></tr>";
-  }
-
-  if (coupons.length === 0) {
-    html += "<tr><td colspan='5'>No coupons.</td></tr>";
-  }
-  document.getElementById("couponTable").innerHTML = html;
+  document.getElementById("couponBody").innerHTML = rows || `<tr><td colspan="5">No coupons.</td></tr>`;
 }
 
 function openCouponForm(id) {
   editingCouponId = id;
-  setText("couponError", "");
+  clearErrors(["couponCodeError", "couponValueError"]);
 
   if (id === 0) {
     setText("couponLegend", "Add Coupon");
     setValue("couponCode", "");
-    setValue("couponType", "Percentage");
+    setRadio("couponType", "Percentage");
     setValue("couponValue", "");
     setValue("couponExpiry", "");
   } else {
-    let coupon = findById(coupons, id);
+    const coupon = findById(coupons, id);
     setText("couponLegend", "Edit Coupon");
     setValue("couponCode", coupon.code);
-    setValue("couponType", coupon.type);
+    setRadio("couponType", coupon.type);
     setValue("couponValue", coupon.value);
     setValue("couponExpiry", coupon.expiry);
   }
-  show("couponForm");
+  openModal("couponModal");
 }
 
 // CREATE and UPDATE
 function saveCoupon() {
-  let code = getValue("couponCode").trim().toUpperCase();
-  let type = getValue("couponType");
-  let value = Number(getValue("couponValue"));
-  let expiry = getValue("couponExpiry");
+  clearErrors(["couponCodeError", "couponValueError"]);
+  const code = getValue("couponCode").trim().toUpperCase();
+  const type = getRadio("couponType");
+  const value = Number(getValue("couponValue"));
+  const expiry = getValue("couponExpiry");
+  let valid = true;
 
-  if (code === "" || expiry === "") {
-    setText("couponError", "Please enter the coupon code and expiry date.");
-    return;
+  if (code === "" || code.includes(" ")) {
+    showError("couponCodeError", "The coupon code cannot be empty or contain spaces");
+    valid = false;
   }
-  if (code.indexOf(" ") !== -1) {
-    setText("couponError", "The coupon code cannot contain spaces.");
-    return;
-  }
-  if (value <= 0) {
-    setText("couponError", "Please enter a discount value greater than 0.");
-    return;
+  const codeTaken = coupons.some(coupon => coupon.code === code && coupon.id !== editingCouponId);
+  if (codeTaken) {
+    showError("couponCodeError", "This coupon code already exists");
+    valid = false;
   }
   if (type === "Percentage" && value > 100) {
-    setText("couponError", "A percentage discount cannot be more than 100.");
-    return;
+    showError("couponValueError", "A percentage discount cannot be more than 100");
+    valid = false;
   }
-  for (let coupon of coupons) {
-    if (coupon.code === code && coupon.id !== editingCouponId) {
-      setText("couponError", "This coupon code already exists.");
-      return;
-    }
+  if (!valid) {
+    return;
   }
 
   if (editingCouponId === 0) {
-    coupons.push({ id: getNextId(coupons), code: code, type: type, value: value, expiry: expiry });
-    showMessage("Coupon " + code + " added.");
+    coupons.push({ id: getNextId(coupons), code, type, value, expiry });
+    showMessage(`Coupon ${code} added.`);
   } else {
-    let coupon = findById(coupons, editingCouponId);
-    coupon.code = code;
-    coupon.type = type;
-    coupon.value = value;
-    coupon.expiry = expiry;
-    showMessage("Coupon " + code + " updated.");
+    Object.assign(findById(coupons, editingCouponId), { code, type, value, expiry });
+    showMessage(`Coupon ${code} updated.`);
   }
-  hide("couponForm");
+  closeModal("couponModal");
   showCoupons();
+  return;
 }
 
 // DELETE
@@ -910,88 +841,72 @@ function deleteCoupon(id) {
   showCoupons();
 }
 
-// ==========================================================
 // ANALYTICS – TABS
-// ==========================================================
-let analyticsTabs = ["analytics", "notifications", "logs"];
+const analyticsTabs = ["analytics", "notifications", "logs"];
 
 function showAnalyticsTab(name) {
-  for (let tab of analyticsTabs) {
-    document.getElementById("panel-" + tab).style.display = "none";
-    document.getElementById("atab-" + tab).className = "tab";
-  }
-  document.getElementById("panel-" + name).style.display = "block";
-  document.getElementById("atab-" + name).className = "tab active";
+  analyticsTabs.forEach(tab => {
+    document.getElementById(`panel-${tab}`).style.display = "none";
+    document.getElementById(`atab-${tab}`).className = "tab";
+  });
+  document.getElementById(`panel-${name}`).style.display = "block";
+  document.getElementById(`atab-${name}`).className = "tab active";
 }
 
-// ==========================================================
 // ANALYTICS – MONTHLY REVENUE DATA (CRUD), STATISTICS AND CHART
-// ==========================================================
 
 // READ: statistics, chart and table are all made from the revenueData array
 function showRevenue() {
-  let totalRevenue = 0;
-  let totalOrders = 0;
-  let highest = 0;
+  const totalRevenue = revenueData.reduce((sum, item) => sum + item.revenue, 0);
+  const totalOrders = revenueData.reduce((sum, item) => sum + item.orders, 0);
+  const highest = Math.max(0, ...revenueData.map(item => item.revenue));
+  const average = (totalOrders > 0) ? Math.round(totalRevenue / totalOrders * 100) / 100 : 0;
 
-  for (let item of revenueData) {
-    totalRevenue += item.revenue;
-    totalOrders += item.orders;
-    if (item.revenue > highest) {
-      highest = item.revenue;
-    }
-  }
-
-  let average = 0;
-  if (totalOrders > 0) {
-    average = Math.round(totalRevenue / totalOrders * 100) / 100;
-  }
   setText("statRevenue", money(totalRevenue));
   setText("statOrders", totalOrders);
   setText("statAvgOrder", money(average));
 
   // Bar chart: the highest month gets a 180px bar, the others are smaller
-  let chart = document.getElementById("chart");
+  const chart = document.getElementById("chart");
   chart.innerHTML = "";
 
-  for (let item of revenueData) {
-    let height = 0;
-    if (highest > 0) {
-      height = Math.round(item.revenue / highest * 180);
-    }
+  revenueData.forEach(item => {
+    const height = (highest > 0) ? Math.round(item.revenue / highest * 180) : 0;
 
-    let column = document.createElement("div");
+    const column = document.createElement("div");
     column.className = "bar-column";
 
-    let bar = document.createElement("div");
+    const bar = document.createElement("div");
     bar.className = "bar";
-    bar.style.height = height + "px";
-    bar.innerText = Math.round(item.revenue / 1000) + "k";
+    bar.style.height = `${height}px`;
+    bar.innerText = `${Math.round(item.revenue / 1000)}k`;
 
-    let label = document.createElement("p");
+    const label = document.createElement("p");
     label.innerText = item.month;
 
     column.appendChild(bar);
     column.appendChild(label);
     chart.appendChild(column);
-  }
+  });
 
   // Table
-  let html = "<tr><th>Month</th><th>Revenue</th><th>Orders</th><th>Actions</th></tr>";
-  for (let item of revenueData) {
-    html += "<tr><td><strong>" + item.month + "</strong></td><td>" + money(item.revenue) + "</td><td>" + item.orders + "</td>" +
-      "<td><button class='small' onclick='openRevenueForm(" + item.id + ")'>Edit</button>" +
-      "<button class='small danger' onclick='deleteRevenue(" + item.id + ")'>Delete</button></td></tr>";
-  }
-  if (revenueData.length === 0) {
-    html += "<tr><td colspan='4'>No monthly data.</td></tr>";
-  }
-  document.getElementById("revenueTable").innerHTML = html;
+  const rows = revenueData.map(item => `
+    <tr>
+      <td><strong>${item.month}</strong></td>
+      <td>${money(item.revenue)}</td>
+      <td>${item.orders}</td>
+      <td>
+        <button class="small" name="edit" value="${item.id}">Edit</button>
+        <button class="small danger" name="delete" value="${item.id}">Delete</button>
+      </td>
+    </tr>`).join("");
+
+  document.getElementById("revenueBody").innerHTML = rows || `<tr><td colspan="4">No monthly data.</td></tr>`;
 }
 
 function openRevenueForm(id) {
   editingRevenueId = id;
-  setText("revenueError", "");
+  clearErrors(["revenueMonthError"]);
 
   if (id === 0) {
     setText("revenueLegend", "Add Monthly Data");
@@ -999,42 +914,37 @@ function openRevenueForm(id) {
     setValue("revenueAmount", "");
     setValue("revenueOrders", "");
   } else {
-    let item = findById(revenueData, id);
+    const item = findById(revenueData, id);
     setText("revenueLegend", "Edit Monthly Data");
     setValue("revenueMonth", item.month);
     setValue("revenueAmount", item.revenue);
     setValue("revenueOrders", item.orders);
   }
-  show("revenueForm");
+  openModal("revenueModal");
 }
 
 // CREATE and UPDATE
 function saveRevenue() {
-  let month = getValue("revenueMonth").trim();
-  let revenue = getValue("revenueAmount");
-  let orders = getValue("revenueOrders");
+  clearErrors(["revenueMonthError"]);
+  const month = getValue("revenueMonth").trim();
+  const revenue = Number(getValue("revenueAmount"));
+  const orders = Number(getValue("revenueOrders"));
 
   if (month === "") {
-    setText("revenueError", "Please enter the month.");
-    return;
-  }
-  if (revenue === "" || Number(revenue) < 0 || orders === "" || Number(orders) < 0) {
-    setText("revenueError", "Please enter valid revenue and order numbers.");
+    showError("revenueMonthError", "Month must be filled out");
     return;
   }
 
   if (editingRevenueId === 0) {
-    revenueData.push({ id: getNextId(revenueData), month: month, revenue: Number(revenue), orders: Number(orders) });
-    showMessage("Monthly data for " + month + " added.");
+    revenueData.push({ id: getNextId(revenueData), month, revenue, orders });
+    showMessage(`Monthly data for ${month} added.`);
   } else {
-    let item = findById(revenueData, editingRevenueId);
-    item.month = month;
-    item.revenue = Number(revenue);
-    item.orders = Number(orders);
-    showMessage("Monthly data for " + month + " updated.");
+    Object.assign(findById(revenueData, editingRevenueId), { month, revenue, orders });
+    showMessage(`Monthly data for ${month} updated.`);
   }
-  hide("revenueForm");
+  closeModal("revenueModal");
   showRevenue();
+  return;
 }
 
 // DELETE
@@ -1044,86 +954,77 @@ function deleteRevenue(id) {
   showRevenue();
 }
 
-// ==========================================================
 // ANALYTICS – NOTIFICATIONS (CRUD)
-// ==========================================================
 
 // READ
 function showNotifications() {
-  let html = "<tr><th>Notification</th><th>Date</th><th>Status</th><th>Actions</th></tr>";
+  const rows = notifications.map(note => {
+    const toggleText = (note.status === "Read") ? "Mark Unread" : "Mark Read";
+    return `
+    <tr>
+      <td>${note.message}</td>
+      <td>${note.date}</td>
+      <td><span class="badge status-${note.status}">${note.status}</span></td>
+      <td>
+        <button class="small good" name="toggle" value="${note.id}">${toggleText}</button>
+        <button class="small" name="edit" value="${note.id}">Edit</button>
+        <button class="small danger" name="delete" value="${note.id}">Delete</button>
+      </td>
+    </tr>`;
+  }).join("");
 
-  for (let note of notifications) {
-    let toggleText = "Mark Read";
-    if (note.status === "Read") {
-      toggleText = "Mark Unread";
-    }
-    html += "<tr><td>" + note.message + "</td><td>" + note.date + "</td>" +
-      "<td><span class='badge status-" + note.status + "'>" + note.status + "</span></td>" +
-      "<td><button class='small good' onclick='toggleNotification(" + note.id + ")'>" + toggleText + "</button>" +
-      "<button class='small' onclick='openNotificationForm(" + note.id + ")'>Edit</button>" +
-      "<button class='small danger' onclick='deleteNotification(" + note.id + ")'>Delete</button></td></tr>";
-  }
-
-  if (notifications.length === 0) {
-    html += "<tr><td colspan='4'>No notifications.</td></tr>";
-  }
-  document.getElementById("notificationTable").innerHTML = html;
+  document.getElementById("notificationBody").innerHTML = rows || `<tr><td colspan="4">No notifications.</td></tr>`;
   updateBell();
 }
 
 function openNotificationForm(id) {
   editingNotificationId = id;
-  setText("notificationError", "");
+  clearErrors(["notificationMessageError"]);
 
   if (id === 0) {
     setText("notificationLegend", "Add Notification");
     setValue("notificationMessage", "");
     setValue("notificationDate", "");
-    setValue("notificationStatus", "Unread");
+    setRadio("notificationStatus", "Unread");
   } else {
-    let note = findById(notifications, id);
+    const note = findById(notifications, id);
     setText("notificationLegend", "Edit Notification");
     setValue("notificationMessage", note.message);
     setValue("notificationDate", note.date);
-    setValue("notificationStatus", note.status);
+    setRadio("notificationStatus", note.status);
   }
-  show("notificationForm");
+  openModal("notificationModal");
 }
 
 // CREATE and UPDATE
 function saveNotification() {
-  let message = getValue("notificationMessage").trim();
-  let date = getValue("notificationDate");
-  let status = getValue("notificationStatus");
+  clearErrors(["notificationMessageError"]);
+  const message = getValue("notificationMessage").trim();
+  const date = getValue("notificationDate");
+  const status = getRadio("notificationStatus");
 
-  if (message === "" || date === "") {
-    setText("notificationError", "Please enter the message and date.");
+  if (message === "") {
+    showError("notificationMessageError", "Notification must be filled out");
     return;
   }
 
   if (editingNotificationId === 0) {
-    notifications.unshift({ id: getNextId(notifications), message: message, date: date, status: status });
+    notifications.unshift({ id: getNextId(notifications), message, date, status });
     showMessage("Notification added.");
   } else {
-    let note = findById(notifications, editingNotificationId);
-    note.message = message;
-    note.date = date;
-    note.status = status;
+    Object.assign(findById(notifications, editingNotificationId), { message, date, status });
     showMessage("Notification updated.");
   }
-  hide("notificationForm");
+  closeModal("notificationModal");
   showNotifications();
+  return;
 }
 
 // UPDATE: mark as read or unread
 function toggleNotification(id) {
-  let note = findById(notifications, id);
-  if (note.status === "Unread") {
-    note.status = "Read";
-  } else {
-    note.status = "Unread";
-  }
-  showMessage("Notification marked as " + note.status.toLowerCase() + ".");
+  const note = findById(notifications, id);
+  note.status = (note.status === "Unread") ? "Read" : "Unread";
+  showMessage(`Notification marked as ${note.status.toLowerCase()}.`);
   showNotifications();
 }
 
@@ -1134,64 +1035,61 @@ function deleteNotification(id) {
   showNotifications();
 }
 
-// ==========================================================
 // ANALYTICS – SYSTEM LOGS (CRUD)
-// ==========================================================
 
 // READ
 function showLogs() {
-  let html = "<tr><th>Activity Description</th><th>Date</th><th>Actions</th></tr>";
+  const rows = logs.map(log => `
+    <tr>
+      <td>${log.description}</td>
+      <td>${log.date}</td>
+      <td>
+        <button class="small" name="edit" value="${log.id}">Edit</button>
+        <button class="small danger" name="delete" value="${log.id}">Delete</button>
+      </td>
+    </tr>`).join("");
 
-  for (let log of logs) {
-    html += "<tr><td>" + log.description + "</td><td>" + log.date + "</td>" +
-      "<td><button class='small' onclick='openLogForm(" + log.id + ")'>Edit</button>" +
-      "<button class='small danger' onclick='deleteLog(" + log.id + ")'>Delete</button></td></tr>";
-  }
-
-  if (logs.length === 0) {
-    html += "<tr><td colspan='3'>No log entries.</td></tr>";
-  }
-  document.getElementById("logTable").innerHTML = html;
+  document.getElementById("logBody").innerHTML = rows || `<tr><td colspan="3">No log entries.</td></tr>`;
 }
 
 function openLogForm(id) {
   editingLogId = id;
-  setText("logError", "");
+  clearErrors(["logDescriptionError"]);
 
   if (id === 0) {
     setText("logLegend", "Add Log Entry");
     setValue("logDescription", "");
     setValue("logDate", "");
   } else {
-    let log = findById(logs, id);
+    const log = findById(logs, id);
     setText("logLegend", "Edit Log Entry");
     setValue("logDescription", log.description);
     setValue("logDate", log.date);
   }
-  show("logForm");
+  openModal("logModal");
 }
 
 // CREATE and UPDATE
 function saveLog() {
-  let description = getValue("logDescription").trim();
-  let date = getValue("logDate");
+  clearErrors(["logDescriptionError"]);
+  const description = getValue("logDescription").trim();
+  const date = getValue("logDate");
 
-  if (description === "" || date === "") {
-    setText("logError", "Please enter the description and date.");
+  if (description === "") {
+    showError("logDescriptionError", "Description must be filled out");
     return;
   }
 
   if (editingLogId === 0) {
-    logs.unshift({ id: getNextId(logs), description: description, date: date });
+    logs.unshift({ id: getNextId(logs), description, date });
     showMessage("Log entry added.");
   } else {
-    let log = findById(logs, editingLogId);
-    log.description = description;
-    log.date = date;
+    Object.assign(findById(logs, editingLogId), { description, date });
     showMessage("Log entry updated.");
   }
-  hide("logForm");
+  closeModal("logModal");
   showLogs();
+  return;
 }
 
 // DELETE
@@ -1201,9 +1099,92 @@ function deleteLog(id) {
   showLogs();
 }
 
-// ==========================================================
+// EVENTS (everything is connected with addEventListener)
+const onClick = (id, handler) => document.getElementById(id).addEventListener("click", handler);
+
+// Sidebar and top bar
+sectionNames.forEach(name => onClick(`menu-${name}`, () => showSection(name)));
+onClick("logoutBtn", logOut);
+onClick("menuLogout", logOut);
+onClick("bellButton", openNotifications);
+onClick("profileButton", toggleProfile);
+document.querySelectorAll(".profile-link").forEach(link => {
+  link.addEventListener("click", () => profileLink(link.innerText));
+});
+
+// Tabs
+document.querySelectorAll("#roleTabs button").forEach(tab => {
+  tab.addEventListener("click", () => filterRole(tab.value));
+});
+analyticsTabs.forEach(name => onClick(`atab-${name}`, () => showAnalyticsTab(name)));
+
+// Search box and role dropdown
+document.getElementById("userSearch").addEventListener("keyup", showUsers);
+document.getElementById("roleFilter").addEventListener("change", () => filterRole(getValue("roleFilter")));
+
+// "+ Add" buttons (0 means "a new item")
+onClick("addActivityBtn", () => openActivityForm(0));
+onClick("addUserBtn", () => openUserForm(0));
+onClick("addSellerBtn", () => openSellerForm(0));
+onClick("addProductBtn", () => openProductForm(0));
+onClick("addCategoryBtn", () => openCategoryForm(0));
+onClick("addCouponBtn", () => openCouponForm(0));
+onClick("addRevenueBtn", () => openRevenueForm(0));
+onClick("addNotificationBtn", () => openNotificationForm(0));
+onClick("addLogBtn", () => openLogForm(0));
+
+// Forms: preventDefault() stops the page from reloading
+const onSubmit = (id, handler) => {
+  document.getElementById(id).addEventListener("submit", event => {
+    event.preventDefault();
+    handler();
+  });
+};
+onSubmit("userForm", saveUser);
+onSubmit("activityForm", saveActivity);
+onSubmit("sellerForm", saveSeller);
+onSubmit("productForm", saveProduct);
+onSubmit("categoryForm", saveCategory);
+onSubmit("couponForm", saveCoupon);
+onSubmit("revenueForm", saveRevenue);
+onSubmit("notificationForm", saveNotification);
+onSubmit("logForm", saveLog);
+onSubmit("settingsForm", saveSettings);
+
+// Close buttons: the x on a pop-up form and the Close button of a details box
+document.querySelectorAll(".close").forEach(button => button.addEventListener("click", closeAllModals));
+document.querySelectorAll(".details button").forEach(button => {
+  button.addEventListener("click", () => { button.parentNode.style.display = "none"; });
+});
+
+// Keyboard: the Escape key closes any open pop-up form
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    closeAllModals();
+  }
+});
+
+// Table rows are redrawn often, so each table body has one listener (button name = action, value = id)
+function listenToTable(bodyId, actions) {
+  document.getElementById(bodyId).addEventListener("click", event => {
+    const button = event.target;
+    if (button.tagName === "BUTTON" && actions[button.name]) {
+      actions[button.name](Number(button.value));
+    }
+  });
+}
+
+listenToTable("activityBody", { edit: openActivityForm, delete: deleteActivity });
+listenToTable("userBody", { view: viewUser, edit: openUserForm, toggle: toggleUser, delete: deleteUser });
+listenToTable("sellerBody", { view: viewSeller, verify: verifySeller, reject: rejectSeller, edit: openSellerForm, delete: deleteSeller });
+listenToTable("productBody", { view: viewProduct, approve: approveProduct, remove: removeProduct, edit: openProductForm, delete: deleteProduct });
+listenToTable("categoryBody", { edit: openCategoryForm, delete: deleteCategory });
+listenToTable("couponBody", { edit: openCouponForm, delete: deleteCoupon });
+listenToTable("revenueBody", { edit: openRevenueForm, delete: deleteRevenue });
+listenToTable("notificationBody", { toggle: toggleNotification, edit: openNotificationForm, delete: deleteNotification });
+listenToTable("logBody", { edit: openLogForm, delete: deleteLog });
+
 // START THE PAGE
-// ==========================================================
 showActivities();
 showUsers();
 showSellers();
