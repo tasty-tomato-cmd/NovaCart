@@ -1,1095 +1,46 @@
 /* ==========================================================
-   NovaCart – Admin Panel Script (final version)
-   Part 1: sidebar navigation, top bar, dashboard (recent activity CRUD)
-   Part 2: user & role management – full CRUD
-   Part 3: seller verification & product moderation – full CRUD
-   Part 4: platform settings, analytics, notifications, system logs – full CRUD
-   Part 5: final integration and cleanup
-   All data is demonstration data, saved with localStorage.
+   NovaCart – Admin Panel (JavaScript)
+   All data is demonstration data kept in arrays.
+   Every module has Create, Read, Update and Delete (CRUD).
    ========================================================== */
 
 // ==========================================================
-// DEMONSTRATION DATA
+// DATA
 // ==========================================================
-
-// Roles used in NovaCart (from the project proposal)
-// User fields follow the ER diagram: userID, name, email, role.
-// "status" and "joined" are extra frontend-only fields for this panel.
-const sampleUsers = [
-  { id: 1, name: "Lubaba", email: "lubaba@novacart.com", role: "Customer",         status: "Active", joined: "2025-01-15" },
-  { id: 2, name: "Sazin",  email: "sazin@novacart.com",  role: "Seller",           status: "Active", joined: "2025-01-14" },
-  { id: 3, name: "Fahad",  email: "fahad@novacart.com",  role: "Manager",          status: "Active", joined: "2025-01-11" },
-  { id: 4, name: "Ameya",  email: "ameya@novacart.com",  role: "Administrator",    status: "Active", joined: "2025-01-12" },
+let users = [
+  { id: 1, name: "Lubaba", email: "lubaba@novacart.com", role: "Customer", status: "Active", joined: "2025-01-15" },
+  { id: 2, name: "Sazin", email: "sazin@novacart.com", role: "Seller", status: "Active", joined: "2025-01-14" },
+  { id: 3, name: "Fahad", email: "fahad@novacart.com", role: "Manager", status: "Active", joined: "2025-01-11" },
+  { id: 4, name: "Ameya", email: "ameya@novacart.com", role: "Administrator", status: "Active", joined: "2025-01-12" },
   { id: 5, name: "Razeen", email: "razeen@novacart.com", role: "Delivery Partner", status: "Active", joined: "2025-01-10" }
 ];
 
-// Seller applications. "storeName" and "verificationStatus" come from the ER diagram (Seller);
-// the other fields are extra frontend-only details for this panel.
-const sampleSellers = [
-  { id: 1, storeName: "TechHub BD",      owner: "Rafiq Hasan",  appliedDate: "2025-11-10", storeInfo: "Electronics and mobile accessories", status: "Pending" },
-  { id: 2, storeName: "Fashion World",   owner: "Nusrat Jahan", appliedDate: "2025-11-09", storeInfo: "Clothing and fashion items",        status: "Pending" },
-  { id: 3, storeName: "Gadget Zone",     owner: "Tanvir Ahmed", appliedDate: "2025-11-08", storeInfo: "Smart gadgets and wearables",       status: "Pending" },
-  { id: 4, storeName: "Home Essentials", owner: "Sadia Rahman", appliedDate: "2025-11-05", storeInfo: "Kitchen and home products",         status: "Verified" },
-  { id: 5, storeName: "BookNest",        owner: "Karim Uddin",  appliedDate: "2025-11-02", storeInfo: "Books and stationery",              status: "Rejected" }
-];
-
-// Reported products. "productName", "price" and the seller come from the ER diagram (Product);
-// the report reason, report date and moderation status are frontend-only details.
-const sampleReportedProducts = [
-  { id: 1, productName: "Wireless Earbuds X2",  sellerName: "TechHub BD",      price: 1850, reason: "Misleading product description", reportDate: "2025-11-11", status: "Pending" },
-  { id: 2, productName: "Designer Handbag",     sellerName: "Fashion World",   price: 3200, reason: "Suspected counterfeit item",     reportDate: "2025-11-10", status: "Pending" },
-  { id: 3, productName: "Smart Watch Pro",      sellerName: "Gadget Zone",     price: 4500, reason: "Incorrect price listed",         reportDate: "2025-11-09", status: "Pending" },
-  { id: 4, productName: "Herbal Face Cream",    sellerName: "Home Essentials", price: 650,  reason: "Prohibited ingredient claim",    reportDate: "2025-11-06", status: "Removed" },
-  { id: 5, productName: "Power Bank 20000mAh",  sellerName: "TechHub BD",      price: 2100, reason: "Safety concern reported",        reportDate: "2025-11-04", status: "Approved" }
-];
-
-const sampleActivities = [
+let activities = [
   { id: 1, text: "New order received", time: "2 min ago" },
-  { id: 2, text: "Seller verified",    time: "5 min ago" },
-  { id: 3, text: "Product reported",   time: "12 min ago" },
+  { id: 2, text: "Seller verified", time: "5 min ago" },
+  { id: 3, text: "Product reported", time: "12 min ago" },
   { id: 4, text: "New user registered", time: "1 hour ago" }
 ];
 
-// Short description shown in the top bar for each section
-const sectionDescriptions = {
-  dashboard: "Overview of users, sellers and platform activity.",
-  users: "Manage users, roles and platform access.",
-  sellers: "Review seller applications and verify trusted sellers.",
-  products: "Review reported products and moderate content.",
-  settings: "Configure commission, categories and coupon policies.",
-  analytics: "Track revenue, notifications and administrator activity."
-};
-
-// ==========================================================
-// PAGE ELEMENTS
-// ==========================================================
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const menuItems = document.querySelectorAll(".menu-item[data-section]");
-const sections = document.querySelectorAll(".section");
-const topbarDescription = document.getElementById("topbarDescription");
-const profileDropdown = document.getElementById("profileDropdown");
-const toast = document.getElementById("toast");
-
-const userTableBody = document.getElementById("userTableBody");
-const userSearch = document.getElementById("userSearch");
-const roleFilter = document.getElementById("roleFilter");
-const userTabs = document.querySelectorAll("#userTabs .tab");
-const userModal = document.getElementById("userModal");
-const viewModal = document.getElementById("viewModal");
-const activityModal = document.getElementById("activityModal");
-const sellerModal = document.getElementById("sellerModal");
-const productModal = document.getElementById("productModal");
-
-// ==========================================================
-// SIDEBAR NAVIGATION (Part 1)
-// ==========================================================
-
-// Show one section and hide the others (no page reload)
-function showSection(sectionName) {
-  sections.forEach(function (section) {
-    section.classList.remove("active");
-  });
-  document.getElementById("section-" + sectionName).classList.add("active");
-
-  topbarDescription.textContent = sectionDescriptions[sectionName];
-  closeSidebar();
-}
-
-// Highlight the clicked menu item
-function setActiveMenu(clickedItem) {
-  menuItems.forEach(function (item) {
-    item.classList.remove("active");
-  });
-  clickedItem.classList.add("active");
-}
-
-menuItems.forEach(function (item) {
-  item.addEventListener("click", function () {
-    setActiveMenu(item);
-    showSection(item.dataset.section);
-  });
-});
-
-// Sidebar open/close (small screens)
-function openSidebar() {
-  sidebar.classList.add("open");
-  overlay.classList.add("show");
-}
-
-function closeSidebar() {
-  sidebar.classList.remove("open");
-  overlay.classList.remove("show");
-}
-
-document.getElementById("menuToggle").addEventListener("click", openSidebar);
-overlay.addEventListener("click", closeSidebar);
-
-// ==========================================================
-// TOP BAR (Part 1)
-// ==========================================================
-
-// Profile dropdown
-document.getElementById("profileBtn").addEventListener("click", function (event) {
-  event.stopPropagation();
-  profileDropdown.classList.toggle("show");
-});
-
-// Close the dropdown when clicking anywhere else
-document.addEventListener("click", function () {
-  profileDropdown.classList.remove("show");
-});
-
-// Notification bell: opens the Notifications tab (Analytics & Reports)
-document.getElementById("notificationBtn").addEventListener("click", function () {
-  setActiveMenu(document.querySelector('.menu-item[data-section="analytics"]'));
-  showSection("analytics");
-  showAnalyticsTab("notifications");
-});
-
-// "My Profile" and "Change Password" are demonstration links only
-document.querySelectorAll(".demo-link").forEach(function (link) {
-  link.addEventListener("click", function (event) {
-    event.preventDefault();
-    showToast(link.textContent + " is not part of this demo.", true);
-  });
-});
-
-// Log out (demonstration only)
-function logOut() {
-  if (confirm("Are you sure you want to log out?")) {
-    showToast("Logged out (demo only).");
-  }
-}
-
-document.getElementById("logoutBtn").addEventListener("click", logOut);
-document.getElementById("dropdownLogout").addEventListener("click", function (event) {
-  event.preventDefault();
-  logOut();
-});
-
-// Toast confirmation message
-function showToast(message, skipLog) {
-  if (!skipLog) addLog(message);
-  toast.textContent = message;
-  toast.classList.add("show");
-  setTimeout(function () {
-    toast.classList.remove("show");
-  }, 2500);
-}
-
-// ==========================================================
-// HELPER FUNCTIONS
-// ==========================================================
-
-// Format numbers like 12580 -> 12,580
-function formatNumber(number) {
-  return number.toLocaleString("en-US");
-}
-
-// Format "2025-01-15" -> "Jan 15, 2025"
-function formatDate(dateText) {
-  const date = new Date(dateText + "T00:00:00");
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
-// Today's date as "YYYY-MM-DD"
-function getToday() {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return now.getFullYear() + "-" + month + "-" + day;
-}
-
-// "John Doe" -> "JD"
-function getInitials(name) {
-  const words = name.trim().split(" ");
-  let initials = words[0].charAt(0);
-  if (words.length > 1) {
-    initials += words[words.length - 1].charAt(0);
-  }
-  return initials.toUpperCase();
-}
-
-// Stops user text from being read as HTML
-function escapeHtml(text) {
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-// "Delivery Partner" -> "Delivery-Partner" (used for CSS class names)
-function roleClass(role) {
-  return "role-" + role.replace(" ", "-");
-}
-
-// ==========================================================
-// USER DATA AND LOCALSTORAGE (Part 2)
-// ==========================================================
-const USERS_KEY = "novacartUsersV3";
-let users = [];
-let currentRole = "All";   // selected role (tab / dropdown)
-
-// Load users from localStorage, or use the sample data the first time
-function loadUsers() {
-  try {
-    const saved = localStorage.getItem(USERS_KEY);
-    if (saved) {
-      users = JSON.parse(saved);
-      return;
-    }
-  } catch (error) {
-    console.log("Could not read saved users:", error);
-  }
-  users = sampleUsers.slice();
-  saveUsers();
-}
-
-function saveUsers() {
-  try {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-  } catch (error) {
-    console.log("Could not save users:", error);
-  }
-}
-
-function findUser(id) {
-  return users.find(function (user) {
-    return user.id === id;
-  });
-}
-
-// ==========================================================
-// STATISTICS (dashboard + user management)
-// ==========================================================
-function updateStats() {
-  const total = users.length;
-  const sellers = users.filter(function (u) { return u.role === "Seller"; }).length;
-  const active = users.filter(function (u) { return u.status === "Active"; }).length;
-  const suspended = users.filter(function (u) { return u.status === "Suspended"; }).length;
-
-  // Dashboard cards
-  document.getElementById("statTotalUsers").textContent = formatNumber(total);
-  document.getElementById("statTotalSellers").textContent = formatNumber(sellers);
-  document.getElementById("statActive").textContent = formatNumber(active);
-  document.getElementById("statSuspended").textContent = formatNumber(suspended);
-
-  // User management cards
-  document.getElementById("userStatTotal").textContent = formatNumber(total);
-  document.getElementById("userStatSellers").textContent = formatNumber(sellers);
-  document.getElementById("userStatActive").textContent = formatNumber(active);
-  document.getElementById("userStatSuspended").textContent = formatNumber(suspended);
-}
-
-// ==========================================================
-// USER TABLE: SEARCH, FILTER, DISPLAY
-// ==========================================================
-
-// Apply the role filter and the search text
-function getFilteredUsers() {
-  const searchText = userSearch.value.trim().toLowerCase();
-
-  return users.filter(function (user) {
-    const roleMatches = currentRole === "All" || user.role === currentRole;
-    const idText = "#" + String(user.id).padStart(3, "0");
-    const searchMatches =
-      user.name.toLowerCase().includes(searchText) ||
-      user.email.toLowerCase().includes(searchText) ||
-      idText.includes(searchText);
-    return roleMatches && searchMatches;
-  });
-}
-
-function renderUsers() {
-  const list = getFilteredUsers();
-  userTableBody.innerHTML = "";
-
-  if (list.length === 0) {
-    userTableBody.innerHTML = "<tr><td colspan='7' class='empty-row'>No users found.</td></tr>";
-  }
-
-  list.forEach(function (user) {
-    const isSuspended = user.status === "Suspended";
-    const row = document.createElement("tr");
-
-    row.innerHTML =
-      "<td>#" + String(user.id).padStart(3, "0") + "</td>" +
-      "<td><div class='user-cell'><span class='user-initials'>" + escapeHtml(getInitials(user.name)) + "</span>" +
-        escapeHtml(user.name) + "</div></td>" +
-      "<td>" + escapeHtml(user.email) + "</td>" +
-      "<td><span class='badge " + roleClass(user.role) + "'>" + user.role + "</span></td>" +
-      "<td><span class='badge status-" + user.status + "'>" + user.status + "</span></td>" +
-      "<td>" + formatDate(user.joined) + "</td>" +
-      "<td><div class='actions'>" +
-        "<button class='action-btn' data-action='view' data-id='" + user.id + "' title='View details'>👁️ View</button>" +
-        "<button class='action-btn' data-action='edit' data-id='" + user.id + "' title='Edit user'>✏️ Edit</button>" +
-        "<button class='action-btn " + (isSuspended ? "success" : "danger") + "' data-action='toggle' data-id='" + user.id + "' " +
-          "title='" + (isSuspended ? "Reactivate account" : "Suspend account") + "'>" + (isSuspended ? "✅ Reactivate" : "🚫 Suspend") + "</button>" +
-        "<button class='action-btn danger' data-action='delete' data-id='" + user.id + "' title='Delete user permanently'>🗑️ Delete</button>" +
-      "</div></td>";
-
-    userTableBody.appendChild(row);
-  });
-
-  document.getElementById("userCount").textContent =
-    "Showing " + list.length + " of " + users.length + " users";
-}
-
-// Change the selected role (keeps tabs and dropdown in sync)
-function setRoleFilter(role) {
-  currentRole = role;
-  roleFilter.value = role;
-  userTabs.forEach(function (tab) {
-    tab.classList.toggle("active", tab.dataset.role === role);
-  });
-  renderUsers();
-}
-
-userTabs.forEach(function (tab) {
-  tab.addEventListener("click", function () {
-    setRoleFilter(tab.dataset.role);
-  });
-});
-
-roleFilter.addEventListener("change", function () {
-  setRoleFilter(roleFilter.value);
-});
-
-userSearch.addEventListener("input", renderUsers);
-
-// One click listener handles all View / Edit / Suspend buttons in the table
-userTableBody.addEventListener("click", function (event) {
-  const button = event.target.closest("button");
-  if (!button) return;
-
-  const id = Number(button.dataset.id);
-  if (button.dataset.action === "view") viewUser(id);
-  if (button.dataset.action === "edit") openUserForm(id);
-  if (button.dataset.action === "toggle") toggleSuspend(id);
-  if (button.dataset.action === "delete") deleteUser(id);
-});
-
-// ==========================================================
-// VIEW, ADD, EDIT, SUSPEND
-// ==========================================================
-
-function openModal(modal) {
-  modal.classList.add("show");
-}
-
-function closeModals() {
-  document.querySelectorAll(".modal-backdrop").forEach(function (modal) {
-    modal.classList.remove("show");
-  });
-}
-
-// ----- View user details -----
-function viewUser(id) {
-  const user = findUser(id);
-  document.getElementById("viewTitle").textContent = "User Details";
-  document.getElementById("viewDetails").innerHTML =
-    "<div class='detail-row'><span>User ID</span><span>#" + String(user.id).padStart(3, "0") + "</span></div>" +
-    "<div class='detail-row'><span>Name</span><span>" + escapeHtml(user.name) + "</span></div>" +
-    "<div class='detail-row'><span>Email</span><span>" + escapeHtml(user.email) + "</span></div>" +
-    "<div class='detail-row'><span>Role</span><span>" + user.role + "</span></div>" +
-    "<div class='detail-row'><span>Account Status</span><span>" + user.status + "</span></div>" +
-    "<div class='detail-row'><span>Joined Date</span><span>" + formatDate(user.joined) + "</span></div>";
-  openModal(viewModal);
-}
-
-// ----- Open the form: no id = Add User, with id = Edit User -----
-function openUserForm(id) {
-  const formError = document.getElementById("formError");
-  formError.classList.remove("show");
-
-  if (id) {
-    const user = findUser(id);
-    document.getElementById("userModalTitle").textContent = "Edit User";
-    document.getElementById("userId").value = user.id;
-    document.getElementById("userName").value = user.name;
-    document.getElementById("userEmail").value = user.email;
-    document.getElementById("userRole").value = user.role;
-    document.getElementById("userStatus").value = user.status;
-  } else {
-    document.getElementById("userModalTitle").textContent = "Add User";
-    document.getElementById("userId").value = "";
-    document.getElementById("userName").value = "";
-    document.getElementById("userEmail").value = "";
-    document.getElementById("userRole").value = "Customer";
-    document.getElementById("userStatus").value = "Active";
-  }
-  openModal(userModal);
-}
-
-function showFormError(message) {
-  const formError = document.getElementById("formError");
-  formError.textContent = message;
-  formError.classList.add("show");
-}
-
-// ----- Save the form (add or edit) -----
-function saveUserForm() {
-  const idValue = document.getElementById("userId").value;
-  const name = document.getElementById("userName").value.trim();
-  const email = document.getElementById("userEmail").value.trim();
-  const role = document.getElementById("userRole").value;
-  const status = document.getElementById("userStatus").value;
-
-  // Simple validation
-  if (name === "") {
-    showFormError("Please enter the user's name.");
-    return;
-  }
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(email)) {
-    showFormError("Please enter a valid email address.");
-    return;
-  }
-  const duplicate = users.some(function (user) {
-    return user.email.toLowerCase() === email.toLowerCase() && String(user.id) !== idValue;
-  });
-  if (duplicate) {
-    showFormError("This email is already used by another user.");
-    return;
-  }
-
-  if (idValue) {
-    // Edit existing user
-    const user = findUser(Number(idValue));
-    user.name = name;
-    user.email = email;
-    user.role = role;
-    user.status = status;
-    showToast("User updated successfully.");
-  } else {
-    // Add new user (next ID = highest ID + 1)
-    let newId = 1;
-    users.forEach(function (user) {
-      if (user.id >= newId) newId = user.id + 1;
-    });
-    users.push({ id: newId, name: name, email: email, role: role, status: status, joined: getToday() });
-    showToast("New user added successfully.");
-  }
-
-  saveUsers();
-  closeModals();
-  renderUsers();
-  updateStats();
-}
-
-// ----- Suspend or reactivate an account -----
-function toggleSuspend(id) {
-  const user = findUser(id);
-
-  if (user.status === "Active") {
-    if (!confirm("Suspend the account of " + user.name + "?")) return;
-    user.status = "Suspended";
-    showToast(user.name + "'s account has been suspended.");
-  } else {
-    user.status = "Active";
-    showToast(user.name + "'s account has been reactivated.");
-  }
-
-  saveUsers();
-  renderUsers();
-  updateStats();
-}
-
-// ----- Delete a user permanently (the "D" in CRUD) -----
-function deleteUser(id) {
-  const user = findUser(id);
-
-  if (!confirm("Permanently delete " + user.name + "? This cannot be undone.")) return;
-
-  // Keep every user except the deleted one
-  users = users.filter(function (u) {
-    return u.id !== id;
-  });
-
-  saveUsers();
-  renderUsers();
-  updateStats();
-  showToast(user.name + " has been permanently deleted.");
-}
-
-// ----- Modal buttons -----
-// Both "Add User" buttons (page header and above the table) open the same form
-["addUserBtn", "addUserBtn2"].forEach(function (buttonId) {
-  document.getElementById(buttonId).addEventListener("click", function () {
-    openUserForm(null);
-  });
-});
-document.getElementById("saveUserBtn").addEventListener("click", saveUserForm);
-document.getElementById("cancelUserBtn").addEventListener("click", closeModals);
-document.getElementById("closeViewBtn").addEventListener("click", closeModals);
-
-// Close a modal by clicking the dark background or pressing Escape
-document.querySelectorAll(".modal-backdrop").forEach(function (modal) {
-  modal.addEventListener("click", function (event) {
-    if (event.target === modal) closeModals();
-  });
-});
-document.addEventListener("keydown", function (event) {
-  if (event.key === "Escape") closeModals();
-});
-
-// ==========================================================
-// DASHBOARD RECENT ACTIVITY – CRUD (Part 1)
-// Create, Read, Update and Delete activities (saved in localStorage)
-// ==========================================================
-const ACTIVITIES_KEY = "novacartActivities";
-let activities = [];
-
-// Load activities from localStorage, or use the sample data the first time
-function loadActivities() {
-  try {
-    const saved = localStorage.getItem(ACTIVITIES_KEY);
-    if (saved) {
-      activities = JSON.parse(saved);
-      return;
-    }
-  } catch (error) {
-    console.log("Could not read saved activities:", error);
-  }
-  activities = sampleActivities.slice();
-  saveActivities();
-}
-
-function saveActivities() {
-  try {
-    localStorage.setItem(ACTIVITIES_KEY, JSON.stringify(activities));
-  } catch (error) {
-    console.log("Could not save activities:", error);
-  }
-}
-
-// READ: show all activities in the list
-function renderActivities() {
-  const list = document.getElementById("activityList");
-  list.innerHTML = "";
-
-  if (activities.length === 0) {
-    list.innerHTML = "<li class='time'>No recent activity.</li>";
-  }
-
-  activities.forEach(function (activity) {
-    const item = document.createElement("li");
-    item.innerHTML =
-      "<span class='activity-text'>" + escapeHtml(activity.text) + "</span>" +
-      "<span class='time'>" + escapeHtml(activity.time) + "</span>" +
-      "<div class='activity-actions'>" +
-        "<button class='action-btn' data-action='edit' data-id='" + activity.id + "' title='Edit'>✏️</button>" +
-        "<button class='action-btn danger' data-action='delete' data-id='" + activity.id + "' title='Delete'>🗑️</button>" +
-      "</div>";
-    list.appendChild(item);
-  });
-
-  renderAnalyticsActivity();
-}
-
-// Open the form: no id = Add Activity, with id = Edit Activity
-function openActivityForm(id) {
-  document.getElementById("activityError").classList.remove("show");
-
-  if (id) {
-    const activity = activities.find(function (a) { return a.id === id; });
-    document.getElementById("activityModalTitle").textContent = "Edit Activity";
-    document.getElementById("activityId").value = activity.id;
-    document.getElementById("activityText").value = activity.text;
-    document.getElementById("activityTime").value = activity.time;
-  } else {
-    document.getElementById("activityModalTitle").textContent = "Add Activity";
-    document.getElementById("activityId").value = "";
-    document.getElementById("activityText").value = "";
-    document.getElementById("activityTime").value = "Just now";
-  }
-  openModal(activityModal);
-}
-
-// CREATE / UPDATE: save the form
-function saveActivityForm() {
-  const idValue = document.getElementById("activityId").value;
-  const text = document.getElementById("activityText").value.trim();
-  const time = document.getElementById("activityTime").value.trim() || "Just now";
-
-  if (text === "") {
-    const error = document.getElementById("activityError");
-    error.textContent = "Please enter the activity description.";
-    error.classList.add("show");
-    return;
-  }
-
-  if (idValue) {
-    // UPDATE existing activity
-    const activity = activities.find(function (a) { return a.id === Number(idValue); });
-    activity.text = text;
-    activity.time = time;
-    showToast("Activity updated successfully.");
-  } else {
-    // CREATE new activity (next ID = highest ID + 1) and show it at the top
-    let newId = 1;
-    activities.forEach(function (a) {
-      if (a.id >= newId) newId = a.id + 1;
-    });
-    activities.unshift({ id: newId, text: text, time: time });
-    showToast("Activity added successfully.");
-  }
-
-  saveActivities();
-  closeModals();
-  renderActivities();
-}
-
-// DELETE: remove an activity permanently
-function deleteActivity(id) {
-  if (!confirm("Permanently delete this activity?")) return;
-
-  activities = activities.filter(function (a) {
-    return a.id !== id;
-  });
-
-  saveActivities();
-  renderActivities();
-  showToast("Activity deleted.");
-}
-
-// Buttons
-document.getElementById("addActivityBtn").addEventListener("click", function () {
-  openActivityForm(null);
-});
-document.getElementById("saveActivityBtn").addEventListener("click", saveActivityForm);
-document.getElementById("cancelActivityBtn").addEventListener("click", closeModals);
-
-// One click listener handles all Edit / Delete buttons in the list
-document.getElementById("activityList").addEventListener("click", function (event) {
-  const button = event.target.closest("button");
-  if (!button) return;
-
-  const id = Number(button.dataset.id);
-  if (button.dataset.action === "edit") openActivityForm(id);
-  if (button.dataset.action === "delete") deleteActivity(id);
-});
-
-// ==========================================================
-// SELLER VERIFICATION & PRODUCT MODERATION – CRUD (Part 3)
-// ==========================================================
-const SELLERS_KEY = "novacartSellers";
-const PRODUCTS_KEY = "novacartReportedProducts";
-let sellers = [];
-let reportedProducts = [];
-
-// ---------- Helpers ----------
-function loadList(key, sampleList) {
-  try {
-    const saved = localStorage.getItem(key);
-    if (saved) return JSON.parse(saved);
-  } catch (error) {
-    console.log("Could not read saved data:", error);
-  }
-  saveList(key, sampleList);
-  return sampleList.slice();
-}
-
-function saveList(key, list) {
-  try {
-    localStorage.setItem(key, JSON.stringify(list));
-  } catch (error) {
-    console.log("Could not save data:", error);
-  }
-}
-
-// Next ID = highest ID + 1
-function getNextId(list) {
-  let newId = 1;
-  list.forEach(function (item) {
-    if (item.id >= newId) newId = item.id + 1;
-  });
-  return newId;
-}
-
-function findById(list, id) {
-  return list.find(function (item) {
-    return item.id === id;
-  });
-}
-
-function countByStatus(list, status) {
-  return list.filter(function (item) {
-    return item.status === status;
-  }).length;
-}
-
-function showError(elementId, message) {
-  const error = document.getElementById(elementId);
-  error.textContent = message;
-  error.classList.add("show");
-}
-
-function loadModeration() {
-  sellers = loadList(SELLERS_KEY, sampleSellers);
-  reportedProducts = loadList(PRODUCTS_KEY, sampleReportedProducts);
-  updateModerationStats();
-  renderSellers();
-  renderProducts();
-}
-
-// Update the overview numbers (dashboard, Seller Verification and Product Moderation pages)
-function updateModerationStats() {
-  const pendingSellers = countByStatus(sellers, "Pending");
-  const pendingProducts = countByStatus(reportedProducts, "Pending");
-
-  // Dashboard "Moderation Overview"
-  document.getElementById("pendingSellers").textContent = pendingSellers;
-  document.getElementById("pendingProducts").textContent = pendingProducts;
-  document.getElementById("reportedProducts").textContent = reportedProducts.length;
-
-  // Seller Verification page
-  document.getElementById("sellerStatPending").textContent = pendingSellers;
-  document.getElementById("sellerStatVerified").textContent = countByStatus(sellers, "Verified");
-  document.getElementById("sellerStatRejected").textContent = countByStatus(sellers, "Rejected");
-
-  // Product Moderation page
-  document.getElementById("productStatPending").textContent = pendingProducts;
-  document.getElementById("productStatApproved").textContent = countByStatus(reportedProducts, "Approved");
-  document.getElementById("productStatRemoved").textContent = countByStatus(reportedProducts, "Removed");
-}
-
-// ==========================================================
-// A. SELLER APPLICATIONS
-// ==========================================================
-
-// READ: show all seller applications
-function renderSellers() {
-  const body = document.getElementById("sellerTableBody");
-  body.innerHTML = "";
-
-  if (sellers.length === 0) {
-    body.innerHTML = "<tr><td colspan='5' class='empty-row'>No seller applications.</td></tr>";
-  }
-
-  sellers.forEach(function (seller) {
-    const row = document.createElement("tr");
-    row.innerHTML =
-      "<td><strong>" + escapeHtml(seller.storeName) + "</strong></td>" +
-      "<td>" + formatDate(seller.appliedDate) + "</td>" +
-      "<td class='info-cell'>" + escapeHtml(seller.storeInfo) + "</td>" +
-      "<td><span class='badge status-" + seller.status + "'>" + seller.status + "</span></td>" +
-      "<td><div class='actions'>" +
-        "<button class='action-btn' data-action='view' data-id='" + seller.id + "'>👁️ View</button>" +
-        (seller.status !== "Verified" ? "<button class='action-btn success' data-action='approve' data-id='" + seller.id + "'>✅ Verify</button>" : "") +
-        (seller.status !== "Rejected" ? "<button class='action-btn danger' data-action='reject' data-id='" + seller.id + "'>❌ Reject</button>" : "") +
-        "<button class='action-btn' data-action='edit' data-id='" + seller.id + "'>✏️ Edit</button>" +
-        "<button class='action-btn danger' data-action='delete' data-id='" + seller.id + "'>🗑️ Delete</button>" +
-      "</div></td>";
-    body.appendChild(row);
-  });
-
-  document.getElementById("sellerCount").textContent = "Showing " + sellers.length + " seller applications";
-}
-
-// READ: view details
-function viewSeller(id) {
-  const seller = findById(sellers, id);
-  document.getElementById("viewTitle").textContent = "Seller Application";
-  document.getElementById("viewDetails").innerHTML =
-    "<div class='detail-row'><span>Application ID</span><span>#" + String(seller.id).padStart(3, "0") + "</span></div>" +
-    "<div class='detail-row'><span>Store Name</span><span>" + escapeHtml(seller.storeName) + "</span></div>" +
-    "<div class='detail-row'><span>Applicant</span><span>" + escapeHtml(seller.owner) + "</span></div>" +
-    "<div class='detail-row'><span>Application Date</span><span>" + formatDate(seller.appliedDate) + "</span></div>" +
-    "<div class='detail-row'><span>Store Information</span><span>" + escapeHtml(seller.storeInfo) + "</span></div>" +
-    "<div class='detail-row'><span>Verification Status</span><span>" + seller.status + "</span></div>";
-  openModal(viewModal);
-}
-
-// Open the form: no id = Add, with id = Edit
-function openSellerForm(id) {
-  document.getElementById("sellerError").classList.remove("show");
-
-  if (id) {
-    const seller = findById(sellers, id);
-    document.getElementById("sellerModalTitle").textContent = "Edit Seller Application";
-    document.getElementById("sellerId").value = seller.id;
-    document.getElementById("sellerStoreName").value = seller.storeName;
-    document.getElementById("sellerOwner").value = seller.owner;
-    document.getElementById("sellerDate").value = seller.appliedDate;
-    document.getElementById("sellerInfo").value = seller.storeInfo;
-    document.getElementById("sellerStatus").value = seller.status;
-  } else {
-    document.getElementById("sellerModalTitle").textContent = "Add Seller Application";
-    document.getElementById("sellerId").value = "";
-    document.getElementById("sellerStoreName").value = "";
-    document.getElementById("sellerOwner").value = "";
-    document.getElementById("sellerDate").value = getToday();
-    document.getElementById("sellerInfo").value = "";
-    document.getElementById("sellerStatus").value = "Pending";
-  }
-  openModal(sellerModal);
-}
-
-// CREATE / UPDATE
-function saveSellerForm() {
-  const idValue = document.getElementById("sellerId").value;
-  const storeName = document.getElementById("sellerStoreName").value.trim();
-  const owner = document.getElementById("sellerOwner").value.trim();
-  const appliedDate = document.getElementById("sellerDate").value;
-  const storeInfo = document.getElementById("sellerInfo").value.trim();
-  const status = document.getElementById("sellerStatus").value;
-
-  if (storeName === "" || owner === "" || appliedDate === "" || storeInfo === "") {
-    showError("sellerError", "Please fill in all fields.");
-    return;
-  }
-
-  if (idValue) {
-    const seller = findById(sellers, Number(idValue));
-    seller.storeName = storeName;
-    seller.owner = owner;
-    seller.appliedDate = appliedDate;
-    seller.storeInfo = storeInfo;
-    seller.status = status;
-    showToast("Seller application updated.");
-  } else {
-    sellers.unshift({ id: getNextId(sellers), storeName: storeName, owner: owner, appliedDate: appliedDate, storeInfo: storeInfo, status: status });
-    showToast("Seller application added.");
-  }
-
-  saveList(SELLERS_KEY, sellers);
-  closeModals();
-  renderSellers();
-  updateModerationStats();
-}
-
-// UPDATE: verify or reject an application
-function setSellerStatus(id, status) {
-  const seller = findById(sellers, id);
-  seller.status = status;
-
-  saveList(SELLERS_KEY, sellers);
-  renderSellers();
-  updateModerationStats();
-  showToast(seller.storeName + " has been " + status.toLowerCase() + ".");
-}
-
-// DELETE: permanently remove an application
-function deleteSeller(id) {
-  const seller = findById(sellers, id);
-  if (!confirm("Permanently delete the application of " + seller.storeName + "? This cannot be undone.")) return;
-
-  sellers = sellers.filter(function (item) {
-    return item.id !== id;
-  });
-
-  saveList(SELLERS_KEY, sellers);
-  renderSellers();
-  updateModerationStats();
-  showToast("Seller application deleted.");
-}
-
-document.getElementById("sellerTableBody").addEventListener("click", function (event) {
-  const button = event.target.closest("button");
-  if (!button) return;
-
-  const id = Number(button.dataset.id);
-  const action = button.dataset.action;
-  if (action === "view") viewSeller(id);
-  if (action === "edit") openSellerForm(id);
-  if (action === "approve") setSellerStatus(id, "Verified");
-  if (action === "reject") setSellerStatus(id, "Rejected");
-  if (action === "delete") deleteSeller(id);
-});
-
-document.getElementById("addSellerBtn").addEventListener("click", function () {
-  openSellerForm(null);
-});
-document.getElementById("saveSellerBtn").addEventListener("click", saveSellerForm);
-document.getElementById("cancelSellerBtn").addEventListener("click", closeModals);
-
-// ==========================================================
-// B. REPORTED PRODUCTS
-// ==========================================================
-
-// READ: show all reported products
-function renderProducts() {
-  const body = document.getElementById("productTableBody");
-  body.innerHTML = "";
-
-  if (reportedProducts.length === 0) {
-    body.innerHTML = "<tr><td colspan='6' class='empty-row'>No reported products.</td></tr>";
-  }
-
-  reportedProducts.forEach(function (product) {
-    const row = document.createElement("tr");
-    row.innerHTML =
-      "<td><strong>" + escapeHtml(product.productName) + "</strong></td>" +
-      "<td>" + escapeHtml(product.sellerName) + "</td>" +
-      "<td class='info-cell'>" + escapeHtml(product.reason) + "</td>" +
-      "<td>" + formatDate(product.reportDate) + "</td>" +
-      "<td><span class='badge status-" + product.status + "'>" + product.status + "</span></td>" +
-      "<td><div class='actions'>" +
-        "<button class='action-btn' data-action='view' data-id='" + product.id + "'>👁️ View</button>" +
-        (product.status !== "Approved" ? "<button class='action-btn success' data-action='approve' data-id='" + product.id + "'>✅ Approve</button>" : "") +
-        (product.status !== "Removed" ? "<button class='action-btn danger' data-action='reject' data-id='" + product.id + "'>❌ Remove</button>" : "") +
-        "<button class='action-btn' data-action='edit' data-id='" + product.id + "'>✏️ Edit</button>" +
-        "<button class='action-btn danger' data-action='delete' data-id='" + product.id + "'>🗑️ Delete</button>" +
-      "</div></td>";
-    body.appendChild(row);
-  });
-
-  document.getElementById("productCount").textContent = "Showing " + reportedProducts.length + " reported products";
-}
-
-// READ: view details
-function viewProduct(id) {
-  const product = findById(reportedProducts, id);
-  document.getElementById("viewTitle").textContent = "Reported Product";
-  document.getElementById("viewDetails").innerHTML =
-    "<div class='detail-row'><span>Report ID</span><span>#" + String(product.id).padStart(3, "0") + "</span></div>" +
-    "<div class='detail-row'><span>Product Name</span><span>" + escapeHtml(product.productName) + "</span></div>" +
-    "<div class='detail-row'><span>Seller</span><span>" + escapeHtml(product.sellerName) + "</span></div>" +
-    "<div class='detail-row'><span>Price</span><span>৳ " + formatNumber(product.price) + "</span></div>" +
-    "<div class='detail-row'><span>Report Reason</span><span>" + escapeHtml(product.reason) + "</span></div>" +
-    "<div class='detail-row'><span>Report Date</span><span>" + formatDate(product.reportDate) + "</span></div>" +
-    "<div class='detail-row'><span>Moderation Status</span><span>" + product.status + "</span></div>";
-  openModal(viewModal);
-}
-
-// Open the form: no id = Add, with id = Edit
-function openProductForm(id) {
-  document.getElementById("productError").classList.remove("show");
-
-  if (id) {
-    const product = findById(reportedProducts, id);
-    document.getElementById("productModalTitle").textContent = "Edit Reported Product";
-    document.getElementById("productId").value = product.id;
-    document.getElementById("productName").value = product.productName;
-    document.getElementById("productSellerName").value = product.sellerName;
-    document.getElementById("productPrice").value = product.price;
-    document.getElementById("productReason").value = product.reason;
-    document.getElementById("productDate").value = product.reportDate;
-    document.getElementById("productStatus").value = product.status;
-  } else {
-    document.getElementById("productModalTitle").textContent = "Add Reported Product";
-    document.getElementById("productId").value = "";
-    document.getElementById("productName").value = "";
-    document.getElementById("productSellerName").value = "";
-    document.getElementById("productPrice").value = "";
-    document.getElementById("productReason").value = "";
-    document.getElementById("productDate").value = getToday();
-    document.getElementById("productStatus").value = "Pending";
-  }
-  openModal(productModal);
-}
-
-// CREATE / UPDATE
-function saveProductForm() {
-  const idValue = document.getElementById("productId").value;
-  const productName = document.getElementById("productName").value.trim();
-  const sellerName = document.getElementById("productSellerName").value.trim();
-  const priceText = document.getElementById("productPrice").value;
-  const reason = document.getElementById("productReason").value.trim();
-  const reportDate = document.getElementById("productDate").value;
-  const status = document.getElementById("productStatus").value;
-
-  if (productName === "" || sellerName === "" || reason === "" || reportDate === "") {
-    showError("productError", "Please fill in all fields.");
-    return;
-  }
-  if (priceText === "" || Number(priceText) < 0) {
-    showError("productError", "Please enter a valid price.");
-    return;
-  }
-  const price = Number(priceText);
-
-  if (idValue) {
-    const product = findById(reportedProducts, Number(idValue));
-    product.productName = productName;
-    product.sellerName = sellerName;
-    product.price = price;
-    product.reason = reason;
-    product.reportDate = reportDate;
-    product.status = status;
-    showToast("Reported product updated.");
-  } else {
-    reportedProducts.unshift({ id: getNextId(reportedProducts), productName: productName, sellerName: sellerName, price: price, reason: reason, reportDate: reportDate, status: status });
-    showToast("Reported product added.");
-  }
-
-  saveList(PRODUCTS_KEY, reportedProducts);
-  closeModals();
-  renderProducts();
-  updateModerationStats();
-}
-
-// UPDATE: approve or remove a reported product
-function setProductStatus(id, status) {
-  const product = findById(reportedProducts, id);
-  product.status = status;
-
-  saveList(PRODUCTS_KEY, reportedProducts);
-  renderProducts();
-  updateModerationStats();
-  showToast(product.productName + " has been " + status.toLowerCase() + ".");
-}
-
-// DELETE: permanently remove a report
-function deleteProduct(id) {
-  const product = findById(reportedProducts, id);
-  if (!confirm("Permanently delete the report for " + product.productName + "? This cannot be undone.")) return;
-
-  reportedProducts = reportedProducts.filter(function (item) {
-    return item.id !== id;
-  });
-
-  saveList(PRODUCTS_KEY, reportedProducts);
-  renderProducts();
-  updateModerationStats();
-  showToast("Reported product deleted.");
-}
-
-document.getElementById("productTableBody").addEventListener("click", function (event) {
-  const button = event.target.closest("button");
-  if (!button) return;
-
-  const id = Number(button.dataset.id);
-  const action = button.dataset.action;
-  if (action === "view") viewProduct(id);
-  if (action === "edit") openProductForm(id);
-  if (action === "approve") setProductStatus(id, "Approved");
-  if (action === "reject") setProductStatus(id, "Removed");
-  if (action === "delete") deleteProduct(id);
-});
-
-document.getElementById("addProductBtn").addEventListener("click", function () {
-  openProductForm(null);
-});
-document.getElementById("saveProductBtn").addEventListener("click", saveProductForm);
-document.getElementById("cancelProductBtn").addEventListener("click", closeModals);
-
-// ==========================================================
-// PLATFORM SETTINGS, ANALYTICS, NOTIFICATIONS, LOGS – CRUD (Part 4)
-// ==========================================================
-const REVENUE_KEY = "novacartRevenue";
-const CATEGORIES_KEY = "novacartCategories";
-const COUPONS_KEY = "novacartCoupons";
-const NOTIFICATIONS_KEY = "novacartNotifications";
-const LOGS_KEY = "novacartLogs";
-const SETTINGS_KEY = "novacartSettings";
-
-// ---------- Demonstration data ----------
-// Category and Coupon fields follow the ER diagram (categoryName; code, discountType,
-// discountValue, expiryDate). Revenue, notifications and logs are demo data.
-const sampleRevenue = [
-  { id: 1, month: "Jan", revenue: 165000, orders: 820 },
-  { id: 2, month: "Feb", revenue: 178000, orders: 880 },
-  { id: 3, month: "Mar", revenue: 192500, orders: 940 },
-  { id: 4, month: "Apr", revenue: 210000, orders: 1030 },
-  { id: 5, month: "May", revenue: 238000, orders: 1170 },
-  { id: 6, month: "Jun", revenue: 262000, orders: 1280 }
+let sellers = [
+  { id: 1, storeName: "TechHub BD", owner: "Rafiq Hasan", date: "2025-11-10", info: "Electronics and mobile accessories", status: "Pending" },
+  { id: 2, storeName: "Fashion World", owner: "Nusrat Jahan", date: "2025-11-09", info: "Clothing and fashion items", status: "Pending" },
+  { id: 3, storeName: "Gadget Zone", owner: "Tanvir Ahmed", date: "2025-11-08", info: "Smart gadgets and wearables", status: "Pending" },
+  { id: 4, storeName: "Home Essentials", owner: "Sadia Rahman", date: "2025-11-05", info: "Kitchen and home products", status: "Verified" },
+  { id: 5, storeName: "BookNest", owner: "Karim Uddin", date: "2025-11-02", info: "Books and stationery", status: "Rejected" }
 ];
 
-const sampleCategories = [
+let products = [
+  { id: 1, name: "Wireless Earbuds X2", seller: "TechHub BD", price: 1850, reason: "Misleading product description", date: "2025-11-11", status: "Pending" },
+  { id: 2, name: "Designer Handbag", seller: "Fashion World", price: 3200, reason: "Suspected counterfeit item", date: "2025-11-10", status: "Pending" },
+  { id: 3, name: "Smart Watch Pro", seller: "Gadget Zone", price: 4500, reason: "Incorrect price listed", date: "2025-11-09", status: "Pending" },
+  { id: 4, name: "Herbal Face Cream", seller: "Home Essentials", price: 650, reason: "Prohibited ingredient claim", date: "2025-11-06", status: "Removed" },
+  { id: 5, name: "Power Bank 20000mAh", seller: "TechHub BD", price: 2100, reason: "Safety concern reported", date: "2025-11-04", status: "Approved" }
+];
+
+let commission = 10;
+
+let categories = [
   { id: 1, name: "Electronics" },
   { id: 2, name: "Fashion" },
   { id: 3, name: "Home & Kitchen" },
@@ -1098,14 +49,23 @@ const sampleCategories = [
   { id: 6, name: "Sports" }
 ];
 
-const sampleCoupons = [
-  { id: 1, code: "WELCOME10", type: "Percentage", value: 10,  expiry: "2026-12-31" },
-  { id: 2, code: "FREESHIP",  type: "Fixed",      value: 50,  expiry: "2026-12-31" },
-  { id: 3, code: "STUDENT15", type: "Percentage", value: 15,  expiry: "2027-03-31" },
-  { id: 4, code: "EID100",    type: "Fixed",      value: 100, expiry: "2025-06-30" }
+let coupons = [
+  { id: 1, code: "WELCOME10", type: "Percentage", value: 10, expiry: "2026-12-31" },
+  { id: 2, code: "FREESHIP", type: "Fixed", value: 50, expiry: "2026-12-31" },
+  { id: 3, code: "STUDENT15", type: "Percentage", value: 15, expiry: "2027-03-31" },
+  { id: 4, code: "EID100", type: "Fixed", value: 100, expiry: "2025-06-30" }
 ];
 
-const sampleNotifications = [
+let revenueData = [
+  { id: 1, month: "Jan", revenue: 165000, orders: 820 },
+  { id: 2, month: "Feb", revenue: 178000, orders: 880 },
+  { id: 3, month: "Mar", revenue: 192500, orders: 940 },
+  { id: 4, month: "Apr", revenue: 210000, orders: 1030 },
+  { id: 5, month: "May", revenue: 238000, orders: 1170 },
+  { id: 6, month: "Jun", revenue: 262000, orders: 1280 }
+];
+
+let notifications = [
   { id: 1, message: "New seller application received", date: "2025-11-10", status: "Unread" },
   { id: 2, message: "Product reported: Smart Watch Pro", date: "2025-11-09", status: "Unread" },
   { id: 3, message: "Monthly revenue report is ready", date: "2025-11-08", status: "Unread" },
@@ -1113,683 +73,1144 @@ const sampleNotifications = [
   { id: 5, message: "System backup completed", date: "2025-11-01", status: "Read" }
 ];
 
-const sampleLogs = [
+let logs = [
   { id: 1, description: "Verified seller Home Essentials", date: "2025-11-05" },
-  { id: 2, description: "Suspended a user account",        date: "2025-11-04" },
-  { id: 3, description: "Updated platform commission",     date: "2025-11-03" },
-  { id: 4, description: "Added a new product category",    date: "2025-11-02" }
+  { id: 2, description: "Suspended a user account", date: "2025-11-04" },
+  { id: 3, description: "Updated platform commission", date: "2025-11-03" },
+  { id: 4, description: "Added a new product category", date: "2025-11-02" }
 ];
 
-let revenueData = [];
-let categories = [];
-let coupons = [];
-let notifications = [];
-let logs = [];
-let settings = { commission: 10 };
+// Which item is being edited? 0 means "adding a new item".
+let editingUserId = 0;
+let editingActivityId = 0;
+let editingSellerId = 0;
+let editingProductId = 0;
+let editingCategoryId = 0;
+let editingCouponId = 0;
+let editingRevenueId = 0;
+let editingNotificationId = 0;
+let editingLogId = 0;
 
-// ---------- Load everything ----------
-function loadPlatform() {
-  revenueData = loadList(REVENUE_KEY, sampleRevenue);
-  categories = loadList(CATEGORIES_KEY, sampleCategories);
-  coupons = loadList(COUPONS_KEY, sampleCoupons);
-  notifications = loadList(NOTIFICATIONS_KEY, sampleNotifications);
-  logs = loadList(LOGS_KEY, sampleLogs);
+let currentRole = "All";
 
-  try {
-    const saved = localStorage.getItem(SETTINGS_KEY);
-    if (saved) settings = JSON.parse(saved);
-  } catch (error) {
-    console.log("Could not read saved settings:", error);
+// ==========================================================
+// SMALL HELPER FUNCTIONS
+// ==========================================================
+function getValue(id) {
+  return document.getElementById(id).value;
+}
+
+function setValue(id, value) {
+  document.getElementById(id).value = value;
+}
+
+function setText(id, text) {
+  document.getElementById(id).innerText = text;
+}
+
+function show(id) {
+  document.getElementById(id).style.display = "block";
+}
+
+function hide(id) {
+  document.getElementById(id).style.display = "none";
+}
+
+// Confirmation message at the top of the page
+function showMessage(text) {
+  setText("message", text);
+}
+
+// Find an item in an array using its id
+function findById(list, id) {
+  for (let item of list) {
+    if (item.id === id) {
+      return item;
+    }
   }
-  document.getElementById("commissionInput").value = settings.commission;
-
-  renderRevenue();
-  renderCategories();
-  renderCoupons();
-  renderNotifications();
-  renderLogs();
-  renderAnalyticsActivity();
 }
 
-// ---------- Tabs (Analytics, Notifications, System Logs) ----------
-function showAnalyticsTab(tabName) {
-  ["analytics", "notifications", "logs"].forEach(function (name) {
-    document.querySelector('#analyticsTabs [data-atab="' + name + '"]').classList.toggle("active", name === tabName);
-    document.getElementById("analyticsPanel-" + name).classList.toggle("active", name === tabName);
-  });
+// Next id = highest id + 1
+function getNextId(list) {
+  let highest = 0;
+  for (let item of list) {
+    if (item.id > highest) {
+      highest = item.id;
+    }
+  }
+  return highest + 1;
 }
 
-document.querySelectorAll("#analyticsTabs .tab").forEach(function (tab) {
-  tab.addEventListener("click", function () {
-    showAnalyticsTab(tab.dataset.atab);
-  });
-});
+// Delete an item from an array
+function removeItem(list, id) {
+  let item = findById(list, id);
+  let index = list.indexOf(item);
+  list.splice(index, 1);
+}
 
-// Money like "৳ 1,245,500"
-function formatMoney(amount) {
-  return "৳ " + formatNumber(amount);
+// Count the items that have a given status
+function countStatus(list, status) {
+  let count = 0;
+  for (let item of list) {
+    if (item.status === status) {
+      count++;
+    }
+  }
+  return count;
+}
+
+function money(amount) {
+  return "৳ " + amount;
 }
 
 // ==========================================================
-// A. ANALYTICS – monthly revenue data (CRUD) + stats + chart
+// SIDEBAR AND TOP BAR
 // ==========================================================
+let sectionNames = ["dashboard", "users", "sellers", "products", "settings", "analytics"];
 
-// READ: statistics, chart and table are all built from the monthly data
-function renderRevenue() {
-  let totalRevenue = 0;
-  let totalOrders = 0;
-  let maxRevenue = 0;
+let descriptions = {
+  dashboard: "Overview of users, sellers and platform activity.",
+  users: "Manage users, roles and platform access.",
+  sellers: "Review seller applications and verify trusted sellers.",
+  products: "Review reported products and moderate content.",
+  settings: "Configure commission, categories and coupon policies.",
+  analytics: "Track revenue, notifications and administrator activity."
+};
 
-  revenueData.forEach(function (item) {
-    totalRevenue += item.revenue;
-    totalOrders += item.orders;
-    if (item.revenue > maxRevenue) maxRevenue = item.revenue;
-  });
-
-  const average = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-  document.getElementById("statRevenue").textContent = formatMoney(totalRevenue);
-  document.getElementById("statOrders").textContent = formatNumber(totalOrders);
-  document.getElementById("statAvgOrder").textContent =
-    "৳ " + average.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-  // Bar chart: each bar height is a percentage of the highest month
-  const chart = document.getElementById("revenueChart");
-  chart.innerHTML = "";
-  if (revenueData.length === 0) {
-    chart.innerHTML = "<p class='hint'>No revenue data yet.</p>";
+// Show one section and hide the others (no page reload)
+function showSection(name) {
+  for (let section of sectionNames) {
+    document.getElementById("section-" + section).style.display = "none";
+    document.getElementById("menu-" + section).className = "menu-item";
   }
-  revenueData.forEach(function (item) {
-    const percent = maxRevenue > 0 ? Math.round((item.revenue / maxRevenue) * 100) : 0;
-    const shortText = item.revenue >= 1000 ? Math.round(item.revenue / 1000) + "k" : item.revenue;
-    const column = document.createElement("div");
-    column.className = "bar-col";
-    column.innerHTML =
-      "<div class='bar-area'><div class='bar' style='height:" + percent + "%' title='" + formatMoney(item.revenue) + "'>" + shortText + "</div></div>" +
-      "<span class='bar-label'>" + escapeHtml(item.month) + "</span>";
-    chart.appendChild(column);
-  });
-
-  // Table
-  const body = document.getElementById("revenueTableBody");
-  body.innerHTML = "";
-  if (revenueData.length === 0) {
-    body.innerHTML = "<tr><td colspan='4' class='empty-row'>No monthly data.</td></tr>";
-  }
-  revenueData.forEach(function (item) {
-    const row = document.createElement("tr");
-    row.innerHTML =
-      "<td><strong>" + escapeHtml(item.month) + "</strong></td>" +
-      "<td>" + formatMoney(item.revenue) + "</td>" +
-      "<td>" + formatNumber(item.orders) + "</td>" +
-      "<td><div class='actions'>" +
-        "<button class='action-btn' data-action='edit' data-id='" + item.id + "'>✏️ Edit</button>" +
-        "<button class='action-btn danger' data-action='delete' data-id='" + item.id + "'>🗑️ Delete</button>" +
-      "</div></td>";
-    body.appendChild(row);
-  });
+  document.getElementById("section-" + name).style.display = "block";
+  document.getElementById("menu-" + name).className = "menu-item active";
+  setText("description", descriptions[name]);
+  hide("profileMenu");
+  showMessage("");
 }
 
-// Analytics "Recent Activity" shows the latest dashboard activities
-function renderAnalyticsActivity() {
-  const list = document.getElementById("analyticsActivityList");
-  list.innerHTML = "";
-
-  if (activities.length === 0) {
-    list.innerHTML = "<li class='time'>No recent activity.</li>";
-  }
-  activities.slice(0, 5).forEach(function (activity) {
-    const item = document.createElement("li");
-    item.innerHTML = "<span class='activity-text'>" + escapeHtml(activity.text) + "</span><span class='time'>" + escapeHtml(activity.time) + "</span>";
-    list.appendChild(item);
-  });
-}
-
-function openRevenueForm(id) {
-  document.getElementById("revenueError").classList.remove("show");
-  if (id) {
-    const item = findById(revenueData, id);
-    document.getElementById("revenueModalTitle").textContent = "Edit Monthly Data";
-    document.getElementById("revenueId").value = item.id;
-    document.getElementById("revenueMonth").value = item.month;
-    document.getElementById("revenueAmount").value = item.revenue;
-    document.getElementById("revenueOrders").value = item.orders;
+function toggleProfile() {
+  let menu = document.getElementById("profileMenu");
+  if (menu.style.display === "block") {
+    menu.style.display = "none";
   } else {
-    document.getElementById("revenueModalTitle").textContent = "Add Monthly Data";
-    document.getElementById("revenueId").value = "";
-    document.getElementById("revenueMonth").value = "";
-    document.getElementById("revenueAmount").value = "";
-    document.getElementById("revenueOrders").value = "";
+    menu.style.display = "block";
   }
-  openModal(document.getElementById("revenueModal"));
 }
 
-// CREATE / UPDATE
-function saveRevenueForm() {
-  const idValue = document.getElementById("revenueId").value;
-  const month = document.getElementById("revenueMonth").value.trim();
-  const revenueText = document.getElementById("revenueAmount").value;
-  const ordersText = document.getElementById("revenueOrders").value;
+function profileLink(name) {
+  hide("profileMenu");
+  showMessage(name + " is not part of this demo.");
+}
 
-  if (month === "") {
-    showError("revenueError", "Please enter the month.");
-    return;
-  }
-  if (revenueText === "" || Number(revenueText) < 0 || ordersText === "" || Number(ordersText) < 0) {
-    showError("revenueError", "Please enter valid revenue and order numbers.");
-    return;
-  }
+function logOut() {
+  hide("profileMenu");
+  showMessage("Logged out (demo only).");
+}
 
-  if (idValue) {
-    const item = findById(revenueData, Number(idValue));
-    item.month = month;
-    item.revenue = Number(revenueText);
-    item.orders = Math.round(Number(ordersText));
-    showToast("Monthly data for " + month + " updated.");
+// The bell opens the Notifications tab
+function openNotifications() {
+  showSection("analytics");
+  showAnalyticsTab("notifications");
+}
+
+// The number on the bell = unread notifications
+function updateBell() {
+  let unread = countStatus(notifications, "Unread");
+  setText("bellCount", unread);
+  if (unread === 0) {
+    hide("bellCount");
   } else {
-    revenueData.push({ id: getNextId(revenueData), month: month, revenue: Number(revenueText), orders: Math.round(Number(ordersText)) });
-    showToast("Monthly data for " + month + " added.");
+    document.getElementById("bellCount").style.display = "inline";
   }
-
-  saveList(REVENUE_KEY, revenueData);
-  closeModals();
-  renderRevenue();
 }
 
-// DELETE
-function deleteRevenue(id) {
-  const item = findById(revenueData, id);
-  if (!confirm("Permanently delete the data for " + item.month + "?")) return;
-
-  revenueData = revenueData.filter(function (entry) {
-    return entry.id !== id;
-  });
-  saveList(REVENUE_KEY, revenueData);
-  renderRevenue();
-  showToast("Monthly data for " + item.month + " deleted.");
-}
-
-document.getElementById("revenueTableBody").addEventListener("click", function (event) {
-  const button = event.target.closest("button");
-  if (!button) return;
-  const id = Number(button.dataset.id);
-  if (button.dataset.action === "edit") openRevenueForm(id);
-  if (button.dataset.action === "delete") deleteRevenue(id);
-});
-document.getElementById("addRevenueBtn").addEventListener("click", function () { openRevenueForm(null); });
-document.getElementById("saveRevenueBtn").addEventListener("click", saveRevenueForm);
-document.getElementById("cancelRevenueBtn").addEventListener("click", closeModals);
-
 // ==========================================================
-// B1. COMMISSION SETTINGS
-// ==========================================================
-function saveSettings() {
-  const error = document.getElementById("settingsError");
-  const value = document.getElementById("commissionInput").value;
-
-  if (value === "" || Number(value) < 0 || Number(value) > 100) {
-    error.textContent = "Commission must be a number between 0 and 100.";
-    error.classList.add("show");
-    return;
-  }
-  error.classList.remove("show");
-
-  settings.commission = Number(value);
-  try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-  } catch (err) {
-    console.log("Could not save settings:", err);
-  }
-  showToast("Platform settings saved. Commission is now " + settings.commission + "%.");
-}
-
-document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
-
-// ==========================================================
-// B2. PRODUCT CATEGORIES (CRUD)
+// DASHBOARD – RECENT ACTIVITY (CRUD)
 // ==========================================================
 
 // READ
-function renderCategories() {
-  const body = document.getElementById("categoryTableBody");
-  body.innerHTML = "";
+function showActivities() {
+  let html = "<tr><th>Activity</th><th>Time</th><th>Actions</th></tr>";
+  let listHtml = "";
+
+  for (let activity of activities) {
+    html += "<tr><td>" + activity.text + "</td><td>" + activity.time + "</td><td>" +
+      "<button class='small' onclick='openActivityForm(" + activity.id + ")'>Edit</button>" +
+      "<button class='small danger' onclick='deleteActivity(" + activity.id + ")'>Delete</button>" +
+      "</td></tr>";
+    listHtml += "<li>" + activity.text + " (" + activity.time + ")</li>";
+  }
+
+  if (activities.length === 0) {
+    html += "<tr><td colspan='3'>No recent activity.</td></tr>";
+  }
+  document.getElementById("activityTable").innerHTML = html;
+  document.getElementById("analyticsActivity").innerHTML = listHtml;
+}
+
+// Open the form: id 0 = Add, otherwise Edit
+function openActivityForm(id) {
+  editingActivityId = id;
+  setText("activityError", "");
+
+  if (id === 0) {
+    setText("activityLegend", "Add Activity");
+    setValue("activityText", "");
+    setValue("activityTime", "Just now");
+  } else {
+    let activity = findById(activities, id);
+    setText("activityLegend", "Edit Activity");
+    setValue("activityText", activity.text);
+    setValue("activityTime", activity.time);
+  }
+  show("activityForm");
+}
+
+// CREATE and UPDATE
+function saveActivity() {
+  let text = getValue("activityText").trim();
+  let time = getValue("activityTime").trim();
+
+  if (text === "") {
+    setText("activityError", "Please enter the activity description.");
+    return;
+  }
+  if (time === "") {
+    time = "Just now";
+  }
+
+  if (editingActivityId === 0) {
+    activities.unshift({ id: getNextId(activities), text: text, time: time });
+    showMessage("Activity added successfully.");
+  } else {
+    let activity = findById(activities, editingActivityId);
+    activity.text = text;
+    activity.time = time;
+    showMessage("Activity updated successfully.");
+  }
+  hide("activityForm");
+  showActivities();
+}
+
+// DELETE
+function deleteActivity(id) {
+  removeItem(activities, id);
+  showMessage("Activity deleted.");
+  showActivities();
+}
+
+// ==========================================================
+// USER MANAGEMENT (CRUD)
+// ==========================================================
+
+// Statistics cards (dashboard and user page) come from the users array
+function updateStats() {
+  let sellerCount = 0;
+  let active = countStatus(users, "Active");
+  let suspended = countStatus(users, "Suspended");
+
+  for (let user of users) {
+    if (user.role === "Seller") {
+      sellerCount++;
+    }
+  }
+
+  setText("statTotalUsers", users.length);
+  setText("statTotalSellers", sellerCount);
+  setText("statActive", active);
+  setText("statSuspended", suspended);
+
+  setText("userStatTotal", users.length);
+  setText("userStatSellers", sellerCount);
+  setText("userStatActive", active);
+  setText("userStatSuspended", suspended);
+}
+
+// READ: show the table (uses the selected role and the search box)
+function showUsers() {
+  let search = getValue("userSearch").toLowerCase();
+  let html = "<tr><th>ID</th><th>User Name</th><th>Email</th><th>Role</th><th>Account Status</th><th>Joined Date</th><th>Actions</th></tr>";
+  let count = 0;
+
+  for (let user of users) {
+    let roleMatches = currentRole === "All" || user.role === currentRole;
+    let searchMatches = user.name.toLowerCase().indexOf(search) !== -1 ||
+      user.email.toLowerCase().indexOf(search) !== -1;
+
+    if (roleMatches && searchMatches) {
+      count++;
+      let suspendButton = "<button class='small danger' onclick='toggleUser(" + user.id + ")'>Suspend</button>";
+      if (user.status === "Suspended") {
+        suspendButton = "<button class='small good' onclick='toggleUser(" + user.id + ")'>Reactivate</button>";
+      }
+
+      html += "<tr><td>#" + user.id + "</td>" +
+        "<td>" + user.name + "</td>" +
+        "<td>" + user.email + "</td>" +
+        "<td>" + user.role + "</td>" +
+        "<td><span class='badge status-" + user.status + "'>" + user.status + "</span></td>" +
+        "<td>" + user.joined + "</td>" +
+        "<td><button class='small' onclick='viewUser(" + user.id + ")'>View</button>" +
+        "<button class='small' onclick='openUserForm(" + user.id + ")'>Edit</button>" +
+        suspendButton +
+        "<button class='small danger' onclick='deleteUser(" + user.id + ")'>Delete</button></td></tr>";
+    }
+  }
+
+  if (count === 0) {
+    html += "<tr><td colspan='7'>No users found.</td></tr>";
+  }
+  document.getElementById("userTable").innerHTML = html;
+  setText("userCount", "Showing " + count + " of " + users.length + " users");
+  updateStats();
+}
+
+// Role tabs and the role dropdown both call this function
+function filterRole(role) {
+  currentRole = role;
+  setValue("roleFilter", role);
+
+  let tabs = document.querySelectorAll("#roleTabs button");
+  for (let tab of tabs) {
+    if (tab.value === role) {
+      tab.className = "tab active";
+    } else {
+      tab.className = "tab";
+    }
+  }
+  showUsers();
+}
+
+// READ: view details
+function viewUser(id) {
+  let user = findById(users, id);
+  document.getElementById("userDetailsText").innerHTML = "<strong>User Details</strong><br>" +
+    "ID: #" + user.id + "<br>Name: " + user.name + "<br>Email: " + user.email +
+    "<br>Role: " + user.role + "<br>Account Status: " + user.status + "<br>Joined Date: " + user.joined;
+  show("userDetails");
+}
+
+// Open the form: id 0 = Add, otherwise Edit
+function openUserForm(id) {
+  editingUserId = id;
+  setText("userError", "");
+
+  if (id === 0) {
+    setText("userLegend", "Add User");
+    setValue("userName", "");
+    setValue("userEmail", "");
+    setValue("userRole", "Customer");
+    setValue("userStatus", "Active");
+    setValue("userJoined", "");
+  } else {
+    let user = findById(users, id);
+    setText("userLegend", "Edit User");
+    setValue("userName", user.name);
+    setValue("userEmail", user.email);
+    setValue("userRole", user.role);
+    setValue("userStatus", user.status);
+    setValue("userJoined", user.joined);
+  }
+  show("userForm");
+}
+
+// CREATE and UPDATE
+function saveUser() {
+  let name = getValue("userName").trim();
+  let email = getValue("userEmail").trim();
+  let role = getValue("userRole");
+  let status = getValue("userStatus");
+  let joined = getValue("userJoined");
+
+  // Validation
+  if (name === "") {
+    setText("userError", "Please enter the user's name.");
+    return;
+  }
+  if (email.indexOf("@") === -1 || email.indexOf(".") === -1) {
+    setText("userError", "Please enter a valid email address.");
+    return;
+  }
+  for (let user of users) {
+    if (user.email.toLowerCase() === email.toLowerCase() && user.id !== editingUserId) {
+      setText("userError", "This email is already used by another user.");
+      return;
+    }
+  }
+  if (joined === "") {
+    setText("userError", "Please select the joined date.");
+    return;
+  }
+
+  if (editingUserId === 0) {
+    users.push({ id: getNextId(users), name: name, email: email, role: role, status: status, joined: joined });
+    showMessage("New user added successfully.");
+  } else {
+    let user = findById(users, editingUserId);
+    user.name = name;
+    user.email = email;
+    user.role = role;
+    user.status = status;
+    user.joined = joined;
+    showMessage("User updated successfully.");
+  }
+  hide("userForm");
+  showUsers();
+}
+
+// UPDATE: suspend or reactivate
+function toggleUser(id) {
+  let user = findById(users, id);
+  if (user.status === "Active") {
+    user.status = "Suspended";
+    showMessage(user.name + "'s account has been suspended.");
+  } else {
+    user.status = "Active";
+    showMessage(user.name + "'s account has been reactivated.");
+  }
+  showUsers();
+}
+
+// DELETE
+function deleteUser(id) {
+  let user = findById(users, id);
+  removeItem(users, id);
+  showMessage(user.name + " has been permanently deleted.");
+  showUsers();
+}
+
+// ==========================================================
+// SELLER VERIFICATION (CRUD)
+// ==========================================================
+
+// READ
+function showSellers() {
+  let html = "<tr><th>Store Name</th><th>Applied Date</th><th>Store Information</th><th>Verification Status</th><th>Actions</th></tr>";
+
+  for (let seller of sellers) {
+    html += "<tr><td><strong>" + seller.storeName + "</strong></td>" +
+      "<td>" + seller.date + "</td>" +
+      "<td>" + seller.info + "</td>" +
+      "<td><span class='badge status-" + seller.status + "'>" + seller.status + "</span></td>" +
+      "<td><button class='small' onclick='viewSeller(" + seller.id + ")'>View</button>" +
+      "<button class='small good' onclick='verifySeller(" + seller.id + ")'>Verify</button>" +
+      "<button class='small danger' onclick='rejectSeller(" + seller.id + ")'>Reject</button>" +
+      "<button class='small' onclick='openSellerForm(" + seller.id + ")'>Edit</button>" +
+      "<button class='small danger' onclick='deleteSeller(" + seller.id + ")'>Delete</button></td></tr>";
+  }
+
+  if (sellers.length === 0) {
+    html += "<tr><td colspan='5'>No seller applications.</td></tr>";
+  }
+  document.getElementById("sellerTable").innerHTML = html;
+  setText("sellerCount", "Showing " + sellers.length + " seller applications");
+  updateModerationStats();
+}
+
+function viewSeller(id) {
+  let seller = findById(sellers, id);
+  document.getElementById("sellerDetailsText").innerHTML = "<strong>Seller Application</strong><br>" +
+    "Application ID: #" + seller.id + "<br>Store Name: " + seller.storeName + "<br>Applicant: " + seller.owner +
+    "<br>Application Date: " + seller.date + "<br>Store Information: " + seller.info +
+    "<br>Verification Status: " + seller.status;
+  show("sellerDetails");
+}
+
+function openSellerForm(id) {
+  editingSellerId = id;
+  setText("sellerError", "");
+
+  if (id === 0) {
+    setText("sellerLegend", "Add Seller Application");
+    setValue("sellerStoreName", "");
+    setValue("sellerOwner", "");
+    setValue("sellerDate", "");
+    setValue("sellerInfo", "");
+    setValue("sellerStatus", "Pending");
+  } else {
+    let seller = findById(sellers, id);
+    setText("sellerLegend", "Edit Seller Application");
+    setValue("sellerStoreName", seller.storeName);
+    setValue("sellerOwner", seller.owner);
+    setValue("sellerDate", seller.date);
+    setValue("sellerInfo", seller.info);
+    setValue("sellerStatus", seller.status);
+  }
+  show("sellerForm");
+}
+
+// CREATE and UPDATE
+function saveSeller() {
+  let storeName = getValue("sellerStoreName").trim();
+  let owner = getValue("sellerOwner").trim();
+  let date = getValue("sellerDate");
+  let info = getValue("sellerInfo").trim();
+  let status = getValue("sellerStatus");
+
+  if (storeName === "" || owner === "" || date === "" || info === "") {
+    setText("sellerError", "Please fill in all fields.");
+    return;
+  }
+
+  if (editingSellerId === 0) {
+    sellers.unshift({ id: getNextId(sellers), storeName: storeName, owner: owner, date: date, info: info, status: status });
+    showMessage("Seller application added.");
+  } else {
+    let seller = findById(sellers, editingSellerId);
+    seller.storeName = storeName;
+    seller.owner = owner;
+    seller.date = date;
+    seller.info = info;
+    seller.status = status;
+    showMessage("Seller application updated.");
+  }
+  hide("sellerForm");
+  showSellers();
+}
+
+// UPDATE: verify or reject
+function verifySeller(id) {
+  let seller = findById(sellers, id);
+  seller.status = "Verified";
+  showMessage(seller.storeName + " has been verified.");
+  showSellers();
+}
+
+function rejectSeller(id) {
+  let seller = findById(sellers, id);
+  seller.status = "Rejected";
+  showMessage(seller.storeName + " has been rejected.");
+  showSellers();
+}
+
+// DELETE
+function deleteSeller(id) {
+  removeItem(sellers, id);
+  showMessage("Seller application deleted.");
+  showSellers();
+}
+
+// ==========================================================
+// PRODUCT MODERATION (CRUD)
+// ==========================================================
+
+// READ
+function showProducts() {
+  let html = "<tr><th>Product Name</th><th>Seller</th><th>Report Reason</th><th>Report Date</th><th>Moderation Status</th><th>Actions</th></tr>";
+
+  for (let product of products) {
+    html += "<tr><td><strong>" + product.name + "</strong></td>" +
+      "<td>" + product.seller + "</td>" +
+      "<td>" + product.reason + "</td>" +
+      "<td>" + product.date + "</td>" +
+      "<td><span class='badge status-" + product.status + "'>" + product.status + "</span></td>" +
+      "<td><button class='small' onclick='viewProduct(" + product.id + ")'>View</button>" +
+      "<button class='small good' onclick='approveProduct(" + product.id + ")'>Approve</button>" +
+      "<button class='small danger' onclick='removeProduct(" + product.id + ")'>Remove</button>" +
+      "<button class='small' onclick='openProductForm(" + product.id + ")'>Edit</button>" +
+      "<button class='small danger' onclick='deleteProduct(" + product.id + ")'>Delete</button></td></tr>";
+  }
+
+  if (products.length === 0) {
+    html += "<tr><td colspan='6'>No reported products.</td></tr>";
+  }
+  document.getElementById("productTable").innerHTML = html;
+  setText("productCount", "Showing " + products.length + " reported products");
+  updateModerationStats();
+}
+
+function viewProduct(id) {
+  let product = findById(products, id);
+  document.getElementById("productDetailsText").innerHTML = "<strong>Reported Product</strong><br>" +
+    "Report ID: #" + product.id + "<br>Product Name: " + product.name + "<br>Seller: " + product.seller +
+    "<br>Price: " + money(product.price) + "<br>Report Reason: " + product.reason +
+    "<br>Report Date: " + product.date + "<br>Moderation Status: " + product.status;
+  show("productDetails");
+}
+
+function openProductForm(id) {
+  editingProductId = id;
+  setText("productError", "");
+
+  if (id === 0) {
+    setText("productLegend", "Add Reported Product");
+    setValue("productName", "");
+    setValue("productSeller", "");
+    setValue("productPrice", "");
+    setValue("productReason", "");
+    setValue("productDate", "");
+    setValue("productStatus", "Pending");
+  } else {
+    let product = findById(products, id);
+    setText("productLegend", "Edit Reported Product");
+    setValue("productName", product.name);
+    setValue("productSeller", product.seller);
+    setValue("productPrice", product.price);
+    setValue("productReason", product.reason);
+    setValue("productDate", product.date);
+    setValue("productStatus", product.status);
+  }
+  show("productForm");
+}
+
+// CREATE and UPDATE
+function saveProduct() {
+  let name = getValue("productName").trim();
+  let seller = getValue("productSeller").trim();
+  let price = getValue("productPrice");
+  let reason = getValue("productReason").trim();
+  let date = getValue("productDate");
+  let status = getValue("productStatus");
+
+  if (name === "" || seller === "" || reason === "" || date === "") {
+    setText("productError", "Please fill in all fields.");
+    return;
+  }
+  if (price === "" || Number(price) < 0) {
+    setText("productError", "Please enter a valid price.");
+    return;
+  }
+
+  if (editingProductId === 0) {
+    products.unshift({ id: getNextId(products), name: name, seller: seller, price: Number(price), reason: reason, date: date, status: status });
+    showMessage("Reported product added.");
+  } else {
+    let product = findById(products, editingProductId);
+    product.name = name;
+    product.seller = seller;
+    product.price = Number(price);
+    product.reason = reason;
+    product.date = date;
+    product.status = status;
+    showMessage("Reported product updated.");
+  }
+  hide("productForm");
+  showProducts();
+}
+
+// UPDATE: approve or remove
+function approveProduct(id) {
+  let product = findById(products, id);
+  product.status = "Approved";
+  showMessage(product.name + " has been approved.");
+  showProducts();
+}
+
+function removeProduct(id) {
+  let product = findById(products, id);
+  product.status = "Removed";
+  showMessage(product.name + " has been removed.");
+  showProducts();
+}
+
+// DELETE
+function deleteProduct(id) {
+  removeItem(products, id);
+  showMessage("Reported product deleted.");
+  showProducts();
+}
+
+// Moderation numbers: dashboard, seller page and product page
+function updateModerationStats() {
+  let pendingSellers = countStatus(sellers, "Pending");
+  let pendingProducts = countStatus(products, "Pending");
+
+  setText("pendingSellers", pendingSellers);
+  setText("pendingProducts", pendingProducts);
+  setText("reportedProducts", products.length);
+
+  setText("sellerStatPending", pendingSellers);
+  setText("sellerStatVerified", countStatus(sellers, "Verified"));
+  setText("sellerStatRejected", countStatus(sellers, "Rejected"));
+
+  setText("productStatPending", pendingProducts);
+  setText("productStatApproved", countStatus(products, "Approved"));
+  setText("productStatRemoved", countStatus(products, "Removed"));
+}
+
+// ==========================================================
+// PLATFORM SETTINGS – COMMISSION
+// ==========================================================
+function saveSettings() {
+  let value = getValue("commissionInput");
+
+  if (value === "" || Number(value) < 0 || Number(value) > 100) {
+    setText("settingsError", "Commission must be a number between 0 and 100.");
+    return;
+  }
+  setText("settingsError", "");
+  commission = Number(value);
+  showMessage("Platform settings saved. Commission is now " + commission + "%.");
+}
+
+// ==========================================================
+// PLATFORM SETTINGS – CATEGORIES (CRUD)
+// ==========================================================
+
+// READ
+function showCategories() {
+  let html = "<tr><th>ID</th><th>Category Name</th><th>Actions</th></tr>";
+
+  for (let category of categories) {
+    html += "<tr><td>#" + category.id + "</td><td><strong>" + category.name + "</strong></td>" +
+      "<td><button class='small' onclick='openCategoryForm(" + category.id + ")'>Edit</button>" +
+      "<button class='small danger' onclick='deleteCategory(" + category.id + ")'>Delete</button></td></tr>";
+  }
 
   if (categories.length === 0) {
-    body.innerHTML = "<tr><td colspan='3' class='empty-row'>No categories.</td></tr>";
+    html += "<tr><td colspan='3'>No categories.</td></tr>";
   }
-  categories.forEach(function (category) {
-    const row = document.createElement("tr");
-    row.innerHTML =
-      "<td>#" + String(category.id).padStart(3, "0") + "</td>" +
-      "<td><strong>" + escapeHtml(category.name) + "</strong></td>" +
-      "<td><div class='actions'>" +
-        "<button class='action-btn' data-action='edit' data-id='" + category.id + "'>✏️ Edit</button>" +
-        "<button class='action-btn danger' data-action='delete' data-id='" + category.id + "'>🗑️ Delete</button>" +
-      "</div></td>";
-    body.appendChild(row);
-  });
-  document.getElementById("categoryCount").textContent = "Showing " + categories.length + " categories";
+  document.getElementById("categoryTable").innerHTML = html;
 }
 
 function openCategoryForm(id) {
-  document.getElementById("categoryError").classList.remove("show");
-  if (id) {
-    const category = findById(categories, id);
-    document.getElementById("categoryModalTitle").textContent = "Edit Category";
-    document.getElementById("categoryId").value = category.id;
-    document.getElementById("categoryNameInput").value = category.name;
+  editingCategoryId = id;
+  setText("categoryError", "");
+
+  if (id === 0) {
+    setText("categoryLegend", "Add Category");
+    setValue("categoryName", "");
   } else {
-    document.getElementById("categoryModalTitle").textContent = "Add Category";
-    document.getElementById("categoryId").value = "";
-    document.getElementById("categoryNameInput").value = "";
+    setText("categoryLegend", "Edit Category");
+    setValue("categoryName", findById(categories, id).name);
   }
-  openModal(document.getElementById("categoryModal"));
+  show("categoryForm");
 }
 
-// CREATE / UPDATE
-function saveCategoryForm() {
-  const idValue = document.getElementById("categoryId").value;
-  const name = document.getElementById("categoryNameInput").value.trim();
+// CREATE and UPDATE
+function saveCategory() {
+  let name = getValue("categoryName").trim();
 
   if (name === "") {
-    showError("categoryError", "Please enter the category name.");
+    setText("categoryError", "Please enter the category name.");
     return;
   }
-  const duplicate = categories.some(function (category) {
-    return category.name.toLowerCase() === name.toLowerCase() && String(category.id) !== idValue;
-  });
-  if (duplicate) {
-    showError("categoryError", "This category already exists.");
-    return;
+  for (let category of categories) {
+    if (category.name.toLowerCase() === name.toLowerCase() && category.id !== editingCategoryId) {
+      setText("categoryError", "This category already exists.");
+      return;
+    }
   }
 
-  if (idValue) {
-    findById(categories, Number(idValue)).name = name;
-    showToast("Category updated: " + name + ".");
-  } else {
+  if (editingCategoryId === 0) {
     categories.push({ id: getNextId(categories), name: name });
-    showToast("Category added: " + name + ".");
+    showMessage("Category added: " + name + ".");
+  } else {
+    findById(categories, editingCategoryId).name = name;
+    showMessage("Category updated: " + name + ".");
   }
-
-  saveList(CATEGORIES_KEY, categories);
-  closeModals();
-  renderCategories();
+  hide("categoryForm");
+  showCategories();
 }
 
 // DELETE
 function deleteCategory(id) {
-  const category = findById(categories, id);
-  if (!confirm("Permanently delete the category " + category.name + "?")) return;
-
-  categories = categories.filter(function (item) {
-    return item.id !== id;
-  });
-  saveList(CATEGORIES_KEY, categories);
-  renderCategories();
-  showToast("Category deleted: " + category.name + ".");
+  removeItem(categories, id);
+  showMessage("Category deleted.");
+  showCategories();
 }
 
-document.getElementById("categoryTableBody").addEventListener("click", function (event) {
-  const button = event.target.closest("button");
-  if (!button) return;
-  const id = Number(button.dataset.id);
-  if (button.dataset.action === "edit") openCategoryForm(id);
-  if (button.dataset.action === "delete") deleteCategory(id);
-});
-document.getElementById("addCategoryBtn").addEventListener("click", function () { openCategoryForm(null); });
-document.getElementById("saveCategoryBtn").addEventListener("click", saveCategoryForm);
-document.getElementById("cancelCategoryBtn").addEventListener("click", closeModals);
-
 // ==========================================================
-// B3. COUPON POLICIES (CRUD)
+// PLATFORM SETTINGS – COUPONS (CRUD)
 // ==========================================================
 
 // READ
-function renderCoupons() {
-  const body = document.getElementById("couponTableBody");
-  body.innerHTML = "";
+function showCoupons() {
+  let html = "<tr><th>Code</th><th>Discount Type</th><th>Discount Value</th><th>Expiry Date</th><th>Actions</th></tr>";
+
+  for (let coupon of coupons) {
+    let discount = money(coupon.value);
+    if (coupon.type === "Percentage") {
+      discount = coupon.value + "%";
+    }
+    html += "<tr><td><strong>" + coupon.code + "</strong></td><td>" + coupon.type + "</td>" +
+      "<td>" + discount + "</td><td>" + coupon.expiry + "</td>" +
+      "<td><button class='small' onclick='openCouponForm(" + coupon.id + ")'>Edit</button>" +
+      "<button class='small danger' onclick='deleteCoupon(" + coupon.id + ")'>Delete</button></td></tr>";
+  }
 
   if (coupons.length === 0) {
-    body.innerHTML = "<tr><td colspan='5' class='empty-row'>No coupons.</td></tr>";
+    html += "<tr><td colspan='5'>No coupons.</td></tr>";
   }
-  coupons.forEach(function (coupon) {
-    const discountText = coupon.type === "Percentage" ? coupon.value + "%" : formatMoney(coupon.value);
-    const expiredText = coupon.expiry < getToday() ? " <span class='expired'>Expired</span>" : "";
-    const row = document.createElement("tr");
-    row.innerHTML =
-      "<td><strong>" + escapeHtml(coupon.code) + "</strong></td>" +
-      "<td>" + coupon.type + "</td>" +
-      "<td>" + discountText + "</td>" +
-      "<td>" + formatDate(coupon.expiry) + expiredText + "</td>" +
-      "<td><div class='actions'>" +
-        "<button class='action-btn' data-action='edit' data-id='" + coupon.id + "'>✏️ Edit</button>" +
-        "<button class='action-btn danger' data-action='delete' data-id='" + coupon.id + "'>🗑️ Delete</button>" +
-      "</div></td>";
-    body.appendChild(row);
-  });
-  document.getElementById("couponCount").textContent = "Showing " + coupons.length + " coupons";
+  document.getElementById("couponTable").innerHTML = html;
 }
 
 function openCouponForm(id) {
-  document.getElementById("couponError").classList.remove("show");
-  if (id) {
-    const coupon = findById(coupons, id);
-    document.getElementById("couponModalTitle").textContent = "Edit Coupon";
-    document.getElementById("couponId").value = coupon.id;
-    document.getElementById("couponCode").value = coupon.code;
-    document.getElementById("couponType").value = coupon.type;
-    document.getElementById("couponValue").value = coupon.value;
-    document.getElementById("couponExpiry").value = coupon.expiry;
+  editingCouponId = id;
+  setText("couponError", "");
+
+  if (id === 0) {
+    setText("couponLegend", "Add Coupon");
+    setValue("couponCode", "");
+    setValue("couponType", "Percentage");
+    setValue("couponValue", "");
+    setValue("couponExpiry", "");
   } else {
-    document.getElementById("couponModalTitle").textContent = "Add Coupon";
-    document.getElementById("couponId").value = "";
-    document.getElementById("couponCode").value = "";
-    document.getElementById("couponType").value = "Percentage";
-    document.getElementById("couponValue").value = "";
-    document.getElementById("couponExpiry").value = "";
+    let coupon = findById(coupons, id);
+    setText("couponLegend", "Edit Coupon");
+    setValue("couponCode", coupon.code);
+    setValue("couponType", coupon.type);
+    setValue("couponValue", coupon.value);
+    setValue("couponExpiry", coupon.expiry);
   }
-  openModal(document.getElementById("couponModal"));
+  show("couponForm");
 }
 
-// CREATE / UPDATE
-function saveCouponForm() {
-  const idValue = document.getElementById("couponId").value;
-  const code = document.getElementById("couponCode").value.trim().toUpperCase();
-  const type = document.getElementById("couponType").value;
-  const valueText = document.getElementById("couponValue").value;
-  const expiry = document.getElementById("couponExpiry").value;
+// CREATE and UPDATE
+function saveCoupon() {
+  let code = getValue("couponCode").trim().toUpperCase();
+  let type = getValue("couponType");
+  let value = Number(getValue("couponValue"));
+  let expiry = getValue("couponExpiry");
 
   if (code === "" || expiry === "") {
-    showError("couponError", "Please enter the coupon code and expiry date.");
+    setText("couponError", "Please enter the coupon code and expiry date.");
     return;
   }
   if (code.indexOf(" ") !== -1) {
-    showError("couponError", "The coupon code cannot contain spaces.");
+    setText("couponError", "The coupon code cannot contain spaces.");
     return;
   }
-  const value = Number(valueText);
-  if (valueText === "" || value <= 0) {
-    showError("couponError", "Please enter a discount value greater than 0.");
+  if (value <= 0) {
+    setText("couponError", "Please enter a discount value greater than 0.");
     return;
   }
   if (type === "Percentage" && value > 100) {
-    showError("couponError", "A percentage discount cannot be more than 100.");
+    setText("couponError", "A percentage discount cannot be more than 100.");
     return;
   }
-  const duplicate = coupons.some(function (coupon) {
-    return coupon.code === code && String(coupon.id) !== idValue;
-  });
-  if (duplicate) {
-    showError("couponError", "This coupon code already exists.");
-    return;
+  for (let coupon of coupons) {
+    if (coupon.code === code && coupon.id !== editingCouponId) {
+      setText("couponError", "This coupon code already exists.");
+      return;
+    }
   }
 
-  if (idValue) {
-    const coupon = findById(coupons, Number(idValue));
+  if (editingCouponId === 0) {
+    coupons.push({ id: getNextId(coupons), code: code, type: type, value: value, expiry: expiry });
+    showMessage("Coupon " + code + " added.");
+  } else {
+    let coupon = findById(coupons, editingCouponId);
     coupon.code = code;
     coupon.type = type;
     coupon.value = value;
     coupon.expiry = expiry;
-    showToast("Coupon " + code + " updated.");
-  } else {
-    coupons.push({ id: getNextId(coupons), code: code, type: type, value: value, expiry: expiry });
-    showToast("Coupon " + code + " added.");
+    showMessage("Coupon " + code + " updated.");
   }
-
-  saveList(COUPONS_KEY, coupons);
-  closeModals();
-  renderCoupons();
+  hide("couponForm");
+  showCoupons();
 }
 
 // DELETE
 function deleteCoupon(id) {
-  const coupon = findById(coupons, id);
-  if (!confirm("Permanently delete the coupon " + coupon.code + "?")) return;
-
-  coupons = coupons.filter(function (item) {
-    return item.id !== id;
-  });
-  saveList(COUPONS_KEY, coupons);
-  renderCoupons();
-  showToast("Coupon " + coupon.code + " deleted.");
+  removeItem(coupons, id);
+  showMessage("Coupon deleted.");
+  showCoupons();
 }
 
-document.getElementById("couponTableBody").addEventListener("click", function (event) {
-  const button = event.target.closest("button");
-  if (!button) return;
-  const id = Number(button.dataset.id);
-  if (button.dataset.action === "edit") openCouponForm(id);
-  if (button.dataset.action === "delete") deleteCoupon(id);
-});
-document.getElementById("addCouponBtn").addEventListener("click", function () { openCouponForm(null); });
-document.getElementById("saveCouponBtn").addEventListener("click", saveCouponForm);
-document.getElementById("cancelCouponBtn").addEventListener("click", closeModals);
-
 // ==========================================================
-// C. NOTIFICATIONS (CRUD)
+// ANALYTICS – TABS
 // ==========================================================
+let analyticsTabs = ["analytics", "notifications", "logs"];
 
-// The red number on the bell = unread notifications
-function updateBell() {
-  const unread = countByStatus(notifications, "Unread");
-  const bell = document.getElementById("bellCount");
-  bell.textContent = unread;
-  bell.style.display = unread > 0 ? "" : "none";
+function showAnalyticsTab(name) {
+  for (let tab of analyticsTabs) {
+    document.getElementById("panel-" + tab).style.display = "none";
+    document.getElementById("atab-" + tab).className = "tab";
+  }
+  document.getElementById("panel-" + name).style.display = "block";
+  document.getElementById("atab-" + name).className = "tab active";
 }
+
+// ==========================================================
+// ANALYTICS – MONTHLY REVENUE DATA (CRUD), STATISTICS AND CHART
+// ==========================================================
+
+// READ: statistics, chart and table are all made from the revenueData array
+function showRevenue() {
+  let totalRevenue = 0;
+  let totalOrders = 0;
+  let highest = 0;
+
+  for (let item of revenueData) {
+    totalRevenue += item.revenue;
+    totalOrders += item.orders;
+    if (item.revenue > highest) {
+      highest = item.revenue;
+    }
+  }
+
+  let average = 0;
+  if (totalOrders > 0) {
+    average = Math.round(totalRevenue / totalOrders * 100) / 100;
+  }
+  setText("statRevenue", money(totalRevenue));
+  setText("statOrders", totalOrders);
+  setText("statAvgOrder", money(average));
+
+  // Bar chart: the highest month gets a 180px bar, the others are smaller
+  let chart = document.getElementById("chart");
+  chart.innerHTML = "";
+
+  for (let item of revenueData) {
+    let height = 0;
+    if (highest > 0) {
+      height = Math.round(item.revenue / highest * 180);
+    }
+
+    let column = document.createElement("div");
+    column.className = "bar-column";
+
+    let bar = document.createElement("div");
+    bar.className = "bar";
+    bar.style.height = height + "px";
+    bar.innerText = Math.round(item.revenue / 1000) + "k";
+
+    let label = document.createElement("p");
+    label.innerText = item.month;
+
+    column.appendChild(bar);
+    column.appendChild(label);
+    chart.appendChild(column);
+  }
+
+  // Table
+  let html = "<tr><th>Month</th><th>Revenue</th><th>Orders</th><th>Actions</th></tr>";
+  for (let item of revenueData) {
+    html += "<tr><td><strong>" + item.month + "</strong></td><td>" + money(item.revenue) + "</td><td>" + item.orders + "</td>" +
+      "<td><button class='small' onclick='openRevenueForm(" + item.id + ")'>Edit</button>" +
+      "<button class='small danger' onclick='deleteRevenue(" + item.id + ")'>Delete</button></td></tr>";
+  }
+  if (revenueData.length === 0) {
+    html += "<tr><td colspan='4'>No monthly data.</td></tr>";
+  }
+  document.getElementById("revenueTable").innerHTML = html;
+}
+
+function openRevenueForm(id) {
+  editingRevenueId = id;
+  setText("revenueError", "");
+
+  if (id === 0) {
+    setText("revenueLegend", "Add Monthly Data");
+    setValue("revenueMonth", "");
+    setValue("revenueAmount", "");
+    setValue("revenueOrders", "");
+  } else {
+    let item = findById(revenueData, id);
+    setText("revenueLegend", "Edit Monthly Data");
+    setValue("revenueMonth", item.month);
+    setValue("revenueAmount", item.revenue);
+    setValue("revenueOrders", item.orders);
+  }
+  show("revenueForm");
+}
+
+// CREATE and UPDATE
+function saveRevenue() {
+  let month = getValue("revenueMonth").trim();
+  let revenue = getValue("revenueAmount");
+  let orders = getValue("revenueOrders");
+
+  if (month === "") {
+    setText("revenueError", "Please enter the month.");
+    return;
+  }
+  if (revenue === "" || Number(revenue) < 0 || orders === "" || Number(orders) < 0) {
+    setText("revenueError", "Please enter valid revenue and order numbers.");
+    return;
+  }
+
+  if (editingRevenueId === 0) {
+    revenueData.push({ id: getNextId(revenueData), month: month, revenue: Number(revenue), orders: Number(orders) });
+    showMessage("Monthly data for " + month + " added.");
+  } else {
+    let item = findById(revenueData, editingRevenueId);
+    item.month = month;
+    item.revenue = Number(revenue);
+    item.orders = Number(orders);
+    showMessage("Monthly data for " + month + " updated.");
+  }
+  hide("revenueForm");
+  showRevenue();
+}
+
+// DELETE
+function deleteRevenue(id) {
+  removeItem(revenueData, id);
+  showMessage("Monthly data deleted.");
+  showRevenue();
+}
+
+// ==========================================================
+// ANALYTICS – NOTIFICATIONS (CRUD)
+// ==========================================================
 
 // READ
-function renderNotifications() {
-  const body = document.getElementById("notificationTableBody");
-  body.innerHTML = "";
+function showNotifications() {
+  let html = "<tr><th>Notification</th><th>Date</th><th>Status</th><th>Actions</th></tr>";
+
+  for (let note of notifications) {
+    let toggleText = "Mark Read";
+    if (note.status === "Read") {
+      toggleText = "Mark Unread";
+    }
+    html += "<tr><td>" + note.message + "</td><td>" + note.date + "</td>" +
+      "<td><span class='badge status-" + note.status + "'>" + note.status + "</span></td>" +
+      "<td><button class='small good' onclick='toggleNotification(" + note.id + ")'>" + toggleText + "</button>" +
+      "<button class='small' onclick='openNotificationForm(" + note.id + ")'>Edit</button>" +
+      "<button class='small danger' onclick='deleteNotification(" + note.id + ")'>Delete</button></td></tr>";
+  }
 
   if (notifications.length === 0) {
-    body.innerHTML = "<tr><td colspan='4' class='empty-row'>No notifications.</td></tr>";
+    html += "<tr><td colspan='4'>No notifications.</td></tr>";
   }
-  notifications.forEach(function (note) {
-    const toggleText = note.status === "Unread" ? "✔️ Mark Read" : "↩️ Mark Unread";
-    const row = document.createElement("tr");
-    row.innerHTML =
-      "<td>" + escapeHtml(note.message) + "</td>" +
-      "<td>" + formatDate(note.date) + "</td>" +
-      "<td><span class='badge status-" + note.status + "'>" + note.status + "</span></td>" +
-      "<td><div class='actions'>" +
-        "<button class='action-btn success' data-action='toggle' data-id='" + note.id + "'>" + toggleText + "</button>" +
-        "<button class='action-btn' data-action='edit' data-id='" + note.id + "'>✏️ Edit</button>" +
-        "<button class='action-btn danger' data-action='delete' data-id='" + note.id + "'>🗑️ Delete</button>" +
-      "</div></td>";
-    body.appendChild(row);
-  });
-  document.getElementById("notificationCount").textContent =
-    "Showing " + notifications.length + " notifications (" + countByStatus(notifications, "Unread") + " unread)";
+  document.getElementById("notificationTable").innerHTML = html;
   updateBell();
 }
 
 function openNotificationForm(id) {
-  document.getElementById("notificationError").classList.remove("show");
-  if (id) {
-    const note = findById(notifications, id);
-    document.getElementById("notificationModalTitle").textContent = "Edit Notification";
-    document.getElementById("notificationId").value = note.id;
-    document.getElementById("notificationMessage").value = note.message;
-    document.getElementById("notificationDate").value = note.date;
-    document.getElementById("notificationStatus").value = note.status;
+  editingNotificationId = id;
+  setText("notificationError", "");
+
+  if (id === 0) {
+    setText("notificationLegend", "Add Notification");
+    setValue("notificationMessage", "");
+    setValue("notificationDate", "");
+    setValue("notificationStatus", "Unread");
   } else {
-    document.getElementById("notificationModalTitle").textContent = "Add Notification";
-    document.getElementById("notificationId").value = "";
-    document.getElementById("notificationMessage").value = "";
-    document.getElementById("notificationDate").value = getToday();
-    document.getElementById("notificationStatus").value = "Unread";
+    let note = findById(notifications, id);
+    setText("notificationLegend", "Edit Notification");
+    setValue("notificationMessage", note.message);
+    setValue("notificationDate", note.date);
+    setValue("notificationStatus", note.status);
   }
-  openModal(document.getElementById("notificationModal"));
+  show("notificationForm");
 }
 
-// CREATE / UPDATE
-function saveNotificationForm() {
-  const idValue = document.getElementById("notificationId").value;
-  const message = document.getElementById("notificationMessage").value.trim();
-  const date = document.getElementById("notificationDate").value;
-  const status = document.getElementById("notificationStatus").value;
+// CREATE and UPDATE
+function saveNotification() {
+  let message = getValue("notificationMessage").trim();
+  let date = getValue("notificationDate");
+  let status = getValue("notificationStatus");
 
   if (message === "" || date === "") {
-    showError("notificationError", "Please enter the message and date.");
+    setText("notificationError", "Please enter the message and date.");
     return;
   }
 
-  if (idValue) {
-    const note = findById(notifications, Number(idValue));
+  if (editingNotificationId === 0) {
+    notifications.unshift({ id: getNextId(notifications), message: message, date: date, status: status });
+    showMessage("Notification added.");
+  } else {
+    let note = findById(notifications, editingNotificationId);
     note.message = message;
     note.date = date;
     note.status = status;
-    showToast("Notification updated.");
-  } else {
-    notifications.unshift({ id: getNextId(notifications), message: message, date: date, status: status });
-    showToast("Notification added.");
+    showMessage("Notification updated.");
   }
-
-  saveList(NOTIFICATIONS_KEY, notifications);
-  closeModals();
-  renderNotifications();
+  hide("notificationForm");
+  showNotifications();
 }
 
-// UPDATE: mark as read / unread (not written to the log)
+// UPDATE: mark as read or unread
 function toggleNotification(id) {
-  const note = findById(notifications, id);
-  note.status = note.status === "Unread" ? "Read" : "Unread";
-  saveList(NOTIFICATIONS_KEY, notifications);
-  renderNotifications();
-  showToast("Notification marked as " + note.status.toLowerCase() + ".", true);
+  let note = findById(notifications, id);
+  if (note.status === "Unread") {
+    note.status = "Read";
+  } else {
+    note.status = "Unread";
+  }
+  showMessage("Notification marked as " + note.status.toLowerCase() + ".");
+  showNotifications();
 }
 
 // DELETE
 function deleteNotification(id) {
-  if (!confirm("Permanently delete this notification?")) return;
-
-  notifications = notifications.filter(function (item) {
-    return item.id !== id;
-  });
-  saveList(NOTIFICATIONS_KEY, notifications);
-  renderNotifications();
-  showToast("Notification deleted.");
+  removeItem(notifications, id);
+  showMessage("Notification deleted.");
+  showNotifications();
 }
 
-document.getElementById("notificationTableBody").addEventListener("click", function (event) {
-  const button = event.target.closest("button");
-  if (!button) return;
-  const id = Number(button.dataset.id);
-  if (button.dataset.action === "toggle") toggleNotification(id);
-  if (button.dataset.action === "edit") openNotificationForm(id);
-  if (button.dataset.action === "delete") deleteNotification(id);
-});
-document.getElementById("addNotificationBtn").addEventListener("click", function () { openNotificationForm(null); });
-document.getElementById("saveNotificationBtn").addEventListener("click", saveNotificationForm);
-document.getElementById("cancelNotificationBtn").addEventListener("click", closeModals);
-
 // ==========================================================
-// D. SYSTEM LOGS (CRUD)
+// ANALYTICS – SYSTEM LOGS (CRUD)
 // ==========================================================
-
-// CREATE (automatic): called by showToast() for every important action
-function addLog(description) {
-  logs.unshift({ id: getNextId(logs), description: description, date: getToday() });
-  if (logs.length > 100) logs.pop();   // keep the list small
-  saveList(LOGS_KEY, logs);
-  renderLogs();
-}
 
 // READ
-function renderLogs() {
-  const body = document.getElementById("logTableBody");
-  body.innerHTML = "";
+function showLogs() {
+  let html = "<tr><th>Activity Description</th><th>Date</th><th>Actions</th></tr>";
+
+  for (let log of logs) {
+    html += "<tr><td>" + log.description + "</td><td>" + log.date + "</td>" +
+      "<td><button class='small' onclick='openLogForm(" + log.id + ")'>Edit</button>" +
+      "<button class='small danger' onclick='deleteLog(" + log.id + ")'>Delete</button></td></tr>";
+  }
 
   if (logs.length === 0) {
-    body.innerHTML = "<tr><td colspan='3' class='empty-row'>No log entries.</td></tr>";
+    html += "<tr><td colspan='3'>No log entries.</td></tr>";
   }
-  logs.forEach(function (log) {
-    const row = document.createElement("tr");
-    row.innerHTML =
-      "<td>" + escapeHtml(log.description) + "</td>" +
-      "<td>" + formatDate(log.date) + "</td>" +
-      "<td><div class='actions'>" +
-        "<button class='action-btn' data-action='edit' data-id='" + log.id + "'>✏️ Edit</button>" +
-        "<button class='action-btn danger' data-action='delete' data-id='" + log.id + "'>🗑️ Delete</button>" +
-      "</div></td>";
-    body.appendChild(row);
-  });
-  document.getElementById("logCount").textContent = "Showing " + logs.length + " log entries";
+  document.getElementById("logTable").innerHTML = html;
 }
 
 function openLogForm(id) {
-  document.getElementById("logError").classList.remove("show");
-  if (id) {
-    const log = findById(logs, id);
-    document.getElementById("logModalTitle").textContent = "Edit Log Entry";
-    document.getElementById("logId").value = log.id;
-    document.getElementById("logDescription").value = log.description;
-    document.getElementById("logDate").value = log.date;
+  editingLogId = id;
+  setText("logError", "");
+
+  if (id === 0) {
+    setText("logLegend", "Add Log Entry");
+    setValue("logDescription", "");
+    setValue("logDate", "");
   } else {
-    document.getElementById("logModalTitle").textContent = "Add Log Entry";
-    document.getElementById("logId").value = "";
-    document.getElementById("logDescription").value = "";
-    document.getElementById("logDate").value = getToday();
+    let log = findById(logs, id);
+    setText("logLegend", "Edit Log Entry");
+    setValue("logDescription", log.description);
+    setValue("logDate", log.date);
   }
-  openModal(document.getElementById("logModal"));
+  show("logForm");
 }
 
-// CREATE / UPDATE (manual)
-function saveLogForm() {
-  const idValue = document.getElementById("logId").value;
-  const description = document.getElementById("logDescription").value.trim();
-  const date = document.getElementById("logDate").value;
+// CREATE and UPDATE
+function saveLog() {
+  let description = getValue("logDescription").trim();
+  let date = getValue("logDate");
 
   if (description === "" || date === "") {
-    showError("logError", "Please enter the description and date.");
+    setText("logError", "Please enter the description and date.");
     return;
   }
 
-  if (idValue) {
-    const log = findById(logs, Number(idValue));
+  if (editingLogId === 0) {
+    logs.unshift({ id: getNextId(logs), description: description, date: date });
+    showMessage("Log entry added.");
+  } else {
+    let log = findById(logs, editingLogId);
     log.description = description;
     log.date = date;
-    showToast("Log entry updated.", true);
-  } else {
-    logs.unshift({ id: getNextId(logs), description: description, date: date });
-    showToast("Log entry added.", true);
+    showMessage("Log entry updated.");
   }
-
-  saveList(LOGS_KEY, logs);
-  closeModals();
-  renderLogs();
+  hide("logForm");
+  showLogs();
 }
 
 // DELETE
 function deleteLog(id) {
-  if (!confirm("Permanently delete this log entry?")) return;
-
-  logs = logs.filter(function (item) {
-    return item.id !== id;
-  });
-  saveList(LOGS_KEY, logs);
-  renderLogs();
-  showToast("Log entry deleted.", true);
+  removeItem(logs, id);
+  showMessage("Log entry deleted.");
+  showLogs();
 }
-
-document.getElementById("logTableBody").addEventListener("click", function (event) {
-  const button = event.target.closest("button");
-  if (!button) return;
-  const id = Number(button.dataset.id);
-  if (button.dataset.action === "edit") openLogForm(id);
-  if (button.dataset.action === "delete") deleteLog(id);
-});
-document.getElementById("addLogBtn").addEventListener("click", function () { openLogForm(null); });
-document.getElementById("saveLogBtn").addEventListener("click", saveLogForm);
-document.getElementById("cancelLogBtn").addEventListener("click", closeModals);
 
 // ==========================================================
 // START THE PAGE
 // ==========================================================
-loadUsers();
-updateStats();
-renderUsers();
-loadModeration();
-loadActivities();
-renderActivities();
-loadPlatform();
+showActivities();
+showUsers();
+showSellers();
+showProducts();
+showCategories();
+showCoupons();
+showRevenue();
+showNotifications();
+showLogs();
+showSection("dashboard");
