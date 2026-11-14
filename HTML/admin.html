@@ -1,30 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-US">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NovaCart administrator panel (CSC 3215 Web Technologies project)">
+  <meta name="author" content="NovaCart Group">
   <title>NovaCart – Admin Panel</title>
   <link rel="stylesheet" href="../CSS/admin.css">
 </head>
 <body>
 
-  <!-- ================= SIDEBAR ================= -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <h2>🛒 NovaCart</h2>
     <p class="admin-label">Admin Panel</p>
 
-    <nav>
-      <button id="menu-dashboard" class="menu-item active" onclick="showSection('dashboard')">🏠 Dashboard</button>
-      <button id="menu-users" class="menu-item" onclick="showSection('users')">👥 User Management</button>
-      <button id="menu-sellers" class="menu-item" onclick="showSection('sellers')">🛡️ Seller Verification</button>
-      <button id="menu-products" class="menu-item" onclick="showSection('products')">📦 Product Moderation</button>
-      <button id="menu-settings" class="menu-item" onclick="showSection('settings')">⚙️ Platform Settings</button>
-      <button id="menu-analytics" class="menu-item" onclick="showSection('analytics')">📊 Analytics &amp; Reports</button>
+    <nav aria-label="Main menu">
+      <button id="menu-dashboard" class="menu-item active">🏠 Dashboard</button>
+      <button id="menu-users" class="menu-item">👥 User Management</button>
+      <button id="menu-sellers" class="menu-item">🛡️ Seller Verification</button>
+      <button id="menu-products" class="menu-item">📦 Product Moderation</button>
+      <button id="menu-settings" class="menu-item">⚙️ Platform Settings</button>
+      <button id="menu-analytics" class="menu-item">📊 Analytics &amp; Reports</button>
     </nav>
 
-    <button class="menu-item logout" onclick="logOut()">🚪 Log Out</button>
+    <button id="logoutBtn" class="menu-item logout">🚪 Log Out</button>
   </aside>
 
-  <!-- ================= MAIN AREA ================= -->
+  <!-- MAIN AREA -->
   <div class="main">
 
     <!-- Top navigation bar -->
@@ -34,28 +37,28 @@
         <p id="description"></p>
       </div>
       <div class="top-right">
-        <button class="bell" onclick="openNotifications()">🔔 <span id="bellCount">0</span></button>
-        <button class="profile-button" onclick="toggleProfile()">A Admin ▾</button>
-        <div id="profileMenu" class="profile-menu" style="display: none">
-          <button onclick="profileLink('My Profile')">My Profile</button>
-          <button onclick="profileLink('Change Password')">Change Password</button>
-          <button onclick="logOut()">Log Out</button>
+        <button id="bellButton" class="bell" aria-label="Notifications">🔔 <span id="bellCount">0</span></button>
+        <button id="profileButton" class="profile-button" aria-haspopup="true">A Admin ▾</button>
+        <div id="profileMenu" class="profile-menu">
+          <button class="profile-link">My Profile</button>
+          <button class="profile-link">Change Password</button>
+          <button id="menuLogout">Log Out</button>
         </div>
       </div>
     </header>
 
     <!-- Confirmation messages appear here -->
-    <p id="message" class="message"></p>
+    <p id="message" class="message" aria-live="polite"></p>
 
     <main>
 
-      <!-- ================= DASHBOARD ================= -->
+      <!-- DASHBOARD -->
       <section id="section-dashboard" class="section">
         <div class="page-header">
           <span class="icon">📋</span>
           <div>
             <h1>Admin Dashboard</h1>
-            <p>A quick overview of NovaCart. (All figures are demonstration data.)</p>
+            <p>A quick overview of users, sellers and activity on NovaCart.</p>
           </div>
         </div>
 
@@ -77,26 +80,19 @@
           <div class="card">
             <div class="card-title">
               <h3>Recent Activity</h3>
-              <button class="btn" onclick="openActivityForm(0)">+ Add Activity</button>
+              <button class="btn" id="addActivityBtn">+ Add Activity</button>
             </div>
-
-            <fieldset id="activityForm" class="form-box" style="display: none">
-              <legend id="activityLegend">Add Activity</legend>
-              <label for="activityText">Activity</label>
-              <input type="text" id="activityText" placeholder="e.g. New order received">
-              <label for="activityTime">Time</label>
-              <input type="text" id="activityTime" placeholder="e.g. 2 min ago">
-              <p class="error" id="activityError"></p>
-              <button class="btn" onclick="saveActivity()">Save</button>
-              <button class="btn light" onclick="hide('activityForm')">Cancel</button>
-            </fieldset>
-
-            <div class="table-box"><table id="activityTable"></table></div>
+            <div class="table-box">
+              <table>
+                <thead><tr><th>Activity</th><th>Time</th><th>Actions</th></tr></thead>
+                <tbody id="activityBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- ================= USER MANAGEMENT ================= -->
+      <!-- USER MANAGEMENT -->
       <section id="section-users" class="section">
         <div class="page-header">
           <span class="icon">👥</span>
@@ -104,7 +100,7 @@
             <h1>User &amp; Role Management</h1>
             <p>View and manage all registered users on NovaCart.</p>
           </div>
-          <button class="btn right" onclick="openUserForm(0)">+ Add User</button>
+          <button class="btn right" id="addUserBtn">+ Add User</button>
         </div>
 
         <div class="cards">
@@ -114,52 +110,24 @@
           <div class="stat-card"><span>Suspended</span><strong id="userStatSuspended">0</strong></div>
         </div>
 
-        <!-- Add / Edit form -->
-        <fieldset id="userForm" class="form-box" style="display: none">
-          <legend id="userLegend">Add User</legend>
-          <label for="userName">Full Name</label>
-          <input type="text" id="userName" placeholder="Enter full name">
-          <label for="userEmail">Email</label>
-          <input type="email" id="userEmail" placeholder="name@novacart.com">
-          <label for="userRole">Role</label>
-          <select id="userRole">
-            <option value="Customer">Customer</option>
-            <option value="Seller">Seller</option>
-            <option value="Manager">Manager</option>
-            <option value="Administrator">Administrator</option>
-            <option value="Delivery Partner">Delivery Partner</option>
-          </select>
-          <label for="userStatus">Account Status</label>
-          <select id="userStatus">
-            <option value="Active">Active</option>
-            <option value="Suspended">Suspended</option>
-          </select>
-          <label for="userJoined">Joined Date</label>
-          <input type="date" id="userJoined">
-          <p class="error" id="userError"></p>
-          <button class="btn" onclick="saveUser()">Save</button>
-          <button class="btn light" onclick="hide('userForm')">Cancel</button>
-        </fieldset>
-
-        <!-- View details -->
-        <div id="userDetails" class="details" style="display: none">
+        <div id="userDetails" class="details">
           <span id="userDetailsText"></span><br>
-          <button class="small" onclick="hide('userDetails')">Close</button>
+          <button class="small">Close</button>
         </div>
 
         <div class="card">
           <div id="roleTabs" class="toolbar">
-            <button class="tab active" value="All" onclick="filterRole('All')">All Users</button>
-            <button class="tab" value="Customer" onclick="filterRole('Customer')">Customers</button>
-            <button class="tab" value="Seller" onclick="filterRole('Seller')">Sellers</button>
-            <button class="tab" value="Manager" onclick="filterRole('Manager')">Managers</button>
-            <button class="tab" value="Administrator" onclick="filterRole('Administrator')">Admins</button>
-            <button class="tab" value="Delivery Partner" onclick="filterRole('Delivery Partner')">Delivery Partners</button>
+            <button class="tab active" value="All">All Users</button>
+            <button class="tab" value="Customer">Customers</button>
+            <button class="tab" value="Seller">Sellers</button>
+            <button class="tab" value="Manager">Managers</button>
+            <button class="tab" value="Administrator">Admins</button>
+            <button class="tab" value="Delivery Partner">Delivery Partners</button>
           </div>
 
           <div class="toolbar">
-            <input type="text" id="userSearch" placeholder="Search by name or email..." onkeyup="showUsers()">
-            <select id="roleFilter" onchange="filterRole(this.value)">
+            <input type="text" id="userSearch" placeholder="Search by name or email...">
+            <select id="roleFilter">
               <option value="All">All Roles</option>
               <option value="Customer">Customer</option>
               <option value="Seller">Seller</option>
@@ -169,12 +137,19 @@
             </select>
           </div>
 
-          <div class="table-box"><table id="userTable"></table></div>
+          <div class="table-box">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>User Name</th><th>Email</th><th>Role</th><th>Account Status</th><th>Joined Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="userBody"></tbody>
+            </table>
+          </div>
           <p id="userCount"></p>
         </div>
       </section>
 
-      <!-- ================= SELLER VERIFICATION ================= -->
+      <!-- SELLER VERIFICATION -->
       <section id="section-sellers" class="section">
         <div class="page-header">
           <span class="icon">🛡️</span>
@@ -182,7 +157,7 @@
             <h1>Seller Verification</h1>
             <p>Review seller applications and verify trusted sellers.</p>
           </div>
-          <button class="btn right" onclick="openSellerForm(0)">+ Add Seller Application</button>
+          <button class="btn right" id="addSellerBtn">+ Add Seller Application</button>
         </div>
 
         <div class="cards">
@@ -191,40 +166,26 @@
           <div class="stat-card"><span>Rejected applications</span><strong id="sellerStatRejected">0</strong></div>
         </div>
 
-        <fieldset id="sellerForm" class="form-box" style="display: none">
-          <legend id="sellerLegend">Add Seller Application</legend>
-          <label for="sellerStoreName">Store Name</label>
-          <input type="text" id="sellerStoreName" placeholder="Enter store name">
-          <label for="sellerOwner">Applicant Name</label>
-          <input type="text" id="sellerOwner" placeholder="Enter applicant name">
-          <label for="sellerDate">Application Date</label>
-          <input type="date" id="sellerDate">
-          <label for="sellerInfo">Store Information</label>
-          <textarea id="sellerInfo" placeholder="What does the store sell?"></textarea>
-          <label for="sellerStatus">Verification Status</label>
-          <select id="sellerStatus">
-            <option value="Pending">Pending</option>
-            <option value="Verified">Verified</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-          <p class="error" id="sellerError"></p>
-          <button class="btn" onclick="saveSeller()">Save</button>
-          <button class="btn light" onclick="hide('sellerForm')">Cancel</button>
-        </fieldset>
-
-        <div id="sellerDetails" class="details" style="display: none">
+        <div id="sellerDetails" class="details">
           <span id="sellerDetailsText"></span><br>
-          <button class="small" onclick="hide('sellerDetails')">Close</button>
+          <button class="small">Close</button>
         </div>
 
         <div class="card">
           <h3>Seller Applications</h3>
-          <div class="table-box"><table id="sellerTable"></table></div>
+          <div class="table-box">
+            <table>
+              <thead>
+                <tr><th>Store Name</th><th>Applied Date</th><th>Store Information</th><th>Verification Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="sellerBody"></tbody>
+            </table>
+          </div>
           <p id="sellerCount"></p>
         </div>
       </section>
 
-      <!-- ================= PRODUCT MODERATION ================= -->
+      <!-- PRODUCT MODERATION -->
       <section id="section-products" class="section">
         <div class="page-header">
           <span class="icon">📦</span>
@@ -232,7 +193,7 @@
             <h1>Product Moderation</h1>
             <p>Review reported products and maintain content quality.</p>
           </div>
-          <button class="btn right" onclick="openProductForm(0)">+ Add Reported Product</button>
+          <button class="btn right" id="addProductBtn">+ Add Reported Product</button>
         </div>
 
         <div class="cards">
@@ -241,42 +202,26 @@
           <div class="stat-card"><span>Removed products</span><strong id="productStatRemoved">0</strong></div>
         </div>
 
-        <fieldset id="productForm" class="form-box" style="display: none">
-          <legend id="productLegend">Add Reported Product</legend>
-          <label for="productName">Product Name</label>
-          <input type="text" id="productName" placeholder="Enter product name">
-          <label for="productSeller">Seller / Store Name</label>
-          <input type="text" id="productSeller" placeholder="Enter seller name">
-          <label for="productPrice">Price (৳)</label>
-          <input type="number" id="productPrice" min="0" placeholder="0">
-          <label for="productReason">Report Reason</label>
-          <input type="text" id="productReason" placeholder="Why was it reported?">
-          <label for="productDate">Report Date</label>
-          <input type="date" id="productDate">
-          <label for="productStatus">Moderation Status</label>
-          <select id="productStatus">
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Removed">Removed</option>
-          </select>
-          <p class="error" id="productError"></p>
-          <button class="btn" onclick="saveProduct()">Save</button>
-          <button class="btn light" onclick="hide('productForm')">Cancel</button>
-        </fieldset>
-
-        <div id="productDetails" class="details" style="display: none">
+        <div id="productDetails" class="details">
           <span id="productDetailsText"></span><br>
-          <button class="small" onclick="hide('productDetails')">Close</button>
+          <button class="small">Close</button>
         </div>
 
         <div class="card">
           <h3>Reported Products</h3>
-          <div class="table-box"><table id="productTable"></table></div>
+          <div class="table-box">
+            <table>
+              <thead>
+                <tr><th>Product Name</th><th>Seller</th><th>Report Reason</th><th>Report Date</th><th>Moderation Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="productBody"></tbody>
+            </table>
+          </div>
           <p id="productCount"></p>
         </div>
       </section>
 
-      <!-- ================= PLATFORM SETTINGS ================= -->
+      <!-- PLATFORM SETTINGS -->
       <section id="section-settings" class="section">
         <div class="page-header">
           <span class="icon">⚙️</span>
@@ -289,54 +234,41 @@
         <div class="card">
           <h3>Platform Commission</h3>
           <p>Percentage the platform keeps from each seller sale.</p>
-          <input type="number" id="commissionInput" min="0" max="100" value="10"> %
-          <button class="btn" onclick="saveSettings()">Save Settings</button>
-          <p class="error" id="settingsError"></p>
+          <form id="settingsForm">
+            <input type="number" id="commissionInput" name="commission" min="0" max="100" step="0.5" value="10" required> %
+            <input type="submit" class="btn" value="Save Settings">
+            <span class="error" id="commissionError"></span>
+          </form>
         </div>
 
         <div class="card">
           <div class="card-title">
             <h3>Product Categories</h3>
-            <button class="btn" onclick="openCategoryForm(0)">+ Add Category</button>
+            <button class="btn" id="addCategoryBtn">+ Add Category</button>
           </div>
-          <fieldset id="categoryForm" class="form-box" style="display: none">
-            <legend id="categoryLegend">Add Category</legend>
-            <label for="categoryName">Category Name</label>
-            <input type="text" id="categoryName" placeholder="e.g. Electronics">
-            <p class="error" id="categoryError"></p>
-            <button class="btn" onclick="saveCategory()">Save</button>
-            <button class="btn light" onclick="hide('categoryForm')">Cancel</button>
-          </fieldset>
-          <div class="table-box"><table id="categoryTable"></table></div>
+          <div class="table-box">
+            <table>
+              <thead><tr><th>ID</th><th>Category Name</th><th>Actions</th></tr></thead>
+              <tbody id="categoryBody"></tbody>
+            </table>
+          </div>
         </div>
 
         <div class="card">
           <div class="card-title">
             <h3>Coupon Policies</h3>
-            <button class="btn" onclick="openCouponForm(0)">+ Add Coupon</button>
+            <button class="btn" id="addCouponBtn">+ Add Coupon</button>
           </div>
-          <fieldset id="couponForm" class="form-box" style="display: none">
-            <legend id="couponLegend">Add Coupon</legend>
-            <label for="couponCode">Coupon Code</label>
-            <input type="text" id="couponCode" placeholder="e.g. WELCOME10">
-            <label for="couponType">Discount Type</label>
-            <select id="couponType">
-              <option value="Percentage">Percentage (%)</option>
-              <option value="Fixed">Fixed Amount (৳)</option>
-            </select>
-            <label for="couponValue">Discount Value</label>
-            <input type="number" id="couponValue" min="0" placeholder="0">
-            <label for="couponExpiry">Expiry Date</label>
-            <input type="date" id="couponExpiry">
-            <p class="error" id="couponError"></p>
-            <button class="btn" onclick="saveCoupon()">Save</button>
-            <button class="btn light" onclick="hide('couponForm')">Cancel</button>
-          </fieldset>
-          <div class="table-box"><table id="couponTable"></table></div>
+          <div class="table-box">
+            <table>
+              <thead><tr><th>Code</th><th>Discount Type</th><th>Discount Value</th><th>Expiry Date</th><th>Actions</th></tr></thead>
+              <tbody id="couponBody"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      <!-- ================= ANALYTICS & REPORTS ================= -->
+      <!-- ANALYTICS & REPORTS -->
       <section id="section-analytics" class="section">
         <div class="page-header">
           <span class="icon">📊</span>
@@ -347,14 +279,13 @@
         </div>
 
         <div class="toolbar">
-          <button id="atab-analytics" class="tab active" onclick="showAnalyticsTab('analytics')">Analytics</button>
-          <button id="atab-notifications" class="tab" onclick="showAnalyticsTab('notifications')">Notifications</button>
-          <button id="atab-logs" class="tab" onclick="showAnalyticsTab('logs')">System Logs</button>
+          <button id="atab-analytics" class="tab active">Analytics</button>
+          <button id="atab-notifications" class="tab">Notifications</button>
+          <button id="atab-logs" class="tab">System Logs</button>
         </div>
 
         <!-- Analytics -->
         <div id="panel-analytics">
-          <p>All revenue and order figures below are demonstration data.</p>
           <div class="cards">
             <div class="stat-card"><span>Total Revenue</span><strong id="statRevenue">0</strong></div>
             <div class="stat-card"><span>Total Orders</span><strong id="statOrders">0</strong></div>
@@ -375,73 +306,343 @@
           <div class="card">
             <div class="card-title">
               <h3>Monthly Revenue Data</h3>
-              <button class="btn" onclick="openRevenueForm(0)">+ Add Month</button>
+              <button class="btn" id="addRevenueBtn">+ Add Month</button>
             </div>
-            <fieldset id="revenueForm" class="form-box" style="display: none">
-              <legend id="revenueLegend">Add Monthly Data</legend>
-              <label for="revenueMonth">Month</label>
-              <input type="text" id="revenueMonth" maxlength="8" placeholder="e.g. Jul">
-              <label for="revenueAmount">Revenue (৳)</label>
-              <input type="number" id="revenueAmount" min="0" placeholder="0">
-              <label for="revenueOrders">Number of Orders</label>
-              <input type="number" id="revenueOrders" min="0" placeholder="0">
-              <p class="error" id="revenueError"></p>
-              <button class="btn" onclick="saveRevenue()">Save</button>
-              <button class="btn light" onclick="hide('revenueForm')">Cancel</button>
-            </fieldset>
-            <div class="table-box"><table id="revenueTable"></table></div>
+            <div class="table-box">
+              <table>
+                <thead><tr><th>Month</th><th>Revenue</th><th>Orders</th><th>Actions</th></tr></thead>
+                <tbody id="revenueBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         <!-- Notifications -->
-        <div id="panel-notifications" style="display: none">
+        <div id="panel-notifications">
           <div class="card">
             <div class="card-title">
               <h3>Platform Notifications</h3>
-              <button class="btn" onclick="openNotificationForm(0)">+ Add Notification</button>
+              <button class="btn" id="addNotificationBtn">+ Add Notification</button>
             </div>
-            <fieldset id="notificationForm" class="form-box" style="display: none">
-              <legend id="notificationLegend">Add Notification</legend>
-              <label for="notificationMessage">Notification</label>
-              <input type="text" id="notificationMessage" placeholder="Enter notification message">
-              <label for="notificationDate">Date</label>
-              <input type="date" id="notificationDate">
-              <label for="notificationStatus">Status</label>
-              <select id="notificationStatus">
-                <option value="Unread">Unread</option>
-                <option value="Read">Read</option>
-              </select>
-              <p class="error" id="notificationError"></p>
-              <button class="btn" onclick="saveNotification()">Save</button>
-              <button class="btn light" onclick="hide('notificationForm')">Cancel</button>
-            </fieldset>
-            <div class="table-box"><table id="notificationTable"></table></div>
+            <div class="table-box">
+              <table>
+                <thead><tr><th>Notification</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="notificationBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         <!-- System logs -->
-        <div id="panel-logs" style="display: none">
+        <div id="panel-logs">
           <div class="card">
             <div class="card-title">
               <h3>Administrator Activity Log</h3>
-              <button class="btn" onclick="openLogForm(0)">+ Add Log Entry</button>
+              <button class="btn" id="addLogBtn">+ Add Log Entry</button>
             </div>
-            <fieldset id="logForm" class="form-box" style="display: none">
-              <legend id="logLegend">Add Log Entry</legend>
-              <label for="logDescription">Activity Description</label>
-              <input type="text" id="logDescription" placeholder="What did the administrator do?">
-              <label for="logDate">Date</label>
-              <input type="date" id="logDate">
-              <p class="error" id="logError"></p>
-              <button class="btn" onclick="saveLog()">Save</button>
-              <button class="btn light" onclick="hide('logForm')">Cancel</button>
-            </fieldset>
-            <div class="table-box"><table id="logTable"></table></div>
+            <div class="table-box">
+              <table>
+                <thead><tr><th>Activity Description</th><th>Date</th><th>Actions</th></tr></thead>
+                <tbody id="logBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
 
     </main>
+
+    <footer class="footer">
+      © 2026 NovaCart · Your Budget. Your Deals. Your World.
+    </footer>
+  </div>
+
+  <!-- POP-UP FORMS (modals) -->
+
+  <!-- Add / Edit user -->
+  <div class="overlay" id="userModal">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="userLegend" id="userForm">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <fieldset>
+        <legend id="userLegend">Add User</legend>
+        <table>
+          <tr>
+            <td><label for="userName">Full Name:</label></td>
+            <td><input type="text" id="userName" name="userName" placeholder="Enter full name" minlength="2" required>
+                <span class="error" id="userNameError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="userEmail">Email:</label></td>
+            <td><input type="email" id="userEmail" name="userEmail" placeholder="name@novacart.com" required>
+                <span class="error" id="userEmailError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="userRole">Role:</label></td>
+            <td><select id="userRole" name="userRole" required>
+                  <option value="">-- Select Role --</option>
+                  <option value="Customer">Customer</option>
+                  <option value="Seller">Seller</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Administrator">Administrator</option>
+                  <option value="Delivery Partner">Delivery Partner</option>
+                </select></td>
+          </tr>
+          <tr>
+            <td>Account Status:</td>
+            <td><input type="radio" id="userActive" name="userStatus" value="Active" required>
+                <label for="userActive">Active</label>
+                <input type="radio" id="userSuspended" name="userStatus" value="Suspended">
+                <label for="userSuspended">Suspended</label></td>
+          </tr>
+          <tr>
+            <td><label for="userJoined">Joined Date:</label></td>
+            <td><input type="date" id="userJoined" name="userJoined" required></td>
+          </tr>
+        </table>
+      </fieldset>
+      <input type="submit" class="btn" value="Save">
+      <input type="reset" class="btn light" value="Clear">
+    </form>
+  </div>
+
+  <!-- Add / Edit activity -->
+  <div class="overlay" id="activityModal">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="activityLegend" id="activityForm">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <fieldset>
+        <legend id="activityLegend">Add Activity</legend>
+        <table>
+          <tr>
+            <td><label for="activityText">Activity:</label></td>
+            <td><input type="text" id="activityText" name="activityText" placeholder="e.g. New order received" required>
+                <span class="error" id="activityTextError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="activityTime">Time:</label></td>
+            <td><input type="text" id="activityTime" name="activityTime" placeholder="e.g. 2 min ago"></td>
+          </tr>
+        </table>
+      </fieldset>
+      <input type="submit" class="btn" value="Save">
+    </form>
+  </div>
+
+  <!-- Add / Edit seller application -->
+  <div class="overlay" id="sellerModal">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="sellerLegend" id="sellerForm">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <fieldset>
+        <legend id="sellerLegend">Add Seller Application</legend>
+        <table>
+          <tr>
+            <td><label for="sellerStoreName">Store Name:</label></td>
+            <td><input type="text" id="sellerStoreName" name="sellerStoreName" placeholder="Enter store name" minlength="2" required>
+                <span class="error" id="sellerStoreNameError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="sellerOwner">Applicant Name:</label></td>
+            <td><input type="text" id="sellerOwner" name="sellerOwner" placeholder="Enter applicant name" required>
+                <span class="error" id="sellerOwnerError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="sellerDate">Application Date:</label></td>
+            <td><input type="date" id="sellerDate" name="sellerDate" required></td>
+          </tr>
+          <tr>
+            <td><label for="sellerInfo">Store Information:</label></td>
+            <td><textarea id="sellerInfo" name="sellerInfo" rows="3" cols="22" placeholder="What does the store sell?" required></textarea>
+                <span class="error" id="sellerInfoError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="sellerStatus">Verification Status:</label></td>
+            <td><select id="sellerStatus" name="sellerStatus">
+                  <option value="Pending">Pending</option>
+                  <option value="Verified">Verified</option>
+                  <option value="Rejected">Rejected</option>
+                </select></td>
+          </tr>
+        </table>
+      </fieldset>
+      <input type="submit" class="btn" value="Save">
+      <input type="reset" class="btn light" value="Clear">
+    </form>
+  </div>
+
+  <!-- Add / Edit reported product -->
+  <div class="overlay" id="productModal">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="productLegend" id="productForm">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <fieldset>
+        <legend id="productLegend">Add Reported Product</legend>
+        <table>
+          <tr>
+            <td><label for="productName">Product Name:</label></td>
+            <td><input type="text" id="productName" name="productName" placeholder="Enter product name" required>
+                <span class="error" id="productNameError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="productSeller">Seller / Store:</label></td>
+            <td><input type="text" id="productSeller" name="productSeller" placeholder="Enter seller name" required>
+                <span class="error" id="productSellerError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="productPrice">Price (৳):</label></td>
+            <td><input type="number" id="productPrice" name="productPrice" min="0" placeholder="0" required></td>
+          </tr>
+          <tr>
+            <td><label for="productReason">Report Reason:</label></td>
+            <td><input type="text" id="productReason" name="productReason" placeholder="Why was it reported?" required>
+                <span class="error" id="productReasonError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="productDate">Report Date:</label></td>
+            <td><input type="date" id="productDate" name="productDate" required></td>
+          </tr>
+          <tr>
+            <td><label for="productStatus">Moderation Status:</label></td>
+            <td><select id="productStatus" name="productStatus">
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Removed">Removed</option>
+                </select></td>
+          </tr>
+        </table>
+      </fieldset>
+      <input type="submit" class="btn" value="Save">
+      <input type="reset" class="btn light" value="Clear">
+    </form>
+  </div>
+
+  <!-- Add / Edit category -->
+  <div class="overlay" id="categoryModal">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="categoryLegend" id="categoryForm">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <fieldset>
+        <legend id="categoryLegend">Add Category</legend>
+        <table>
+          <tr>
+            <td><label for="categoryName">Category Name:</label></td>
+            <td><input type="text" id="categoryName" name="categoryName" placeholder="e.g. Electronics" minlength="2" required>
+                <span class="error" id="categoryNameError"></span></td>
+          </tr>
+        </table>
+      </fieldset>
+      <input type="submit" class="btn" value="Save">
+    </form>
+  </div>
+
+  <!-- Add / Edit coupon -->
+  <div class="overlay" id="couponModal">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="couponLegend" id="couponForm">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <fieldset>
+        <legend id="couponLegend">Add Coupon</legend>
+        <table>
+          <tr>
+            <td><label for="couponCode">Coupon Code:</label></td>
+            <td><input type="text" id="couponCode" name="couponCode" placeholder="e.g. WELCOME10" pattern="[A-Za-z0-9]+" title="Letters and digits only, no spaces" required>
+                <span class="error" id="couponCodeError"></span></td>
+          </tr>
+          <tr>
+            <td>Discount Type:</td>
+            <td><input type="radio" id="couponPercentage" name="couponType" value="Percentage" required>
+                <label for="couponPercentage">Percentage (%)</label>
+                <input type="radio" id="couponFixed" name="couponType" value="Fixed">
+                <label for="couponFixed">Fixed (৳)</label></td>
+          </tr>
+          <tr>
+            <td><label for="couponValue">Discount Value:</label></td>
+            <td><input type="number" id="couponValue" name="couponValue" min="1" placeholder="0" required>
+                <span class="error" id="couponValueError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="couponExpiry">Expiry Date:</label></td>
+            <td><input type="date" id="couponExpiry" name="couponExpiry" required></td>
+          </tr>
+        </table>
+      </fieldset>
+      <input type="submit" class="btn" value="Save">
+      <input type="reset" class="btn light" value="Clear">
+    </form>
+  </div>
+
+  <!-- Add / Edit monthly revenue -->
+  <div class="overlay" id="revenueModal">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="revenueLegend" id="revenueForm">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <fieldset>
+        <legend id="revenueLegend">Add Monthly Data</legend>
+        <table>
+          <tr>
+            <td><label for="revenueMonth">Month:</label></td>
+            <td><input type="text" id="revenueMonth" name="revenueMonth" maxlength="8" placeholder="e.g. Jul" required>
+                <span class="error" id="revenueMonthError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="revenueAmount">Revenue (৳):</label></td>
+            <td><input type="number" id="revenueAmount" name="revenueAmount" min="0" placeholder="0" required></td>
+          </tr>
+          <tr>
+            <td><label for="revenueOrders">Number of Orders:</label></td>
+            <td><input type="number" id="revenueOrders" name="revenueOrders" min="0" placeholder="0" required></td>
+          </tr>
+        </table>
+      </fieldset>
+      <input type="submit" class="btn" value="Save">
+      <input type="reset" class="btn light" value="Clear">
+    </form>
+  </div>
+
+  <!-- Add / Edit notification -->
+  <div class="overlay" id="notificationModal">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="notificationLegend" id="notificationForm">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <fieldset>
+        <legend id="notificationLegend">Add Notification</legend>
+        <table>
+          <tr>
+            <td><label for="notificationMessage">Notification:</label></td>
+            <td><input type="text" id="notificationMessage" name="notificationMessage" placeholder="Enter notification message" required>
+                <span class="error" id="notificationMessageError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="notificationDate">Date:</label></td>
+            <td><input type="date" id="notificationDate" name="notificationDate" required></td>
+          </tr>
+          <tr>
+            <td>Status:</td>
+            <td><input type="radio" id="noteUnread" name="notificationStatus" value="Unread" required>
+                <label for="noteUnread">Unread</label>
+                <input type="radio" id="noteRead" name="notificationStatus" value="Read">
+                <label for="noteRead">Read</label></td>
+          </tr>
+        </table>
+      </fieldset>
+      <input type="submit" class="btn" value="Save">
+      <input type="reset" class="btn light" value="Clear">
+    </form>
+  </div>
+
+  <!-- Add / Edit system log -->
+  <div class="overlay" id="logModal">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="logLegend" id="logForm">
+      <button type="button" class="close" aria-label="Close">×</button>
+      <fieldset>
+        <legend id="logLegend">Add Log Entry</legend>
+        <table>
+          <tr>
+            <td><label for="logDescription">Description:</label></td>
+            <td><input type="text" id="logDescription" name="logDescription" placeholder="What did the administrator do?" required>
+                <span class="error" id="logDescriptionError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="logDate">Date:</label></td>
+            <td><input type="date" id="logDate" name="logDate" required></td>
+          </tr>
+        </table>
+      </fieldset>
+      <input type="submit" class="btn" value="Save">
+    </form>
   </div>
 
   <script src="../JS/admin.js"></script>

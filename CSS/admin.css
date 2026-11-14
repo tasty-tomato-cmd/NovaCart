@@ -1,7 +1,4 @@
-/* ==========================================================
-   NovaCart – Admin Panel Stylesheet
-   Purple and white theme
-   ========================================================== */
+/* NovaCart Admin Panel: purple and white theme */
 
 * {
   box-sizing: border-box;
@@ -18,7 +15,7 @@ button {
   font-family: inherit;
 }
 
-/* ---------- Sidebar ---------- */
+/* Sidebar */
 .sidebar {
   position: fixed;
   top: 0;
@@ -36,6 +33,9 @@ button {
 }
 
 .admin-label {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
   text-align: center;
   background-color: #4a3190;
   border-radius: 8px;
@@ -73,7 +73,7 @@ button {
   width: 206px;
 }
 
-/* ---------- Main area and top bar ---------- */
+/* Main area and top bar */
 .main {
   margin-left: 230px;
   padding: 0 24px 30px 24px;
@@ -84,7 +84,10 @@ button {
   justify-content: space-between;
   align-items: center;
   padding: 14px 0;
-  position: relative;
+  position: sticky;
+  top: 0;
+  background-color: #f3effd;
+  z-index: 5;
 }
 
 .topbar h2 {
@@ -143,8 +146,16 @@ button {
   margin: 0 0 10px 0;
 }
 
-/* ---------- Sections ---------- */
+/* Sections */
 .section {
+  display: none;
+}
+
+/* Hidden at first: JavaScript shows them with style.display */
+#profileMenu,
+.details,
+#panel-notifications,
+#panel-logs {
   display: none;
 }
 
@@ -184,7 +195,7 @@ button {
   margin-left: auto;
 }
 
-/* ---------- Cards ---------- */
+/* Cards */
 .card {
   background-color: white;
   border: 1px solid #e2dbf5;
@@ -211,12 +222,14 @@ button {
 
 .cards {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 18px;
 }
 
 .stat-card {
   flex: 1;
+  min-width: 170px;
   background-color: white;
   border: 1px solid #e2dbf5;
   border-radius: 14px;
@@ -237,15 +250,16 @@ button {
 
 .two-columns {
   display: flex;
+  flex-wrap: wrap;
   gap: 18px;
 }
 
-.two-columns .card {
+.two-columns > .card {
   flex: 1;
-  min-width: 0;
+  min-width: 300px;
 }
 
-/* ---------- Buttons ---------- */
+/* Buttons */
 .btn {
   background-color: #5b2fd1;
   color: white;
@@ -258,6 +272,13 @@ button {
 
 .btn:hover {
   background-color: #4a22b8;
+}
+
+.btn,
+.small,
+.tab,
+.menu-item {
+  transition: background-color 0.3s;
 }
 
 .btn.light {
@@ -289,7 +310,7 @@ button {
   color: #1a9e55;
 }
 
-/* ---------- Tabs, search and filter ---------- */
+/* Tabs, search and filter */
 .toolbar {
   margin-bottom: 14px;
 }
@@ -326,15 +347,20 @@ textarea {
 
 input:focus,
 select:focus,
-textarea:focus {
-  border-color: #5b2fd1;
+textarea:focus,
+button:focus {
+  outline: 2px solid #5b2fd1;
+}
+
+textarea {
+  resize: none;
 }
 
 #userSearch {
   width: 280px;
 }
 
-/* ---------- Tables ---------- */
+/* Tables */
 .table-box {
   overflow: auto;
   border: 1px solid #e2dbf5;
@@ -399,34 +425,7 @@ tr:hover td {
   color: #6b6685;
 }
 
-/* ---------- Forms and details ---------- */
-.form-box {
-  background-color: #faf8ff;
-  border: 1px solid #5b2fd1;
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 18px;
-}
-
-.form-box legend {
-  font-weight: bold;
-  color: #5b2fd1;
-}
-
-.form-box label {
-  display: block;
-  font-weight: bold;
-  font-size: 14px;
-  margin: 10px 0 4px 0;
-}
-
-.form-box input,
-.form-box select,
-.form-box textarea {
-  width: 320px;
-  max-width: 100%;
-}
-
+/* Forms and details */
 .error {
   color: #e0443e;
   font-size: 14px;
@@ -441,7 +440,7 @@ tr:hover td {
   line-height: 1.8;
 }
 
-/* ---------- Revenue bar chart ---------- */
+/* Revenue bar chart */
 .chart {
   display: flex;
   align-items: flex-end;
@@ -466,4 +465,98 @@ tr:hover td {
   margin: 6px 0 0 0;
   color: #6b6685;
   font-size: 13px;
+}
+
+/* Headings share one rule (grouping selector) */
+h1,
+h2,
+h3 {
+  color: #1f1a3d;
+}
+
+/* Pop-up forms (modal): overlay + dialog */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 20;
+  display: none;
+  overflow: auto;
+}
+
+.overlay.show {
+  display: block;
+}
+
+.dialog {
+  position: relative;
+  max-width: 480px;
+  margin: 50px auto;
+  background-color: white;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background-color: white;
+  border: none;
+  font-size: 26px;
+  color: #6b6685;
+}
+
+.dialog fieldset {
+  border: 1px solid #5b2fd1;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.dialog legend {
+  font-weight: bold;
+  color: #5b2fd1;
+}
+
+.dialog table {
+  font-size: 14px;
+}
+
+.dialog td {
+  border-top: none;
+  padding: 6px 8px;
+  vertical-align: top;
+}
+
+.dialog tr:hover td {
+  background-color: white;
+}
+
+.dialog input[type="text"],
+.dialog input[type="email"],
+.dialog input[type="number"],
+.dialog input[type="date"],
+.dialog select,
+.dialog textarea {
+  width: 230px;
+}
+
+.dialog .error {
+  display: block;
+}
+
+form .btn {
+  margin-right: 6px;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  color: #6b6685;
+  font-size: 13px;
+  padding: 10px;
+  margin-top: 20px;
 }
