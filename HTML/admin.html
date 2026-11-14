@@ -2,758 +2,448 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NovaCart – Admin Panel</title>
-  <!-- External stylesheet -->
   <link rel="stylesheet" href="../CSS/admin.css">
 </head>
 <body>
 
-  <div class="app">
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <h2>🛒 NovaCart</h2>
+    <p class="admin-label">Admin Panel</p>
 
-    <!-- ===================== SIDEBAR ===================== -->
-    <aside class="sidebar" id="sidebar">
-      <div class="logo">
-        <div class="logo-name"><span class="logo-icon">🛒</span> NovaCart</div>
-        <span class="logo-badge">Admin Panel</span>
+    <nav>
+      <button id="menu-dashboard" class="menu-item active" onclick="showSection('dashboard')">🏠 Dashboard</button>
+      <button id="menu-users" class="menu-item" onclick="showSection('users')">👥 User Management</button>
+      <button id="menu-sellers" class="menu-item" onclick="showSection('sellers')">🛡️ Seller Verification</button>
+      <button id="menu-products" class="menu-item" onclick="showSection('products')">📦 Product Moderation</button>
+      <button id="menu-settings" class="menu-item" onclick="showSection('settings')">⚙️ Platform Settings</button>
+      <button id="menu-analytics" class="menu-item" onclick="showSection('analytics')">📊 Analytics &amp; Reports</button>
+    </nav>
+
+    <button class="menu-item logout" onclick="logOut()">🚪 Log Out</button>
+  </aside>
+
+  <!-- ================= MAIN AREA ================= -->
+  <div class="main">
+
+    <!-- Top navigation bar -->
+    <header class="topbar">
+      <div>
+        <h2>Welcome back, Admin!</h2>
+        <p id="description"></p>
       </div>
+      <div class="top-right">
+        <button class="bell" onclick="openNotifications()">🔔 <span id="bellCount">0</span></button>
+        <button class="profile-button" onclick="toggleProfile()">A Admin ▾</button>
+        <div id="profileMenu" class="profile-menu" style="display: none">
+          <button onclick="profileLink('My Profile')">My Profile</button>
+          <button onclick="profileLink('Change Password')">Change Password</button>
+          <button onclick="logOut()">Log Out</button>
+        </div>
+      </div>
+    </header>
 
-      <nav class="menu">
-        <button class="menu-item active" data-section="dashboard"><span class="menu-icon">🏠</span> Dashboard</button>
-        <button class="menu-item" data-section="users"><span class="menu-icon">👥</span> User Management</button>
-        <button class="menu-item" data-section="sellers"><span class="menu-icon">🛡️</span> Seller Verification</button>
-        <button class="menu-item" data-section="products"><span class="menu-icon">📦</span> Product Moderation</button>
-        <button class="menu-item" data-section="settings"><span class="menu-icon">⚙️</span> Platform Settings</button>
-        <button class="menu-item" data-section="analytics"><span class="menu-icon">📊</span> Analytics &amp; Reports</button>
-      </nav>
+    <!-- Confirmation messages appear here -->
+    <p id="message" class="message"></p>
 
-      <button class="menu-item logout" id="logoutBtn"><span class="menu-icon">🚪</span> Log Out</button>
-    </aside>
+    <main>
 
-    <!-- ===================== MAIN AREA ===================== -->
-    <div class="main">
-
-      <!-- Top navigation bar -->
-      <header class="topbar">
-        <button class="hamburger" id="menuToggle" aria-label="Toggle sidebar">☰</button>
-
-        <div class="welcome">
-          <h2>Welcome back, Admin!</h2>
-          <p id="topbarDescription">Overview of users, sellers and platform activity.</p>
+      <!-- ================= DASHBOARD ================= -->
+      <section id="section-dashboard" class="section">
+        <div class="page-header">
+          <span class="icon">📋</span>
+          <div>
+            <h1>Admin Dashboard</h1>
+            <p>A quick overview of NovaCart. (All figures are demonstration data.)</p>
+          </div>
         </div>
 
-        <div class="topbar-right">
-          <button class="bell" id="notificationBtn" aria-label="Notifications">🔔<span class="bell-count" id="bellCount">0</span></button>
+        <div class="cards">
+          <div class="stat-card"><span>Total Users</span><strong id="statTotalUsers">0</strong></div>
+          <div class="stat-card"><span>Total Sellers</span><strong id="statTotalSellers">0</strong></div>
+          <div class="stat-card"><span>Active Accounts</span><strong id="statActive">0</strong></div>
+          <div class="stat-card"><span>Suspended</span><strong id="statSuspended">0</strong></div>
+        </div>
 
-          <div class="profile">
-            <button class="profile-btn" id="profileBtn">
-              <span class="avatar">A</span>
-              <span class="profile-name">Admin</span>
-              <span class="arrow">▾</span>
-            </button>
-            <div class="dropdown" id="profileDropdown">
-              <a href="#" class="demo-link">My Profile</a>
-              <a href="#" class="demo-link">Change Password</a>
-              <a href="#" id="dropdownLogout">Log Out</a>
+        <div class="two-columns">
+          <div class="card">
+            <h3>Moderation Overview</h3>
+            <p>Pending seller applications: <strong id="pendingSellers">0</strong></p>
+            <p>Pending product reviews: <strong id="pendingProducts">0</strong></p>
+            <p>Reported products: <strong id="reportedProducts">0</strong></p>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <h3>Recent Activity</h3>
+              <button class="btn" onclick="openActivityForm(0)">+ Add Activity</button>
             </div>
+
+            <fieldset id="activityForm" class="form-box" style="display: none">
+              <legend id="activityLegend">Add Activity</legend>
+              <label for="activityText">Activity</label>
+              <input type="text" id="activityText" placeholder="e.g. New order received">
+              <label for="activityTime">Time</label>
+              <input type="text" id="activityTime" placeholder="e.g. 2 min ago">
+              <p class="error" id="activityError"></p>
+              <button class="btn" onclick="saveActivity()">Save</button>
+              <button class="btn light" onclick="hide('activityForm')">Cancel</button>
+            </fieldset>
+
+            <div class="table-box"><table id="activityTable"></table></div>
           </div>
         </div>
-      </header>
+      </section>
 
-      <!-- Page content -->
-      <main class="content">
+      <!-- ================= USER MANAGEMENT ================= -->
+      <section id="section-users" class="section">
+        <div class="page-header">
+          <span class="icon">👥</span>
+          <div>
+            <h1>User &amp; Role Management</h1>
+            <p>View and manage all registered users on NovaCart.</p>
+          </div>
+          <button class="btn right" onclick="openUserForm(0)">+ Add User</button>
+        </div>
 
-        <!-- ========== DASHBOARD SECTION ========== -->
-        <section class="section active" id="section-dashboard">
+        <div class="cards">
+          <div class="stat-card"><span>Total Users</span><strong id="userStatTotal">0</strong></div>
+          <div class="stat-card"><span>Total Sellers</span><strong id="userStatSellers">0</strong></div>
+          <div class="stat-card"><span>Active Accounts</span><strong id="userStatActive">0</strong></div>
+          <div class="stat-card"><span>Suspended</span><strong id="userStatSuspended">0</strong></div>
+        </div>
 
-          <div class="page-header">
-            <div class="page-icon">📋</div>
-            <div>
-              <h1>Admin Dashboard</h1>
-              <p>A quick overview of NovaCart. (All figures are demonstration data.)</p>
-            </div>
+        <!-- Add / Edit form -->
+        <fieldset id="userForm" class="form-box" style="display: none">
+          <legend id="userLegend">Add User</legend>
+          <label for="userName">Full Name</label>
+          <input type="text" id="userName" placeholder="Enter full name">
+          <label for="userEmail">Email</label>
+          <input type="email" id="userEmail" placeholder="name@novacart.com">
+          <label for="userRole">Role</label>
+          <select id="userRole">
+            <option value="Customer">Customer</option>
+            <option value="Seller">Seller</option>
+            <option value="Manager">Manager</option>
+            <option value="Administrator">Administrator</option>
+            <option value="Delivery Partner">Delivery Partner</option>
+          </select>
+          <label for="userStatus">Account Status</label>
+          <select id="userStatus">
+            <option value="Active">Active</option>
+            <option value="Suspended">Suspended</option>
+          </select>
+          <label for="userJoined">Joined Date</label>
+          <input type="date" id="userJoined">
+          <p class="error" id="userError"></p>
+          <button class="btn" onclick="saveUser()">Save</button>
+          <button class="btn light" onclick="hide('userForm')">Cancel</button>
+        </fieldset>
+
+        <!-- View details -->
+        <div id="userDetails" class="details" style="display: none">
+          <span id="userDetailsText"></span><br>
+          <button class="small" onclick="hide('userDetails')">Close</button>
+        </div>
+
+        <div class="card">
+          <div id="roleTabs" class="toolbar">
+            <button class="tab active" value="All" onclick="filterRole('All')">All Users</button>
+            <button class="tab" value="Customer" onclick="filterRole('Customer')">Customers</button>
+            <button class="tab" value="Seller" onclick="filterRole('Seller')">Sellers</button>
+            <button class="tab" value="Manager" onclick="filterRole('Manager')">Managers</button>
+            <button class="tab" value="Administrator" onclick="filterRole('Administrator')">Admins</button>
+            <button class="tab" value="Delivery Partner" onclick="filterRole('Delivery Partner')">Delivery Partners</button>
           </div>
 
-          <!-- Statistics cards -->
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-icon purple">👥</div>
-              <div>
-                <span class="stat-label">Total Users</span>
-                <strong class="stat-value" id="statTotalUsers">0</strong>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon purple">🏪</div>
-              <div>
-                <span class="stat-label">Total Sellers</span>
-                <strong class="stat-value" id="statTotalSellers">0</strong>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon green">✔️</div>
-              <div>
-                <span class="stat-label">Active Accounts</span>
-                <strong class="stat-value" id="statActive">0</strong>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon red">⛔</div>
-              <div>
-                <span class="stat-label">Suspended</span>
-                <strong class="stat-value" id="statSuspended">0</strong>
-              </div>
-            </div>
+          <div class="toolbar">
+            <input type="text" id="userSearch" placeholder="Search by name or email..." onkeyup="showUsers()">
+            <select id="roleFilter" onchange="filterRole(this.value)">
+              <option value="All">All Roles</option>
+              <option value="Customer">Customer</option>
+              <option value="Seller">Seller</option>
+              <option value="Manager">Manager</option>
+              <option value="Administrator">Administrator</option>
+              <option value="Delivery Partner">Delivery Partner</option>
+            </select>
           </div>
 
-          <!-- Lower area: overview + recent activity -->
+          <div class="table-box"><table id="userTable"></table></div>
+          <p id="userCount"></p>
+        </div>
+      </section>
+
+      <!-- ================= SELLER VERIFICATION ================= -->
+      <section id="section-sellers" class="section">
+        <div class="page-header">
+          <span class="icon">🛡️</span>
+          <div>
+            <h1>Seller Verification</h1>
+            <p>Review seller applications and verify trusted sellers.</p>
+          </div>
+          <button class="btn right" onclick="openSellerForm(0)">+ Add Seller Application</button>
+        </div>
+
+        <div class="cards">
+          <div class="stat-card"><span>Pending applications</span><strong id="sellerStatPending">0</strong></div>
+          <div class="stat-card"><span>Verified sellers</span><strong id="sellerStatVerified">0</strong></div>
+          <div class="stat-card"><span>Rejected applications</span><strong id="sellerStatRejected">0</strong></div>
+        </div>
+
+        <fieldset id="sellerForm" class="form-box" style="display: none">
+          <legend id="sellerLegend">Add Seller Application</legend>
+          <label for="sellerStoreName">Store Name</label>
+          <input type="text" id="sellerStoreName" placeholder="Enter store name">
+          <label for="sellerOwner">Applicant Name</label>
+          <input type="text" id="sellerOwner" placeholder="Enter applicant name">
+          <label for="sellerDate">Application Date</label>
+          <input type="date" id="sellerDate">
+          <label for="sellerInfo">Store Information</label>
+          <textarea id="sellerInfo" placeholder="What does the store sell?"></textarea>
+          <label for="sellerStatus">Verification Status</label>
+          <select id="sellerStatus">
+            <option value="Pending">Pending</option>
+            <option value="Verified">Verified</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+          <p class="error" id="sellerError"></p>
+          <button class="btn" onclick="saveSeller()">Save</button>
+          <button class="btn light" onclick="hide('sellerForm')">Cancel</button>
+        </fieldset>
+
+        <div id="sellerDetails" class="details" style="display: none">
+          <span id="sellerDetailsText"></span><br>
+          <button class="small" onclick="hide('sellerDetails')">Close</button>
+        </div>
+
+        <div class="card">
+          <h3>Seller Applications</h3>
+          <div class="table-box"><table id="sellerTable"></table></div>
+          <p id="sellerCount"></p>
+        </div>
+      </section>
+
+      <!-- ================= PRODUCT MODERATION ================= -->
+      <section id="section-products" class="section">
+        <div class="page-header">
+          <span class="icon">📦</span>
+          <div>
+            <h1>Product Moderation</h1>
+            <p>Review reported products and maintain content quality.</p>
+          </div>
+          <button class="btn right" onclick="openProductForm(0)">+ Add Reported Product</button>
+        </div>
+
+        <div class="cards">
+          <div class="stat-card"><span>Pending product reviews</span><strong id="productStatPending">0</strong></div>
+          <div class="stat-card"><span>Approved products</span><strong id="productStatApproved">0</strong></div>
+          <div class="stat-card"><span>Removed products</span><strong id="productStatRemoved">0</strong></div>
+        </div>
+
+        <fieldset id="productForm" class="form-box" style="display: none">
+          <legend id="productLegend">Add Reported Product</legend>
+          <label for="productName">Product Name</label>
+          <input type="text" id="productName" placeholder="Enter product name">
+          <label for="productSeller">Seller / Store Name</label>
+          <input type="text" id="productSeller" placeholder="Enter seller name">
+          <label for="productPrice">Price (৳)</label>
+          <input type="number" id="productPrice" min="0" placeholder="0">
+          <label for="productReason">Report Reason</label>
+          <input type="text" id="productReason" placeholder="Why was it reported?">
+          <label for="productDate">Report Date</label>
+          <input type="date" id="productDate">
+          <label for="productStatus">Moderation Status</label>
+          <select id="productStatus">
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Removed">Removed</option>
+          </select>
+          <p class="error" id="productError"></p>
+          <button class="btn" onclick="saveProduct()">Save</button>
+          <button class="btn light" onclick="hide('productForm')">Cancel</button>
+        </fieldset>
+
+        <div id="productDetails" class="details" style="display: none">
+          <span id="productDetailsText"></span><br>
+          <button class="small" onclick="hide('productDetails')">Close</button>
+        </div>
+
+        <div class="card">
+          <h3>Reported Products</h3>
+          <div class="table-box"><table id="productTable"></table></div>
+          <p id="productCount"></p>
+        </div>
+      </section>
+
+      <!-- ================= PLATFORM SETTINGS ================= -->
+      <section id="section-settings" class="section">
+        <div class="page-header">
+          <span class="icon">⚙️</span>
+          <div>
+            <h1>Platform Configuration</h1>
+            <p>Manage commission, product categories and coupon policies.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Platform Commission</h3>
+          <p>Percentage the platform keeps from each seller sale.</p>
+          <input type="number" id="commissionInput" min="0" max="100" value="10"> %
+          <button class="btn" onclick="saveSettings()">Save Settings</button>
+          <p class="error" id="settingsError"></p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <h3>Product Categories</h3>
+            <button class="btn" onclick="openCategoryForm(0)">+ Add Category</button>
+          </div>
+          <fieldset id="categoryForm" class="form-box" style="display: none">
+            <legend id="categoryLegend">Add Category</legend>
+            <label for="categoryName">Category Name</label>
+            <input type="text" id="categoryName" placeholder="e.g. Electronics">
+            <p class="error" id="categoryError"></p>
+            <button class="btn" onclick="saveCategory()">Save</button>
+            <button class="btn light" onclick="hide('categoryForm')">Cancel</button>
+          </fieldset>
+          <div class="table-box"><table id="categoryTable"></table></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <h3>Coupon Policies</h3>
+            <button class="btn" onclick="openCouponForm(0)">+ Add Coupon</button>
+          </div>
+          <fieldset id="couponForm" class="form-box" style="display: none">
+            <legend id="couponLegend">Add Coupon</legend>
+            <label for="couponCode">Coupon Code</label>
+            <input type="text" id="couponCode" placeholder="e.g. WELCOME10">
+            <label for="couponType">Discount Type</label>
+            <select id="couponType">
+              <option value="Percentage">Percentage (%)</option>
+              <option value="Fixed">Fixed Amount (৳)</option>
+            </select>
+            <label for="couponValue">Discount Value</label>
+            <input type="number" id="couponValue" min="0" placeholder="0">
+            <label for="couponExpiry">Expiry Date</label>
+            <input type="date" id="couponExpiry">
+            <p class="error" id="couponError"></p>
+            <button class="btn" onclick="saveCoupon()">Save</button>
+            <button class="btn light" onclick="hide('couponForm')">Cancel</button>
+          </fieldset>
+          <div class="table-box"><table id="couponTable"></table></div>
+        </div>
+      </section>
+
+      <!-- ================= ANALYTICS & REPORTS ================= -->
+      <section id="section-analytics" class="section">
+        <div class="page-header">
+          <span class="icon">📊</span>
+          <div>
+            <h1>Revenue Monitoring</h1>
+            <p>Track revenue, notifications and administrator activity.</p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button id="atab-analytics" class="tab active" onclick="showAnalyticsTab('analytics')">Analytics</button>
+          <button id="atab-notifications" class="tab" onclick="showAnalyticsTab('notifications')">Notifications</button>
+          <button id="atab-logs" class="tab" onclick="showAnalyticsTab('logs')">System Logs</button>
+        </div>
+
+        <!-- Analytics -->
+        <div id="panel-analytics">
+          <p>All revenue and order figures below are demonstration data.</p>
+          <div class="cards">
+            <div class="stat-card"><span>Total Revenue</span><strong id="statRevenue">0</strong></div>
+            <div class="stat-card"><span>Total Orders</span><strong id="statOrders">0</strong></div>
+            <div class="stat-card"><span>Average Order Value</span><strong id="statAvgOrder">0</strong></div>
+          </div>
+
           <div class="two-columns">
             <div class="card">
-              <h3>Moderation Overview</h3>
-              <ul class="overview-list">
-                <li><span>Pending seller applications</span><strong id="pendingSellers">0</strong></li>
-                <li><span>Pending product reviews</span><strong id="pendingProducts">0</strong></li>
-                <li><span>Reported products</span><strong id="reportedProducts">0</strong></li>
-              </ul>
+              <h3>Revenue Overview</h3>
+              <div id="chart" class="chart"></div>
             </div>
-
             <div class="card">
-              <div class="card-header">
-                <h3>Recent Activity</h3>
-                <button class="btn btn-primary btn-small" id="addActivityBtn">+ Add Activity</button>
-              </div>
-              <ul class="activity-list" id="activityList">
-                <!-- Filled by admin.js -->
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <!-- ========== USER MANAGEMENT SECTION (Part 2) ========== -->
-        <section class="section" id="section-users">
-          <div class="page-header">
-            <div class="page-icon">👥</div>
-            <div class="page-header-text">
-              <h1>User &amp; Role Management</h1>
-              <p>View and manage all registered users on NovaCart.</p>
-            </div>
-            <button class="btn btn-primary" id="addUserBtn">+ Add User</button>
-          </div>
-
-          <!-- User statistics (calculated from user data) -->
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-icon purple">👥</div>
-              <div>
-                <span class="stat-label">Total Users</span>
-                <strong class="stat-value" id="userStatTotal">0</strong>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon purple">🏪</div>
-              <div>
-                <span class="stat-label">Total Sellers</span>
-                <strong class="stat-value" id="userStatSellers">0</strong>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon green">✔️</div>
-              <div>
-                <span class="stat-label">Active Accounts</span>
-                <strong class="stat-value" id="userStatActive">0</strong>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon red">⛔</div>
-              <div>
-                <span class="stat-label">Suspended</span>
-                <strong class="stat-value" id="userStatSuspended">0</strong>
-              </div>
+              <h3>Recent Activity</h3>
+              <ul id="analyticsActivity"></ul>
             </div>
           </div>
 
           <div class="card">
-            <!-- Role tabs, search box and role filter -->
-            <div class="toolbar">
-              <div class="tabs" id="userTabs">
-                <button class="tab active" data-role="All">All Users</button>
-                <button class="tab" data-role="Customer">Customers</button>
-                <button class="tab" data-role="Seller">Sellers</button>
-                <button class="tab" data-role="Manager">Managers</button>
-                <button class="tab" data-role="Administrator">Admins</button>
-                <button class="tab" data-role="Delivery Partner">Delivery Partners</button>
-              </div>
-              <div class="filters">
-                <input type="text" id="userSearch" class="input" placeholder="Search by name, email or ID...">
-                <select id="roleFilter" class="input">
-                  <option value="All">All Roles</option>
-                  <option value="Customer">Customer</option>
-                  <option value="Seller">Seller</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Administrator">Administrator</option>
-                  <option value="Delivery Partner">Delivery Partner</option>
-                </select>
-                <button class="btn btn-primary" id="addUserBtn2">+ Add New User</button>
-              </div>
+            <div class="card-title">
+              <h3>Monthly Revenue Data</h3>
+              <button class="btn" onclick="openRevenueForm(0)">+ Add Month</button>
             </div>
-
-            <!-- User table -->
-            <div class="table-wrap">
-              <table class="user-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>User Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Account Status</th>
-                    <th>Joined Date</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="userTableBody">
-                  <!-- Rows are created by admin.js -->
-                </tbody>
-              </table>
-            </div>
-            <p class="table-footer" id="userCount"></p>
+            <fieldset id="revenueForm" class="form-box" style="display: none">
+              <legend id="revenueLegend">Add Monthly Data</legend>
+              <label for="revenueMonth">Month</label>
+              <input type="text" id="revenueMonth" maxlength="8" placeholder="e.g. Jul">
+              <label for="revenueAmount">Revenue (৳)</label>
+              <input type="number" id="revenueAmount" min="0" placeholder="0">
+              <label for="revenueOrders">Number of Orders</label>
+              <input type="number" id="revenueOrders" min="0" placeholder="0">
+              <p class="error" id="revenueError"></p>
+              <button class="btn" onclick="saveRevenue()">Save</button>
+              <button class="btn light" onclick="hide('revenueForm')">Cancel</button>
+            </fieldset>
+            <div class="table-box"><table id="revenueTable"></table></div>
           </div>
-        </section>
+        </div>
 
-        <!-- ========== SELLER VERIFICATION SECTION ========== -->
-        <section class="section" id="section-sellers">
-          <div class="page-header">
-            <div class="page-icon">🛡️</div>
-            <div class="page-header-text">
-              <h1>Seller Verification</h1>
-              <p>Review seller applications and verify trusted sellers.</p>
-            </div>
-            <button class="btn btn-primary" id="addSellerBtn">+ Add Seller Application</button>
-          </div>
-
-          <!-- Application overview (calculated from the list below) -->
-          <div class="card mod-overview">
-            <h3>Application Overview</h3>
-            <div class="mod-summary">
-              <div class="mod-item">
-                <strong id="sellerStatPending">0</strong>
-                <span>Pending applications</span>
-              </div>
-              <div class="mod-item">
-                <strong id="sellerStatVerified">0</strong>
-                <span>Verified sellers</span>
-              </div>
-              <div class="mod-item">
-                <strong id="sellerStatRejected">0</strong>
-                <span>Rejected applications</span>
-              </div>
-            </div>
-          </div>
-
+        <!-- Notifications -->
+        <div id="panel-notifications" style="display: none">
           <div class="card">
-            <h3>Seller Applications</h3>
-            <div class="table-wrap">
-              <table class="user-table">
-                <thead>
-                  <tr>
-                    <th>Store Name</th>
-                    <th>Applied Date</th>
-                    <th>Store Information</th>
-                    <th>Verification Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="sellerTableBody"></tbody>
-              </table>
+            <div class="card-title">
+              <h3>Platform Notifications</h3>
+              <button class="btn" onclick="openNotificationForm(0)">+ Add Notification</button>
             </div>
-            <p class="table-footer" id="sellerCount"></p>
+            <fieldset id="notificationForm" class="form-box" style="display: none">
+              <legend id="notificationLegend">Add Notification</legend>
+              <label for="notificationMessage">Notification</label>
+              <input type="text" id="notificationMessage" placeholder="Enter notification message">
+              <label for="notificationDate">Date</label>
+              <input type="date" id="notificationDate">
+              <label for="notificationStatus">Status</label>
+              <select id="notificationStatus">
+                <option value="Unread">Unread</option>
+                <option value="Read">Read</option>
+              </select>
+              <p class="error" id="notificationError"></p>
+              <button class="btn" onclick="saveNotification()">Save</button>
+              <button class="btn light" onclick="hide('notificationForm')">Cancel</button>
+            </fieldset>
+            <div class="table-box"><table id="notificationTable"></table></div>
           </div>
+        </div>
 
-          <div class="tip-banner">🛡️ <strong>Keep NovaCart safe!</strong> Review applications carefully before verifying a seller.</div>
-        </section>
-
-        <!-- ========== PRODUCT MODERATION SECTION ========== -->
-        <section class="section" id="section-products">
-          <div class="page-header">
-            <div class="page-icon">📦</div>
-            <div class="page-header-text">
-              <h1>Product Moderation</h1>
-              <p>Review reported products and maintain content quality.</p>
-            </div>
-            <button class="btn btn-primary" id="addProductBtn">+ Add Reported Product</button>
-          </div>
-
-          <!-- Report overview (calculated from the list below) -->
-          <div class="card mod-overview">
-            <h3>Report Overview</h3>
-            <div class="mod-summary">
-              <div class="mod-item">
-                <strong id="productStatPending">0</strong>
-                <span>Pending product reviews</span>
-              </div>
-              <div class="mod-item">
-                <strong id="productStatApproved">0</strong>
-                <span>Approved products</span>
-              </div>
-              <div class="mod-item">
-                <strong id="productStatRemoved">0</strong>
-                <span>Removed products</span>
-              </div>
-            </div>
-          </div>
-
+        <!-- System logs -->
+        <div id="panel-logs" style="display: none">
           <div class="card">
-            <h3>Reported Products</h3>
-            <div class="table-wrap">
-              <table class="user-table">
-                <thead>
-                  <tr>
-                    <th>Product Name</th>
-                    <th>Seller</th>
-                    <th>Report Reason</th>
-                    <th>Report Date</th>
-                    <th>Moderation Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="productTableBody"></tbody>
-              </table>
+            <div class="card-title">
+              <h3>Administrator Activity Log</h3>
+              <button class="btn" onclick="openLogForm(0)">+ Add Log Entry</button>
             </div>
-            <p class="table-footer" id="productCount"></p>
+            <fieldset id="logForm" class="form-box" style="display: none">
+              <legend id="logLegend">Add Log Entry</legend>
+              <label for="logDescription">Activity Description</label>
+              <input type="text" id="logDescription" placeholder="What did the administrator do?">
+              <label for="logDate">Date</label>
+              <input type="date" id="logDate">
+              <p class="error" id="logError"></p>
+              <button class="btn" onclick="saveLog()">Save</button>
+              <button class="btn light" onclick="hide('logForm')">Cancel</button>
+            </fieldset>
+            <div class="table-box"><table id="logTable"></table></div>
           </div>
+        </div>
+      </section>
 
-          <div class="tip-banner">🛡️ <strong>Keep NovaCart safe!</strong> Remove products that break platform rules to protect customers.</div>
-        </section>
-
-        <!-- ========== PLATFORM SETTINGS SECTION ========== -->
-        <section class="section" id="section-settings">
-          <div class="page-header">
-            <div class="page-icon">⚙️</div>
-            <div class="page-header-text">
-              <h1>Platform Configuration</h1>
-              <p>Manage commission, product categories and coupon policies.</p>
-            </div>
-          </div>
-
-
-            <div class="card">
-              <h3>Platform Commission</h3>
-              <p class="hint">Percentage the platform keeps from each seller sale.</p>
-              <div class="commission-row">
-                <input type="number" id="commissionInput" class="input" min="0" max="100" step="0.5">
-                <span>%</span>
-                <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
-              </div>
-              <div class="form-error" id="settingsError"></div>
-            </div>
-
-            <div class="card section-gap">
-              <div class="card-header">
-                <h3>Product Categories</h3>
-                <button class="btn btn-primary btn-small" id="addCategoryBtn">+ Add Category</button>
-              </div>
-              <div class="table-wrap">
-                <table class="user-table compact-table">
-                  <thead>
-                    <tr><th>ID</th><th>Category Name</th><th>Actions</th></tr>
-                  </thead>
-                  <tbody id="categoryTableBody"></tbody>
-                </table>
-              </div>
-              <p class="table-footer" id="categoryCount"></p>
-            </div>
-
-            <div class="card section-gap">
-              <div class="card-header">
-                <h3>Coupon Policies</h3>
-                <button class="btn btn-primary btn-small" id="addCouponBtn">+ Add Coupon</button>
-              </div>
-              <div class="table-wrap">
-                <table class="user-table compact-table">
-                  <thead>
-                    <tr><th>Code</th><th>Discount Type</th><th>Discount Value</th><th>Expiry Date</th><th>Actions</th></tr>
-                  </thead>
-                  <tbody id="couponTableBody"></tbody>
-                </table>
-              </div>
-              <p class="table-footer" id="couponCount"></p>
-            </div>
-        </section>
-
-        <!-- ========== ANALYTICS & REPORTS SECTION ========== -->
-        <section class="section" id="section-analytics">
-          <div class="page-header">
-            <div class="page-icon">📊</div>
-            <div class="page-header-text">
-              <h1>Revenue Monitoring</h1>
-              <p>Track revenue, notifications and administrator activity.</p>
-            </div>
-          </div>
-
-          <!-- Tabs -->
-          <div class="tabs tabs-standalone" id="analyticsTabs">
-            <button class="tab active" data-atab="analytics">Analytics</button>
-            <button class="tab" data-atab="notifications">Notifications</button>
-            <button class="tab" data-atab="logs">System Logs</button>
-          </div>
-
-          <!-- ===== A. ANALYTICS ===== -->
-          <div class="tab-panel analytics-panel active" id="analyticsPanel-analytics">
-            <p class="demo-note">All revenue and order figures below are demonstration data.</p>
-
-            <div class="stats-grid three">
-              <div class="stat-card">
-                <div class="stat-icon purple">💰</div>
-                <div>
-                  <span class="stat-label">Total Revenue</span>
-                  <strong class="stat-value" id="statRevenue">৳ 0</strong>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon purple">🛒</div>
-                <div>
-                  <span class="stat-label">Total Orders</span>
-                  <strong class="stat-value" id="statOrders">0</strong>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon green">📈</div>
-                <div>
-                  <span class="stat-label">Average Order Value</span>
-                  <strong class="stat-value" id="statAvgOrder">৳ 0</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="two-columns chart-columns">
-              <div class="card">
-                <h3>Revenue Overview</h3>
-                <div class="bar-chart" id="revenueChart"></div>
-              </div>
-              <div class="card">
-                <h3>Recent Activity</h3>
-                <ul class="activity-list" id="analyticsActivityList"></ul>
-              </div>
-            </div>
-
-            <div class="card section-gap">
-              <div class="card-header">
-                <h3>Monthly Revenue Data</h3>
-                <button class="btn btn-primary btn-small" id="addRevenueBtn">+ Add Month</button>
-              </div>
-              <div class="table-wrap">
-                <table class="user-table compact-table">
-                  <thead>
-                    <tr><th>Month</th><th>Revenue</th><th>Orders</th><th>Actions</th></tr>
-                  </thead>
-                  <tbody id="revenueTableBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- ===== C. NOTIFICATIONS ===== -->
-          <div class="tab-panel analytics-panel" id="analyticsPanel-notifications">
-            <div class="card">
-              <div class="card-header">
-                <h3>Platform Notifications</h3>
-                <button class="btn btn-primary btn-small" id="addNotificationBtn">+ Add Notification</button>
-              </div>
-              <div class="table-wrap">
-                <table class="user-table compact-table">
-                  <thead>
-                    <tr><th>Notification</th><th>Date</th><th>Status</th><th>Actions</th></tr>
-                  </thead>
-                  <tbody id="notificationTableBody"></tbody>
-                </table>
-              </div>
-              <p class="table-footer" id="notificationCount"></p>
-            </div>
-          </div>
-
-          <!-- ===== D. SYSTEM LOGS ===== -->
-          <div class="tab-panel analytics-panel" id="analyticsPanel-logs">
-            <div class="card">
-              <div class="card-header">
-                <h3>Administrator Activity Log</h3>
-                <button class="btn btn-primary btn-small" id="addLogBtn">+ Add Log Entry</button>
-              </div>
-              <p class="hint">Important actions you perform in this panel are added here automatically.</p>
-              <div class="table-wrap">
-                <table class="user-table compact-table">
-                  <thead>
-                    <tr><th>Activity Description</th><th>Date</th><th>Actions</th></tr>
-                  </thead>
-                  <tbody id="logTableBody"></tbody>
-                </table>
-              </div>
-              <p class="table-footer" id="logCount"></p>
-            </div>
-          </div>
-
-        </section>
-
-      </main>
-    </div>
+    </main>
   </div>
 
-  <!-- Add / Edit user modal -->
-  <div class="modal-backdrop" id="userModal">
-    <div class="modal">
-      <h3 id="userModalTitle">Add User</h3>
-      <div class="form-error" id="formError"></div>
-      <input type="hidden" id="userId">
-
-      <label for="userName">Full Name</label>
-      <input type="text" id="userName" class="input" placeholder="Enter full name">
-
-      <label for="userEmail">Email</label>
-      <input type="email" id="userEmail" class="input" placeholder="name@novacart.com">
-
-      <label for="userRole">Role</label>
-      <select id="userRole" class="input">
-        <option value="Customer">Customer</option>
-        <option value="Seller">Seller</option>
-        <option value="Manager">Manager</option>
-        <option value="Administrator">Administrator</option>
-        <option value="Delivery Partner">Delivery Partner</option>
-      </select>
-
-      <label for="userStatus">Account Status</label>
-      <select id="userStatus" class="input">
-        <option value="Active">Active</option>
-        <option value="Suspended">Suspended</option>
-      </select>
-
-      <div class="modal-buttons">
-        <button class="btn btn-light" id="cancelUserBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveUserBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- View user details modal -->
-  <div class="modal-backdrop" id="viewModal">
-    <div class="modal">
-      <h3 id="viewTitle">User Details</h3>
-      <div id="viewDetails"></div>
-      <div class="modal-buttons">
-        <button class="btn btn-light" id="closeViewBtn">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add / Edit activity modal (dashboard) -->
-  <div class="modal-backdrop" id="activityModal">
-    <div class="modal">
-      <h3 id="activityModalTitle">Add Activity</h3>
-      <div class="form-error" id="activityError"></div>
-      <input type="hidden" id="activityId">
-
-      <label for="activityText">Activity</label>
-      <input type="text" id="activityText" class="input" placeholder="e.g. New order received">
-
-      <label for="activityTime">Time</label>
-      <input type="text" id="activityTime" class="input" placeholder="e.g. 2 min ago">
-
-      <div class="modal-buttons">
-        <button class="btn btn-light" id="cancelActivityBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveActivityBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add / Edit seller application modal -->
-  <div class="modal-backdrop" id="sellerModal">
-    <div class="modal">
-      <h3 id="sellerModalTitle">Add Seller Application</h3>
-      <div class="form-error" id="sellerError"></div>
-      <input type="hidden" id="sellerId">
-
-      <label for="sellerStoreName">Store Name</label>
-      <input type="text" id="sellerStoreName" class="input" placeholder="Enter store name">
-
-      <label for="sellerOwner">Applicant Name</label>
-      <input type="text" id="sellerOwner" class="input" placeholder="Enter applicant name">
-
-      <label for="sellerDate">Application Date</label>
-      <input type="date" id="sellerDate" class="input">
-
-      <label for="sellerInfo">Store Information</label>
-      <textarea id="sellerInfo" class="input" rows="3" placeholder="What does the store sell?"></textarea>
-
-      <label for="sellerStatus">Verification Status</label>
-      <select id="sellerStatus" class="input">
-        <option value="Pending">Pending</option>
-        <option value="Verified">Verified</option>
-        <option value="Rejected">Rejected</option>
-      </select>
-
-      <div class="modal-buttons">
-        <button class="btn btn-light" id="cancelSellerBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveSellerBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add / Edit reported product modal -->
-  <div class="modal-backdrop" id="productModal">
-    <div class="modal">
-      <h3 id="productModalTitle">Add Reported Product</h3>
-      <div class="form-error" id="productError"></div>
-      <input type="hidden" id="productId">
-
-      <label for="productName">Product Name</label>
-      <input type="text" id="productName" class="input" placeholder="Enter product name">
-
-      <label for="productSellerName">Seller / Store Name</label>
-      <input type="text" id="productSellerName" class="input" placeholder="Enter seller name">
-
-      <label for="productPrice">Price (৳)</label>
-      <input type="number" id="productPrice" class="input" min="0" placeholder="0">
-
-      <label for="productReason">Report Reason</label>
-      <input type="text" id="productReason" class="input" placeholder="Why was it reported?">
-
-      <label for="productDate">Report Date</label>
-      <input type="date" id="productDate" class="input">
-
-      <label for="productStatus">Moderation Status</label>
-      <select id="productStatus" class="input">
-        <option value="Pending">Pending</option>
-        <option value="Approved">Approved</option>
-        <option value="Removed">Removed</option>
-      </select>
-
-      <div class="modal-buttons">
-        <button class="btn btn-light" id="cancelProductBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveProductBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add / Edit monthly revenue modal -->
-  <div class="modal-backdrop" id="revenueModal">
-    <div class="modal">
-      <h3 id="revenueModalTitle">Add Monthly Data</h3>
-      <div class="form-error" id="revenueError"></div>
-      <input type="hidden" id="revenueId">
-
-      <label for="revenueMonth">Month</label>
-      <input type="text" id="revenueMonth" class="input" maxlength="8" placeholder="e.g. Jul">
-
-      <label for="revenueAmount">Revenue (৳)</label>
-      <input type="number" id="revenueAmount" class="input" min="0" placeholder="0">
-
-      <label for="revenueOrders">Number of Orders</label>
-      <input type="number" id="revenueOrders" class="input" min="0" placeholder="0">
-
-      <div class="modal-buttons">
-        <button class="btn btn-light" id="cancelRevenueBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveRevenueBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add / Edit category modal -->
-  <div class="modal-backdrop" id="categoryModal">
-    <div class="modal">
-      <h3 id="categoryModalTitle">Add Category</h3>
-      <div class="form-error" id="categoryError"></div>
-      <input type="hidden" id="categoryId">
-
-      <label for="categoryNameInput">Category Name</label>
-      <input type="text" id="categoryNameInput" class="input" placeholder="e.g. Electronics">
-
-      <div class="modal-buttons">
-        <button class="btn btn-light" id="cancelCategoryBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveCategoryBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add / Edit coupon modal -->
-  <div class="modal-backdrop" id="couponModal">
-    <div class="modal">
-      <h3 id="couponModalTitle">Add Coupon</h3>
-      <div class="form-error" id="couponError"></div>
-      <input type="hidden" id="couponId">
-
-      <label for="couponCode">Coupon Code</label>
-      <input type="text" id="couponCode" class="input" placeholder="e.g. WELCOME10">
-
-      <label for="couponType">Discount Type</label>
-      <select id="couponType" class="input">
-        <option value="Percentage">Percentage (%)</option>
-        <option value="Fixed">Fixed Amount (৳)</option>
-      </select>
-
-      <label for="couponValue">Discount Value</label>
-      <input type="number" id="couponValue" class="input" min="0" placeholder="0">
-
-      <label for="couponExpiry">Expiry Date</label>
-      <input type="date" id="couponExpiry" class="input">
-
-      <div class="modal-buttons">
-        <button class="btn btn-light" id="cancelCouponBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveCouponBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add / Edit notification modal -->
-  <div class="modal-backdrop" id="notificationModal">
-    <div class="modal">
-      <h3 id="notificationModalTitle">Add Notification</h3>
-      <div class="form-error" id="notificationError"></div>
-      <input type="hidden" id="notificationId">
-
-      <label for="notificationMessage">Notification</label>
-      <input type="text" id="notificationMessage" class="input" placeholder="Enter notification message">
-
-      <label for="notificationDate">Date</label>
-      <input type="date" id="notificationDate" class="input">
-
-      <label for="notificationStatus">Status</label>
-      <select id="notificationStatus" class="input">
-        <option value="Unread">Unread</option>
-        <option value="Read">Read</option>
-      </select>
-
-      <div class="modal-buttons">
-        <button class="btn btn-light" id="cancelNotificationBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveNotificationBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add / Edit system log modal -->
-  <div class="modal-backdrop" id="logModal">
-    <div class="modal">
-      <h3 id="logModalTitle">Add Log Entry</h3>
-      <div class="form-error" id="logError"></div>
-      <input type="hidden" id="logId">
-
-      <label for="logDescription">Activity Description</label>
-      <input type="text" id="logDescription" class="input" placeholder="What did the administrator do?">
-
-      <label for="logDate">Date</label>
-      <input type="date" id="logDate" class="input">
-
-      <div class="modal-buttons">
-        <button class="btn btn-light" id="cancelLogBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveLogBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Dark overlay used when the sidebar is open on small screens -->
-  <div class="overlay" id="overlay"></div>
-
-  <!-- Toast message for confirmations -->
-  <div class="toast" id="toast"></div>
-
-  <!-- External JavaScript -->
   <script src="../JS/admin.js"></script>
 </body>
 </html>
