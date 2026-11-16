@@ -1,4 +1,4 @@
-// NovaCart Admin Panel (ES6): data is kept in arrays and every module has CRUD
+// NovaCart Admin Panel
 
 // DATA (arrays of objects)
 const users = [
@@ -138,7 +138,8 @@ const countStatus = (list, status) => list.filter(item => item.status === status
 const money = amount => `৳ ${amount}`;
 
 // SIDEBAR AND TOP BAR
-const sectionNames = ["dashboard", "users", "sellers", "products", "settings", "analytics"];
+const menuSections = ["dashboard", "users", "sellers", "products", "settings", "analytics"];
+const sectionNames = [...menuSections, "profile", "password"];
 
 const descriptions = {
   dashboard: "Overview of users, sellers and platform activity.",
@@ -146,17 +147,25 @@ const descriptions = {
   sellers: "Review seller applications and verify trusted sellers.",
   products: "Review reported products and moderate content.",
   settings: "Configure commission, categories and coupon policies.",
-  analytics: "Track revenue, notifications and administrator activity."
+  analytics: "Track revenue, notifications and administrator activity.",
+  profile: "View and update your administrator profile.",
+  password: "Keep your account secure by changing your password."
 };
 
 // Show one section and hide the others (no page reload)
 function showSection(name) {
   sectionNames.forEach(section => {
     document.getElementById(`section-${section}`).style.display = "none";
-    document.getElementById(`menu-${section}`).className = "menu-item";
+    const menuItem = document.getElementById(`menu-${section}`);   // profile and password have no menu item
+    if (menuItem) {
+      menuItem.className = "menu-item";
+    }
   });
   document.getElementById(`section-${name}`).style.display = "block";
-  document.getElementById(`menu-${name}`).className = "menu-item active";
+  const activeItem = document.getElementById(`menu-${name}`);
+  if (activeItem) {
+    activeItem.className = "menu-item active";
+  }
   setText("description", descriptions[name]);
   hide("profileMenu");
   showMessage();
@@ -165,11 +174,6 @@ function showSection(name) {
 function toggleProfile() {
   const menu = document.getElementById("profileMenu");
   menu.style.display = (menu.style.display === "block") ? "none" : "block";
-}
-
-function profileLink(name) {
-  hide("profileMenu");
-  showMessage(`${name} is not available yet.`);
 }
 
 function logOut() {
@@ -1099,18 +1103,163 @@ function deleteLog(id) {
   showLogs();
 }
 
+// MY PROFILE
+// The logged-in administrator (the same person as user #4 in the Users table)
+const profile = {
+  id: 4,
+  name: "Ameya",
+  email: "ameya@novacart.com",
+  phone: "+8801712345678",
+  birth: "2002-05-15",
+  address: "House 12, Road 5, Dhanmondi, Dhaka",
+  role: "Administrator",
+  joined: "2025-01-12"
+};
+
+// READ
+function showProfile() {
+  setText("profileInitial", profile.name.charAt(0).toUpperCase());
+  setText("profileName", profile.name);
+  setText("profileEmail", profile.email);
+  setText("profilePhone", profile.phone);
+  setText("profileBirth", profile.birth);
+  setText("profileAddress", profile.address);
+  setText("profileRole", profile.role);
+  setText("profileJoined", profile.joined);
+}
+
+function openProfileForm() {
+  clearErrors(["profileNameError", "profileEmailError", "profilePhoneError", "profileAddressError"]);
+  setValue("profileNameInput", profile.name);
+  setValue("profileEmailInput", profile.email);
+  setValue("profilePhoneInput", profile.phone);
+  setValue("profileBirthInput", profile.birth);
+  setValue("profileAddressInput", profile.address);
+  openModal("profileModal");
+}
+
+// Bangladesh mobile number: +880 and 10 digits starting with 1, or 0 and 10 digits starting with 1
+const getPhoneDigits = phone => {
+  if (phone.startsWith("+880")) {
+    return phone.slice(4);
+  }
+  return phone.startsWith("0") ? phone.slice(1) : "";
+};
+const isValidPhone = phone => {
+  const digits = getPhoneDigits(phone);
+  return digits.length === 10 && digits.startsWith("1") && [...digits].every(digit => "0123456789".includes(digit));
+};
+
+// UPDATE
+function saveProfile() {
+  clearErrors(["profileNameError", "profileEmailError", "profilePhoneError", "profileAddressError"]);
+  const name = getValue("profileNameInput").trim();
+  const email = getValue("profileEmailInput").trim();
+  const phoneText = getValue("profilePhoneInput").trim();
+  const birth = getValue("profileBirthInput");
+  const address = getValue("profileAddressInput").trim();
+  let valid = true;
+
+  if (name === "") {
+    showError("profileNameError", "Name must be filled out");
+    valid = false;
+  }
+  if (!email.includes("@")) {
+    showError("profileEmailError", "Email must contain an @");
+    valid = false;
+  }
+  const emailTaken = users.some(user =>
+    user.email.toLowerCase() === email.toLowerCase() && user.id !== profile.id);
+  if (emailTaken) {
+    showError("profileEmailError", "This email is already used by another user");
+    valid = false;
+  }
+  if (!isValidPhone(phoneText)) {
+    showError("profilePhoneError", "Enter a valid number, for example +8801712345678");
+    valid = false;
+  }
+  if (address === "") {
+    showError("profileAddressError", "Address must be filled out");
+    valid = false;
+  }
+  if (!valid) {
+    return;
+  }
+
+  const phone = `+880${getPhoneDigits(phoneText)}`;   // always saved in the +880 form
+  Object.assign(profile, { name, email, phone, birth, address });
+  const adminUser = findById(users, profile.id);   // keep the Users table in step
+  if (adminUser) {
+    Object.assign(adminUser, { name, email });
+    showUsers();
+  }
+  closeModal("profileModal");
+  showProfile();
+  showMessage("Profile updated successfully.");
+}
+
+// CHANGE PASSWORD
+let adminPassword = "admin123";
+
+// Show or hide the typed passwords (checkbox)
+function togglePasswords() {
+  const type = document.getElementById("showPasswords").checked ? "text" : "password";
+  ["currentPassword", "newPassword", "confirmPassword"].forEach(id => {
+    document.getElementById(id).type = type;
+  });
+}
+
+// UPDATE (the browser checks required and minlength, here we check the other rules)
+function savePassword() {
+  clearErrors(["currentPasswordError", "newPasswordError", "confirmPasswordError"]);
+  const current = getValue("currentPassword");
+  const newPassword = getValue("newPassword");
+  const confirm = getValue("confirmPassword");
+  const hasNumber = [...newPassword].some(character => "0123456789".includes(character));
+  let valid = true;
+
+  if (current !== adminPassword) {
+    showError("currentPasswordError", "Current password is incorrect");
+    valid = false;
+  }
+  if (newPassword.length < 8) {
+    showError("newPasswordError", "Password must be at least 8 characters");
+    valid = false;
+  } else if (!hasNumber) {
+    showError("newPasswordError", "Password must contain at least one number");
+    valid = false;
+  } else if (newPassword === current) {
+    showError("newPasswordError", "New password must be different from the current password");
+    valid = false;
+  }
+  if (confirm !== newPassword) {
+    showError("confirmPasswordError", "Passwords do not match");
+    valid = false;
+  }
+  if (!valid) {
+    return;
+  }
+
+  adminPassword = newPassword;
+  document.getElementById("passwordForm").reset();
+  togglePasswords();
+  showMessage("Password changed successfully.");
+}
+
 // EVENTS (everything is connected with addEventListener)
 const onClick = (id, handler) => document.getElementById(id).addEventListener("click", handler);
 
 // Sidebar and top bar
-sectionNames.forEach(name => onClick(`menu-${name}`, () => showSection(name)));
+menuSections.forEach(name => onClick(`menu-${name}`, () => showSection(name)));
 onClick("logoutBtn", logOut);
 onClick("menuLogout", logOut);
 onClick("bellButton", openNotifications);
 onClick("profileButton", toggleProfile);
-document.querySelectorAll(".profile-link").forEach(link => {
-  link.addEventListener("click", () => profileLink(link.innerText));
-});
+onClick("myProfileBtn", () => showSection("profile"));
+onClick("changePasswordBtn", () => showSection("password"));
+onClick("editProfileBtn", openProfileForm);
+onClick("cancelProfileBtn", () => closeModal("profileModal"));
+document.getElementById("showPasswords").addEventListener("change", togglePasswords);
 
 // Tabs
 document.querySelectorAll("#roleTabs button").forEach(tab => {
@@ -1150,6 +1299,8 @@ onSubmit("revenueForm", saveRevenue);
 onSubmit("notificationForm", saveNotification);
 onSubmit("logForm", saveLog);
 onSubmit("settingsForm", saveSettings);
+onSubmit("profileForm", saveProfile);
+onSubmit("passwordForm", savePassword);
 
 // Close buttons: the x on a pop-up form and the Close button of a details box
 document.querySelectorAll(".close").forEach(button => button.addEventListener("click", closeAllModals));
@@ -1194,4 +1345,5 @@ showCoupons();
 showRevenue();
 showNotifications();
 showLogs();
+showProfile();
 showSection("dashboard");
