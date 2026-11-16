@@ -38,10 +38,10 @@
       </div>
       <div class="top-right">
         <button id="bellButton" class="bell" aria-label="Notifications">🔔 <span id="bellCount">0</span></button>
-        <button id="profileButton" class="profile-button" aria-haspopup="true">A Admin ▾</button>
+        <button id="profileButton" class="profile-button" aria-haspopup="true">Admin ▾</button>
         <div id="profileMenu" class="profile-menu">
-          <button class="profile-link">My Profile</button>
-          <button class="profile-link">Change Password</button>
+          <button id="myProfileBtn">My Profile</button>
+          <button id="changePasswordBtn">Change Password</button>
           <button id="menuLogout">Log Out</button>
         </div>
       </div>
@@ -350,6 +350,83 @@
         </div>
       </section>
 
+      <!-- My profile -->
+      <section id="section-profile" class="section">
+        <div class="page-header">
+          <span class="icon">👤</span>
+          <div>
+            <h1>My Profile</h1>
+            <p>View and update your administrator profile.</p>
+          </div>
+          <button id="editProfileBtn" class="btn right">Edit Profile</button>
+        </div>
+
+        <div class="card">
+          <h3>Profile Details</h3>
+          <div id="profileInitial" class="profile-picture">A</div>
+          <p>Name: <strong id="profileName"></strong></p>
+          <p>Email: <strong id="profileEmail"></strong></p>
+          <p>Contact No: <strong id="profilePhone"></strong></p>
+          <p>Date of Birth: <strong id="profileBirth"></strong></p>
+          <p>Address: <strong id="profileAddress"></strong></p>
+          <p>Role: <strong id="profileRole"></strong></p>
+          <p>Joined Date: <strong id="profileJoined"></strong></p>
+        </div>
+      </section>
+
+      <!-- Change password -->
+      <section id="section-password" class="section">
+        <div class="page-header">
+          <span class="icon">🔒</span>
+          <div>
+            <h1>Change Password</h1>
+            <p>Keep your account secure by choosing a strong password.</p>
+          </div>
+        </div>
+
+        <div class="two-columns">
+          <div class="card">
+            <h3>New Password</h3>
+            <form id="passwordForm" class="plain-form">
+              <table>
+                <tr>
+                  <td><label for="currentPassword">Current Password:</label></td>
+                  <td><input type="password" id="currentPassword" name="currentPassword" required>
+                      <span class="error" id="currentPasswordError"></span></td>
+                </tr>
+                <tr>
+                  <td><label for="newPassword">New Password:</label></td>
+                  <td><input type="password" id="newPassword" name="newPassword" minlength="8" required>
+                      <span class="error" id="newPasswordError"></span></td>
+                </tr>
+                <tr>
+                  <td><label for="confirmPassword">Confirm Password:</label></td>
+                  <td><input type="password" id="confirmPassword" name="confirmPassword" required>
+                      <span class="error" id="confirmPasswordError"></span></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td><input type="checkbox" id="showPasswords" name="showPasswords">
+                      <label for="showPasswords">Show passwords</label></td>
+                </tr>
+              </table>
+              <input type="submit" class="btn" value="Change Password">
+            </form>
+          </div>
+
+          <div class="card">
+            <h3>Instructions</h3>
+            <ul>
+              <li>Enter your current password first.</li>
+              <li>Use at least 8 characters.</li>
+              <li>Include at least one number.</li>
+              <li>The new password must be different from the current one.</li>
+              <li>Type the new password again to confirm it.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
     </main>
 
     <footer class="footer">
@@ -642,6 +719,44 @@
         </table>
       </fieldset>
       <input type="submit" class="btn" value="Save">
+    </form>
+  </div>
+
+  <!-- Edit profile -->
+  <div class="overlay" id="profileModal">
+    <form class="dialog" role="dialog" aria-modal="true" aria-labelledby="profileLegend" id="profileForm">
+      <fieldset>
+        <legend id="profileLegend">Edit Profile</legend>
+        <table>
+          <tr>
+            <td><label for="profileNameInput">Full Name:</label></td>
+            <td><input type="text" id="profileNameInput" name="profileNameInput" minlength="2" required>
+                <span class="error" id="profileNameError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="profileEmailInput">Email:</label></td>
+            <td><input type="email" id="profileEmailInput" name="profileEmailInput" required>
+                <span class="error" id="profileEmailError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="profilePhoneInput">Contact No:</label></td>
+            <td><input type="text" id="profilePhoneInput" name="profilePhoneInput" placeholder="+8801712345678"
+                       pattern="(\+880|0)1[0-9]{9}" title="Use +880 followed by 10 digits starting with 1, or the 11-digit number starting with 01" required>
+                <span class="error" id="profilePhoneError"></span></td>
+          </tr>
+          <tr>
+            <td><label for="profileBirthInput">Date of Birth:</label></td>
+            <td><input type="date" id="profileBirthInput" name="profileBirthInput" min="1950-01-01" max="2008-12-31" required></td>
+          </tr>
+          <tr>
+            <td><label for="profileAddressInput">Address:</label></td>
+            <td><textarea id="profileAddressInput" name="profileAddressInput" rows="3" cols="22" minlength="5" placeholder="House, road, area, city" required></textarea>
+                <span class="error" id="profileAddressError"></span></td>
+          </tr>
+        </table>
+      </fieldset>
+      <input type="submit" class="btn" value="Save">
+      <button type="button" id="cancelProfileBtn" class="btn light">Cancel</button>
     </form>
   </div>
 

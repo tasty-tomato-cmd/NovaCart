@@ -1,4 +1,4 @@
-/* NovaCart Admin Panel: purple and white theme */
+/* NovaCart Admin Panel */
 
 * {
   box-sizing: border-box;
@@ -28,6 +28,7 @@ button {
 }
 
 .sidebar h2 {
+  color: white;
   text-align: center;
   margin-top: 0;
 }
@@ -521,17 +522,20 @@ h3 {
   color: #5b2fd1;
 }
 
-.dialog table {
+.dialog table,
+.plain-form table {
   font-size: 14px;
 }
 
-.dialog td {
+.dialog td,
+.plain-form td {
   border-top: none;
   padding: 6px 8px;
   vertical-align: top;
 }
 
-.dialog tr:hover td {
+.dialog tr:hover td,
+.plain-form tr:hover td {
   background-color: white;
 }
 
@@ -544,12 +548,17 @@ h3 {
   width: 230px;
 }
 
-.dialog .error {
+.dialog .error,
+.plain-form .error {
   display: block;
 }
 
 form .btn {
   margin-right: 6px;
+}
+
+.plain-form .btn {
+  margin-top: 10px;
 }
 
 /* Footer */
@@ -559,4 +568,22 @@ form .btn {
   font-size: 13px;
   padding: 10px;
   margin-top: 20px;
+}
+
+/* Profile page */
+.profile-picture {
+  width: 90px;
+  height: 90px;
+  line-height: 90px;
+  border-radius: 50%;
+  background-color: #5b2fd1;
+  color: white;
+  font-size: 38px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.two-columns li {
+  margin-bottom: 8px;
 }
