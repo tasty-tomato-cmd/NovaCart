@@ -35,8 +35,8 @@ const products = [
 // An object with a method: "this" means the object that owns the method
 const settings = {
   commission: 10,
-  summary() {
-    return `Commission is now ${this.commission}%.`;
+  summary: function () {
+    return "Commission is now " + this.commission + "%.";
   }
 };
 
@@ -93,53 +93,112 @@ let editingLogId = 0;
 
 let currentRole = "All";
 
-// SMALL HELPER FUNCTIONS (arrow functions)
-const getValue = id => document.getElementById(id).value;
-const setValue = (id, value) => { document.getElementById(id).value = value; };
-const setText = (id, text) => { document.getElementById(id).innerText = text; };
-const show = id => { document.getElementById(id).style.display = "block"; };
-const hide = id => { document.getElementById(id).style.display = "none"; };
+// SMALL HELPER FUNCTIONS
+function getValue(id) {
+  return document.getElementById(id).value;
+}
+
+function setValue(id, value) {
+  document.getElementById(id).value = value;
+}
+
+function setText(id, text) {
+  document.getElementById(id).innerText = text;
+}
+
+function show(id) {
+  document.getElementById(id).style.display = "block";
+}
+
+function hide(id) {
+  document.getElementById(id).style.display = "none";
+}
 
 // Pop-up forms: the CSS class "show" makes the overlay visible
-const openModal = id => document.getElementById(id).classList.add("show");
-const closeModal = id => document.getElementById(id).classList.remove("show");
-const closeAllModals = () => {
-  document.querySelectorAll(".overlay").forEach(overlay => overlay.classList.remove("show"));
-};
+function openModal(id) {
+  document.getElementById(id).classList.add("show");
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove("show");
+}
+
+function closeAllModals() {
+  document.querySelectorAll(".overlay").forEach(function (overlay) { overlay.classList.remove("show"); });
+}
 
 // Radio buttons that share one name form a group
-const getRadio = name => {
-  const checked = [...document.getElementsByName(name)].find(radio => radio.checked);
-  return checked ? checked.value : "";
-};
-const setRadio = (name, value) => {
-  [...document.getElementsByName(name)].forEach(radio => {
+function getRadio(name) {
+  for (const radio of document.getElementsByName(name)) {
+    if (radio.checked) {
+      return radio.value;
+    }
+  }
+  return "";
+}
+
+function setRadio(name, value) {
+  for (const radio of document.getElementsByName(name)) {
     radio.checked = (radio.value === value);
-  });
-};
+  }
+}
 
 // Show a validation error in red next to its field
-const showError = (id, text) => {
+function showError(id, text) {
   const error = document.getElementById(id);
   error.innerText = text;
   error.style.color = "red";
-};
-const clearErrors = ids => ids.forEach(id => setText(id, ""));
+}
+
+function clearErrors(ids) {
+  ids.forEach(function (id) { setText(id, ""); });
+}
 
 // Confirmation message at the top of the page
-const showMessage = (text = "") => setText("message", text);
+function showMessage(text) {
+  setText("message", text);
+}
 
 // Working with arrays of objects
-const findById = (list, id) => list.find(item => item.id === id);
-const getNextId = list => Math.max(0, ...list.map(item => item.id)) + 1;
-const removeItem = (list, id) => list.splice(list.indexOf(findById(list, id)), 1);
-const countStatus = (list, status) => list.filter(item => item.status === status).length;
+function findById(list, id) {
+  for (const item of list) {
+    if (item.id === id) {
+      return item;
+    }
+  }
+}
 
-const money = amount => `৳ ${amount}`;
+function getNextId(list) {
+  let highest = 0;
+  for (const item of list) {
+    if (item.id > highest) {
+      highest = item.id;
+    }
+  }
+  return highest + 1;
+}
+
+function removeItem(list, id) {
+  list.splice(list.indexOf(findById(list, id)), 1);
+}
+
+function countStatus(list, status) {
+  let count = 0;
+  for (const item of list) {
+    if (item.status === status) {
+      count++;
+    }
+  }
+  return count;
+}
+
+function money(amount) {
+  return "৳ " + amount;
+}
 
 // SIDEBAR AND TOP BAR
 const menuSections = ["dashboard", "users", "sellers", "products", "settings", "analytics"];
-const sectionNames = [...menuSections, "profile", "password"];
+const sectionNames = ["dashboard", "users", "sellers", "products", "settings", "analytics", "profile", "password"];
 
 const descriptions = {
   dashboard: "Overview of users, sellers and platform activity.",
@@ -154,21 +213,21 @@ const descriptions = {
 
 // Show one section and hide the others (no page reload)
 function showSection(name) {
-  sectionNames.forEach(section => {
-    document.getElementById(`section-${section}`).style.display = "none";
-    const menuItem = document.getElementById(`menu-${section}`);   // profile and password have no menu item
+  sectionNames.forEach(function (section) {
+    document.getElementById("section-" + section).style.display = "none";
+    const menuItem = document.getElementById("menu-" + section);   // profile and password have no menu item
     if (menuItem) {
       menuItem.className = "menu-item";
     }
   });
-  document.getElementById(`section-${name}`).style.display = "block";
-  const activeItem = document.getElementById(`menu-${name}`);
+  document.getElementById("section-" + name).style.display = "block";
+  const activeItem = document.getElementById("menu-" + name);
   if (activeItem) {
     activeItem.className = "menu-item active";
   }
   setText("description", descriptions[name]);
   hide("profileMenu");
-  showMessage();
+  showMessage("");
 }
 
 function toggleProfile() {
@@ -198,19 +257,24 @@ function updateBell() {
 
 // READ
 function showActivities() {
-  const rows = activities.map(activity => `
-    <tr>
-      <td>${activity.text}</td>
-      <td>${activity.time}</td>
-      <td>
-        <button class="small" name="edit" value="${activity.id}">Edit</button>
-        <button class="small danger" name="delete" value="${activity.id}">Delete</button>
-      </td>
-    </tr>`).join("");
+  let rows = "";
+  for (const activity of activities) {
+    rows += "<tr>" +
+      "<td>" + activity.text + "</td>" +
+      "<td>" + activity.time + "</td>" +
+      "<td>" +
+      "<button class='small' name='edit' value='" + activity.id + "'>Edit</button> " +
+      "<button class='small danger' name='delete' value='" + activity.id + "'>Delete</button> " +
+      "</td>" +
+      "</tr>";
+  }
 
-  document.getElementById("activityBody").innerHTML = rows || `<tr><td colspan="3">No recent activity.</td></tr>`;
-  document.getElementById("analyticsActivity").innerHTML =
-    activities.map(activity => `<li>${activity.text} (${activity.time})</li>`).join("");
+  document.getElementById("activityBody").innerHTML = rows || "<tr><td colspan='3'>No recent activity.</td></tr>";
+  let listItems = "";
+  for (const activity of activities) {
+    listItems += "<li>" + activity.text + " (" + activity.time + ")</li>";
+  }
+  document.getElementById("analyticsActivity").innerHTML = listItems;
 }
 
 // Open the form: id 0 = Add, otherwise Edit
@@ -243,10 +307,12 @@ function saveActivity() {
   }
 
   if (editingActivityId === 0) {
-    activities.unshift({ id: getNextId(activities), text, time });
+    activities.unshift({ id: getNextId(activities), text: text, time: time });
     showMessage("Activity added successfully.");
   } else {
-    Object.assign(findById(activities, editingActivityId), { text, time });
+    const activity = findById(activities, editingActivityId);
+    activity.text = text;
+    activity.time = time;
     showMessage("Activity updated successfully.");
   }
   console.log(activities);
@@ -266,7 +332,12 @@ function deleteActivity(id) {
 
 // Statistics cards (dashboard and user page) come from the users array
 function updateStats() {
-  const sellerCount = users.filter(user => user.role === "Seller").length;
+  let sellerCount = 0;
+  for (const user of users) {
+    if (user.role === "Seller") {
+      sellerCount++;
+    }
+  }
   const active = countStatus(users, "Active");
   const suspended = countStatus(users, "Suspended");
 
@@ -284,38 +355,39 @@ function updateStats() {
 // READ: show the table (uses the selected role and the search box)
 function showUsers() {
   const search = getValue("userSearch").toLowerCase();
+  let rows = "";
+  let count = 0;
 
-  const matches = users.filter(user => {
+  for (const user of users) {
     const roleMatches = currentRole === "All" || user.role === currentRole;
     const searchMatches = user.name.toLowerCase().includes(search) ||
       user.email.toLowerCase().includes(search);
-    return roleMatches && searchMatches;
-  });
 
-  const rows = matches.map(user => {
-    const suspendButton = (user.status === "Active")
-      ? `<button class="small danger" name="toggle" value="${user.id}">Suspend</button>`
-      : `<button class="small good" name="toggle" value="${user.id}">Reactivate</button>`;
+    if (roleMatches && searchMatches) {
+      count++;
+      const suspendButton = (user.status === "Active")
+        ? "<button class='small danger' name='toggle' value='" + user.id + "'>Suspend</button>"
+        : "<button class='small good' name='toggle' value='" + user.id + "'>Reactivate</button>";
 
-    return `
-    <tr>
-      <td>#${user.id}</td>
-      <td>${user.name}</td>
-      <td>${user.email}</td>
-      <td>${user.role}</td>
-      <td><span class="badge status-${user.status}">${user.status}</span></td>
-      <td>${user.joined}</td>
-      <td>
-        <button class="small" name="view" value="${user.id}">View</button>
-        <button class="small" name="edit" value="${user.id}">Edit</button>
-        ${suspendButton}
-        <button class="small danger" name="delete" value="${user.id}">Delete</button>
-      </td>
-    </tr>`;
-  }).join("");
+      rows += "<tr>" +
+        "<td>#" + user.id + "</td>" +
+        "<td>" + user.name + "</td>" +
+        "<td>" + user.email + "</td>" +
+        "<td>" + user.role + "</td>" +
+        "<td><span class='badge status-" + user.status + "'>" + user.status + "</span></td>" +
+        "<td>" + user.joined + "</td>" +
+        "<td>" +
+        "<button class='small' name='view' value='" + user.id + "'>View</button> " +
+        "<button class='small' name='edit' value='" + user.id + "'>Edit</button> " +
+        suspendButton + " " +
+        "<button class='small danger' name='delete' value='" + user.id + "'>Delete</button> " +
+        "</td>" +
+        "</tr>";
+    }
+  }
 
-  document.getElementById("userBody").innerHTML = rows || `<tr><td colspan="7">No users found.</td></tr>`;
-  setText("userCount", `Showing ${matches.length} of ${users.length} users`);
+  document.getElementById("userBody").innerHTML = rows || "<tr><td colspan='7'>No users found.</td></tr>";
+  setText("userCount", "Showing " + count + " of " + users.length + " users");
   updateStats();
 }
 
@@ -324,7 +396,7 @@ function filterRole(role) {
   currentRole = role;
   setValue("roleFilter", role);
 
-  document.querySelectorAll("#roleTabs button").forEach(tab => {
+  document.querySelectorAll("#roleTabs button").forEach(function (tab) {
     tab.className = (tab.value === role) ? "tab active" : "tab";
   });
   showUsers();
@@ -333,9 +405,9 @@ function filterRole(role) {
 // READ: view details
 function viewUser(id) {
   const user = findById(users, id);
-  document.getElementById("userDetailsText").innerHTML = `<strong>User Details</strong><br>
-    ID: #${user.id}<br>Name: ${user.name}<br>Email: ${user.email}<br>
-    Role: ${user.role}<br>Account Status: ${user.status}<br>Joined Date: ${user.joined}`;
+  document.getElementById("userDetailsText").innerHTML = "<strong>User Details</strong><br>" +
+      "ID: #" + user.id + "<br>Name: " + user.name + "<br>Email: " + user.email + "<br>" +
+      "Role: " + user.role + "<br>Account Status: " + user.status + "<br>Joined Date: " + user.joined;
   show("userDetails");
 }
 
@@ -381,8 +453,12 @@ function saveUser() {
     showError("userEmailError", "Email must contain an @");
     valid = false;
   }
-  const emailTaken = users.some(user =>
-    user.email.toLowerCase() === email.toLowerCase() && user.id !== editingUserId);
+  let emailTaken = false;
+  for (const user of users) {
+    if (user.email.toLowerCase() === email.toLowerCase() && user.id !== editingUserId) {
+      emailTaken = true;
+    }
+  }
   if (emailTaken) {
     showError("userEmailError", "This email is already used by another user");
     valid = false;
@@ -392,16 +468,20 @@ function saveUser() {
   }
 
   if (editingUserId === 0) {
-    users.push({ id: getNextId(users), name, email, role, status, joined });
+    users.push({ id: getNextId(users), name: name, email: email, role: role, status: status, joined: joined });
     showMessage("New user added successfully.");
   } else {
-    Object.assign(findById(users, editingUserId), { name, email, role, status, joined });
+    const user = findById(users, editingUserId);
+    user.name = name;
+    user.email = email;
+    user.role = role;
+    user.status = status;
+    user.joined = joined;
     showMessage("User updated successfully.");
   }
   console.log(users);
   closeModal("userModal");
   showUsers();
-  return;
 }
 
 // UPDATE: suspend or reactivate
@@ -409,16 +489,16 @@ function toggleUser(id) {
   const user = findById(users, id);
   user.status = (user.status === "Active") ? "Suspended" : "Active";
   showMessage(user.status === "Suspended"
-    ? `${user.name}'s account has been suspended.`
-    : `${user.name}'s account has been reactivated.`);
+    ? user.name + "'s account has been suspended."
+    : user.name + "'s account has been reactivated.");
   showUsers();
 }
 
 // DELETE
 function deleteUser(id) {
-  const { name } = findById(users, id);   // destructuring: take only the name
+  const user = findById(users, id);
   removeItem(users, id);
-  showMessage(`${name} has been permanently deleted.`);
+  showMessage(user.name + " has been permanently deleted.");
   console.log(users);
   showUsers();
 }
@@ -427,32 +507,34 @@ function deleteUser(id) {
 
 // READ
 function showSellers() {
-  const rows = sellers.map(seller => `
-    <tr>
-      <td><strong>${seller.storeName}</strong></td>
-      <td>${seller.date}</td>
-      <td>${seller.info}</td>
-      <td><span class="badge status-${seller.status}">${seller.status}</span></td>
-      <td>
-        <button class="small" name="view" value="${seller.id}">View</button>
-        <button class="small good" name="verify" value="${seller.id}">Verify</button>
-        <button class="small danger" name="reject" value="${seller.id}">Reject</button>
-        <button class="small" name="edit" value="${seller.id}">Edit</button>
-        <button class="small danger" name="delete" value="${seller.id}">Delete</button>
-      </td>
-    </tr>`).join("");
+  let rows = "";
+  for (const seller of sellers) {
+    rows += "<tr>" +
+      "<td><strong>" + seller.storeName + "</strong></td>" +
+      "<td>" + seller.date + "</td>" +
+      "<td>" + seller.info + "</td>" +
+      "<td><span class='badge status-" + seller.status + "'>" + seller.status + "</span></td>" +
+      "<td>" +
+      "<button class='small' name='view' value='" + seller.id + "'>View</button> " +
+      "<button class='small good' name='verify' value='" + seller.id + "'>Verify</button> " +
+      "<button class='small danger' name='reject' value='" + seller.id + "'>Reject</button> " +
+      "<button class='small' name='edit' value='" + seller.id + "'>Edit</button> " +
+      "<button class='small danger' name='delete' value='" + seller.id + "'>Delete</button> " +
+      "</td>" +
+      "</tr>";
+  }
 
-  document.getElementById("sellerBody").innerHTML = rows || `<tr><td colspan="5">No seller applications.</td></tr>`;
-  setText("sellerCount", `Showing ${sellers.length} seller applications`);
+  document.getElementById("sellerBody").innerHTML = rows || "<tr><td colspan='5'>No seller applications.</td></tr>";
+  setText("sellerCount", "Showing " + sellers.length + " seller applications");
   updateModerationStats();
 }
 
 function viewSeller(id) {
   const seller = findById(sellers, id);
-  document.getElementById("sellerDetailsText").innerHTML = `<strong>Seller Application</strong><br>
-    Application ID: #${seller.id}<br>Store Name: ${seller.storeName}<br>Applicant: ${seller.owner}<br>
-    Application Date: ${seller.date}<br>Store Information: ${seller.info}<br>
-    Verification Status: ${seller.status}`;
+  document.getElementById("sellerDetailsText").innerHTML = "<strong>Seller Application</strong><br>" +
+      "Application ID: #" + seller.id + "<br>Store Name: " + seller.storeName + "<br>Applicant: " + seller.owner + "<br>" +
+      "Application Date: " + seller.date + "<br>Store Information: " + seller.info + "<br>" +
+      "Verification Status: " + seller.status;
   show("sellerDetails");
 }
 
@@ -506,29 +588,33 @@ function saveSeller() {
   }
 
   if (editingSellerId === 0) {
-    sellers.unshift({ id: getNextId(sellers), storeName, owner, date, info, status });
+    sellers.unshift({ id: getNextId(sellers), storeName: storeName, owner: owner, date: date, info: info, status: status });
     showMessage("Seller application added.");
   } else {
-    Object.assign(findById(sellers, editingSellerId), { storeName, owner, date, info, status });
+    const seller = findById(sellers, editingSellerId);
+    seller.storeName = storeName;
+    seller.owner = owner;
+    seller.date = date;
+    seller.info = info;
+    seller.status = status;
     showMessage("Seller application updated.");
   }
   closeModal("sellerModal");
   showSellers();
-  return;
 }
 
 // UPDATE: verify or reject
 function verifySeller(id) {
   const seller = findById(sellers, id);
   seller.status = "Verified";
-  showMessage(`${seller.storeName} has been verified.`);
+  showMessage(seller.storeName + " has been verified.");
   showSellers();
 }
 
 function rejectSeller(id) {
   const seller = findById(sellers, id);
   seller.status = "Rejected";
-  showMessage(`${seller.storeName} has been rejected.`);
+  showMessage(seller.storeName + " has been rejected.");
   showSellers();
 }
 
@@ -543,33 +629,35 @@ function deleteSeller(id) {
 
 // READ
 function showProducts() {
-  const rows = products.map(product => `
-    <tr>
-      <td><strong>${product.name}</strong></td>
-      <td>${product.seller}</td>
-      <td>${product.reason}</td>
-      <td>${product.date}</td>
-      <td><span class="badge status-${product.status}">${product.status}</span></td>
-      <td>
-        <button class="small" name="view" value="${product.id}">View</button>
-        <button class="small good" name="approve" value="${product.id}">Approve</button>
-        <button class="small danger" name="remove" value="${product.id}">Remove</button>
-        <button class="small" name="edit" value="${product.id}">Edit</button>
-        <button class="small danger" name="delete" value="${product.id}">Delete</button>
-      </td>
-    </tr>`).join("");
+  let rows = "";
+  for (const product of products) {
+    rows += "<tr>" +
+      "<td><strong>" + product.name + "</strong></td>" +
+      "<td>" + product.seller + "</td>" +
+      "<td>" + product.reason + "</td>" +
+      "<td>" + product.date + "</td>" +
+      "<td><span class='badge status-" + product.status + "'>" + product.status + "</span></td>" +
+      "<td>" +
+      "<button class='small' name='view' value='" + product.id + "'>View</button> " +
+      "<button class='small good' name='approve' value='" + product.id + "'>Approve</button> " +
+      "<button class='small danger' name='remove' value='" + product.id + "'>Remove</button> " +
+      "<button class='small' name='edit' value='" + product.id + "'>Edit</button> " +
+      "<button class='small danger' name='delete' value='" + product.id + "'>Delete</button> " +
+      "</td>" +
+      "</tr>";
+  }
 
-  document.getElementById("productBody").innerHTML = rows || `<tr><td colspan="6">No reported products.</td></tr>`;
-  setText("productCount", `Showing ${products.length} reported products`);
+  document.getElementById("productBody").innerHTML = rows || "<tr><td colspan='6'>No reported products.</td></tr>";
+  setText("productCount", "Showing " + products.length + " reported products");
   updateModerationStats();
 }
 
 function viewProduct(id) {
   const product = findById(products, id);
-  document.getElementById("productDetailsText").innerHTML = `<strong>Reported Product</strong><br>
-    Report ID: #${product.id}<br>Product Name: ${product.name}<br>Seller: ${product.seller}<br>
-    Price: ${money(product.price)}<br>Report Reason: ${product.reason}<br>
-    Report Date: ${product.date}<br>Moderation Status: ${product.status}`;
+  document.getElementById("productDetailsText").innerHTML = "<strong>Reported Product</strong><br>" +
+      "Report ID: #" + product.id + "<br>Product Name: " + product.name + "<br>Seller: " + product.seller + "<br>" +
+      "Price: " + money(product.price) + "<br>Report Reason: " + product.reason + "<br>" +
+      "Report Date: " + product.date + "<br>Moderation Status: " + product.status;
   show("productDetails");
 }
 
@@ -626,29 +714,34 @@ function saveProduct() {
   }
 
   if (editingProductId === 0) {
-    products.unshift({ id: getNextId(products), name, seller, price, reason, date, status });
+    products.unshift({ id: getNextId(products), name: name, seller: seller, price: price, reason: reason, date: date, status: status });
     showMessage("Reported product added.");
   } else {
-    Object.assign(findById(products, editingProductId), { name, seller, price, reason, date, status });
+    const product = findById(products, editingProductId);
+    product.name = name;
+    product.seller = seller;
+    product.price = price;
+    product.reason = reason;
+    product.date = date;
+    product.status = status;
     showMessage("Reported product updated.");
   }
   closeModal("productModal");
   showProducts();
-  return;
 }
 
 // UPDATE: approve or remove
 function approveProduct(id) {
   const product = findById(products, id);
   product.status = "Approved";
-  showMessage(`${product.name} has been approved.`);
+  showMessage(product.name + " has been approved.");
   showProducts();
 }
 
 function removeProduct(id) {
   const product = findById(products, id);
   product.status = "Removed";
-  showMessage(`${product.name} has been removed.`);
+  showMessage(product.name + " has been removed.");
   showProducts();
 }
 
@@ -687,25 +780,26 @@ function saveSettings() {
     return;
   }
   settings.commission = Number(value);
-  showMessage(`Platform settings saved. ${settings.summary()}`);
-  return;
+  showMessage("Platform settings saved. " + settings.summary());
 }
 
 // PLATFORM SETTINGS – CATEGORIES (CRUD)
 
 // READ
 function showCategories() {
-  const rows = categories.map(category => `
-    <tr>
-      <td>#${category.id}</td>
-      <td><strong>${category.name}</strong></td>
-      <td>
-        <button class="small" name="edit" value="${category.id}">Edit</button>
-        <button class="small danger" name="delete" value="${category.id}">Delete</button>
-      </td>
-    </tr>`).join("");
+  let rows = "";
+  for (const category of categories) {
+    rows += "<tr>" +
+      "<td>#" + category.id + "</td>" +
+      "<td><strong>" + category.name + "</strong></td>" +
+      "<td>" +
+      "<button class='small' name='edit' value='" + category.id + "'>Edit</button> " +
+      "<button class='small danger' name='delete' value='" + category.id + "'>Delete</button> " +
+      "</td>" +
+      "</tr>";
+  }
 
-  document.getElementById("categoryBody").innerHTML = rows || `<tr><td colspan="3">No categories.</td></tr>`;
+  document.getElementById("categoryBody").innerHTML = rows || "<tr><td colspan='3'>No categories.</td></tr>";
 }
 
 function openCategoryForm(id) {
@@ -731,23 +825,26 @@ function saveCategory() {
     showError("categoryNameError", "Category name must be filled out");
     return;
   }
-  const exists = categories.some(category =>
-    category.name.toLowerCase() === name.toLowerCase() && category.id !== editingCategoryId);
+  let exists = false;
+  for (const category of categories) {
+    if (category.name.toLowerCase() === name.toLowerCase() && category.id !== editingCategoryId) {
+      exists = true;
+    }
+  }
   if (exists) {
     showError("categoryNameError", "This category already exists");
     return;
   }
 
   if (editingCategoryId === 0) {
-    categories.push({ id: getNextId(categories), name });
-    showMessage(`Category added: ${name}.`);
+    categories.push({ id: getNextId(categories), name: name });
+    showMessage("Category added: " + name + ".");
   } else {
     findById(categories, editingCategoryId).name = name;
-    showMessage(`Category updated: ${name}.`);
+    showMessage("Category updated: " + name + ".");
   }
   closeModal("categoryModal");
   showCategories();
-  return;
 }
 
 // DELETE
@@ -761,22 +858,22 @@ function deleteCategory(id) {
 
 // READ
 function showCoupons() {
-  const rows = coupons.map(coupon => {
-    const discount = (coupon.type === "Percentage") ? `${coupon.value}%` : money(coupon.value);
-    return `
-    <tr>
-      <td><strong>${coupon.code}</strong></td>
-      <td>${coupon.type}</td>
-      <td>${discount}</td>
-      <td>${coupon.expiry}</td>
-      <td>
-        <button class="small" name="edit" value="${coupon.id}">Edit</button>
-        <button class="small danger" name="delete" value="${coupon.id}">Delete</button>
-      </td>
-    </tr>`;
-  }).join("");
+  let rows = "";
+  for (const coupon of coupons) {
+    const discount = (coupon.type === "Percentage") ? coupon.value + "%" : money(coupon.value);
+    rows += "<tr>" +
+      "<td><strong>" + coupon.code + "</strong></td>" +
+      "<td>" + coupon.type + "</td>" +
+      "<td>" + discount + "</td>" +
+      "<td>" + coupon.expiry + "</td>" +
+      "<td>" +
+      "<button class='small' name='edit' value='" + coupon.id + "'>Edit</button> " +
+      "<button class='small danger' name='delete' value='" + coupon.id + "'>Delete</button> " +
+      "</td>" +
+      "</tr>";
+  }
 
-  document.getElementById("couponBody").innerHTML = rows || `<tr><td colspan="5">No coupons.</td></tr>`;
+  document.getElementById("couponBody").innerHTML = rows || "<tr><td colspan='5'>No coupons.</td></tr>";
 }
 
 function openCouponForm(id) {
@@ -813,7 +910,12 @@ function saveCoupon() {
     showError("couponCodeError", "The coupon code cannot be empty or contain spaces");
     valid = false;
   }
-  const codeTaken = coupons.some(coupon => coupon.code === code && coupon.id !== editingCouponId);
+  let codeTaken = false;
+  for (const coupon of coupons) {
+    if (coupon.code === code && coupon.id !== editingCouponId) {
+      codeTaken = true;
+    }
+  }
   if (codeTaken) {
     showError("couponCodeError", "This coupon code already exists");
     valid = false;
@@ -827,15 +929,18 @@ function saveCoupon() {
   }
 
   if (editingCouponId === 0) {
-    coupons.push({ id: getNextId(coupons), code, type, value, expiry });
-    showMessage(`Coupon ${code} added.`);
+    coupons.push({ id: getNextId(coupons), code: code, type: type, value: value, expiry: expiry });
+    showMessage("Coupon " + code + " added.");
   } else {
-    Object.assign(findById(coupons, editingCouponId), { code, type, value, expiry });
-    showMessage(`Coupon ${code} updated.`);
+    const coupon = findById(coupons, editingCouponId);
+    coupon.code = code;
+    coupon.type = type;
+    coupon.value = value;
+    coupon.expiry = expiry;
+    showMessage("Coupon " + code + " updated.");
   }
   closeModal("couponModal");
   showCoupons();
-  return;
 }
 
 // DELETE
@@ -849,21 +954,28 @@ function deleteCoupon(id) {
 const analyticsTabs = ["analytics", "notifications", "logs"];
 
 function showAnalyticsTab(name) {
-  analyticsTabs.forEach(tab => {
-    document.getElementById(`panel-${tab}`).style.display = "none";
-    document.getElementById(`atab-${tab}`).className = "tab";
+  analyticsTabs.forEach(function (tab) {
+    document.getElementById("panel-" + tab).style.display = "none";
+    document.getElementById("atab-" + tab).className = "tab";
   });
-  document.getElementById(`panel-${name}`).style.display = "block";
-  document.getElementById(`atab-${name}`).className = "tab active";
+  document.getElementById("panel-" + name).style.display = "block";
+  document.getElementById("atab-" + name).className = "tab active";
 }
 
 // ANALYTICS – MONTHLY REVENUE DATA (CRUD), STATISTICS AND CHART
 
 // READ: statistics, chart and table are all made from the revenueData array
 function showRevenue() {
-  const totalRevenue = revenueData.reduce((sum, item) => sum + item.revenue, 0);
-  const totalOrders = revenueData.reduce((sum, item) => sum + item.orders, 0);
-  const highest = Math.max(0, ...revenueData.map(item => item.revenue));
+  let totalRevenue = 0;
+  let totalOrders = 0;
+  let highest = 0;
+  for (const item of revenueData) {
+    totalRevenue += item.revenue;
+    totalOrders += item.orders;
+    if (item.revenue > highest) {
+      highest = item.revenue;
+    }
+  }
   const average = (totalOrders > 0) ? Math.round(totalRevenue / totalOrders * 100) / 100 : 0;
 
   setText("statRevenue", money(totalRevenue));
@@ -874,7 +986,7 @@ function showRevenue() {
   const chart = document.getElementById("chart");
   chart.innerHTML = "";
 
-  revenueData.forEach(item => {
+  revenueData.forEach(function (item) {
     const height = (highest > 0) ? Math.round(item.revenue / highest * 180) : 0;
 
     const column = document.createElement("div");
@@ -882,8 +994,8 @@ function showRevenue() {
 
     const bar = document.createElement("div");
     bar.className = "bar";
-    bar.style.height = `${height}px`;
-    bar.innerText = `${Math.round(item.revenue / 1000)}k`;
+    bar.style.height = height + "px";
+    bar.innerText = Math.round(item.revenue / 1000) + "k";
 
     const label = document.createElement("p");
     label.innerText = item.month;
@@ -894,18 +1006,20 @@ function showRevenue() {
   });
 
   // Table
-  const rows = revenueData.map(item => `
-    <tr>
-      <td><strong>${item.month}</strong></td>
-      <td>${money(item.revenue)}</td>
-      <td>${item.orders}</td>
-      <td>
-        <button class="small" name="edit" value="${item.id}">Edit</button>
-        <button class="small danger" name="delete" value="${item.id}">Delete</button>
-      </td>
-    </tr>`).join("");
+  let rows = "";
+  for (const item of revenueData) {
+    rows += "<tr>" +
+      "<td><strong>" + item.month + "</strong></td>" +
+      "<td>" + money(item.revenue) + "</td>" +
+      "<td>" + item.orders + "</td>" +
+      "<td>" +
+      "<button class='small' name='edit' value='" + item.id + "'>Edit</button> " +
+      "<button class='small danger' name='delete' value='" + item.id + "'>Delete</button> " +
+      "</td>" +
+      "</tr>";
+  }
 
-  document.getElementById("revenueBody").innerHTML = rows || `<tr><td colspan="4">No monthly data.</td></tr>`;
+  document.getElementById("revenueBody").innerHTML = rows || "<tr><td colspan='4'>No monthly data.</td></tr>";
 }
 
 function openRevenueForm(id) {
@@ -940,15 +1054,17 @@ function saveRevenue() {
   }
 
   if (editingRevenueId === 0) {
-    revenueData.push({ id: getNextId(revenueData), month, revenue, orders });
-    showMessage(`Monthly data for ${month} added.`);
+    revenueData.push({ id: getNextId(revenueData), month: month, revenue: revenue, orders: orders });
+    showMessage("Monthly data for " + month + " added.");
   } else {
-    Object.assign(findById(revenueData, editingRevenueId), { month, revenue, orders });
-    showMessage(`Monthly data for ${month} updated.`);
+    const item = findById(revenueData, editingRevenueId);
+    item.month = month;
+    item.revenue = revenue;
+    item.orders = orders;
+    showMessage("Monthly data for " + month + " updated.");
   }
   closeModal("revenueModal");
   showRevenue();
-  return;
 }
 
 // DELETE
@@ -962,22 +1078,22 @@ function deleteRevenue(id) {
 
 // READ
 function showNotifications() {
-  const rows = notifications.map(note => {
+  let rows = "";
+  for (const note of notifications) {
     const toggleText = (note.status === "Read") ? "Mark Unread" : "Mark Read";
-    return `
-    <tr>
-      <td>${note.message}</td>
-      <td>${note.date}</td>
-      <td><span class="badge status-${note.status}">${note.status}</span></td>
-      <td>
-        <button class="small good" name="toggle" value="${note.id}">${toggleText}</button>
-        <button class="small" name="edit" value="${note.id}">Edit</button>
-        <button class="small danger" name="delete" value="${note.id}">Delete</button>
-      </td>
-    </tr>`;
-  }).join("");
+    rows += "<tr>" +
+      "<td>" + note.message + "</td>" +
+      "<td>" + note.date + "</td>" +
+      "<td><span class='badge status-" + note.status + "'>" + note.status + "</span></td>" +
+      "<td>" +
+      "<button class='small good' name='toggle' value='" + note.id + "'>" + toggleText + "</button> " +
+      "<button class='small' name='edit' value='" + note.id + "'>Edit</button> " +
+      "<button class='small danger' name='delete' value='" + note.id + "'>Delete</button> " +
+      "</td>" +
+      "</tr>";
+  }
 
-  document.getElementById("notificationBody").innerHTML = rows || `<tr><td colspan="4">No notifications.</td></tr>`;
+  document.getElementById("notificationBody").innerHTML = rows || "<tr><td colspan='4'>No notifications.</td></tr>";
   updateBell();
 }
 
@@ -1013,22 +1129,24 @@ function saveNotification() {
   }
 
   if (editingNotificationId === 0) {
-    notifications.unshift({ id: getNextId(notifications), message, date, status });
+    notifications.unshift({ id: getNextId(notifications), message: message, date: date, status: status });
     showMessage("Notification added.");
   } else {
-    Object.assign(findById(notifications, editingNotificationId), { message, date, status });
+    const note = findById(notifications, editingNotificationId);
+    note.message = message;
+    note.date = date;
+    note.status = status;
     showMessage("Notification updated.");
   }
   closeModal("notificationModal");
   showNotifications();
-  return;
 }
 
 // UPDATE: mark as read or unread
 function toggleNotification(id) {
   const note = findById(notifications, id);
   note.status = (note.status === "Unread") ? "Read" : "Unread";
-  showMessage(`Notification marked as ${note.status.toLowerCase()}.`);
+  showMessage("Notification marked as " + note.status.toLowerCase() + ".");
   showNotifications();
 }
 
@@ -1043,17 +1161,19 @@ function deleteNotification(id) {
 
 // READ
 function showLogs() {
-  const rows = logs.map(log => `
-    <tr>
-      <td>${log.description}</td>
-      <td>${log.date}</td>
-      <td>
-        <button class="small" name="edit" value="${log.id}">Edit</button>
-        <button class="small danger" name="delete" value="${log.id}">Delete</button>
-      </td>
-    </tr>`).join("");
+  let rows = "";
+  for (const log of logs) {
+    rows += "<tr>" +
+      "<td>" + log.description + "</td>" +
+      "<td>" + log.date + "</td>" +
+      "<td>" +
+      "<button class='small' name='edit' value='" + log.id + "'>Edit</button> " +
+      "<button class='small danger' name='delete' value='" + log.id + "'>Delete</button> " +
+      "</td>" +
+      "</tr>";
+  }
 
-  document.getElementById("logBody").innerHTML = rows || `<tr><td colspan="3">No log entries.</td></tr>`;
+  document.getElementById("logBody").innerHTML = rows || "<tr><td colspan='3'>No log entries.</td></tr>";
 }
 
 function openLogForm(id) {
@@ -1085,15 +1205,16 @@ function saveLog() {
   }
 
   if (editingLogId === 0) {
-    logs.unshift({ id: getNextId(logs), description, date });
+    logs.unshift({ id: getNextId(logs), description: description, date: date });
     showMessage("Log entry added.");
   } else {
-    Object.assign(findById(logs, editingLogId), { description, date });
+    const log = findById(logs, editingLogId);
+    log.description = description;
+    log.date = date;
     showMessage("Log entry updated.");
   }
   closeModal("logModal");
   showLogs();
-  return;
 }
 
 // DELETE
@@ -1139,16 +1260,25 @@ function openProfileForm() {
 }
 
 // Bangladesh mobile number: +880 and 10 digits starting with 1, or 0 and 10 digits starting with 1
-const getPhoneDigits = phone => {
+function getPhoneDigits(phone) {
   if (phone.startsWith("+880")) {
     return phone.slice(4);
   }
   return phone.startsWith("0") ? phone.slice(1) : "";
-};
-const isValidPhone = phone => {
+}
+
+function isValidPhone(phone) {
   const digits = getPhoneDigits(phone);
-  return digits.length === 10 && digits.startsWith("1") && [...digits].every(digit => "0123456789".includes(digit));
-};
+  if (digits.length !== 10 || !digits.startsWith("1")) {
+    return false;
+  }
+  for (const digit of digits) {
+    if (!"0123456789".includes(digit)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 // UPDATE
 function saveProfile() {
@@ -1168,8 +1298,12 @@ function saveProfile() {
     showError("profileEmailError", "Email must contain an @");
     valid = false;
   }
-  const emailTaken = users.some(user =>
-    user.email.toLowerCase() === email.toLowerCase() && user.id !== profile.id);
+  let emailTaken = false;
+  for (const user of users) {
+    if (user.email.toLowerCase() === email.toLowerCase() && user.id !== profile.id) {
+      emailTaken = true;
+    }
+  }
   if (emailTaken) {
     showError("profileEmailError", "This email is already used by another user");
     valid = false;
@@ -1186,11 +1320,16 @@ function saveProfile() {
     return;
   }
 
-  const phone = `+880${getPhoneDigits(phoneText)}`;   // always saved in the +880 form
-  Object.assign(profile, { name, email, phone, birth, address });
+  const phone = "+880" + getPhoneDigits(phoneText);   // always saved in the +880 form
+  profile.name = name;
+  profile.email = email;
+  profile.phone = phone;
+  profile.birth = birth;
+  profile.address = address;
   const adminUser = findById(users, profile.id);   // keep the Users table in step
   if (adminUser) {
-    Object.assign(adminUser, { name, email });
+    adminUser.name = name;
+    adminUser.email = email;
     showUsers();
   }
   closeModal("profileModal");
@@ -1204,7 +1343,7 @@ let adminPassword = "admin123";
 // Show or hide the typed passwords (checkbox)
 function togglePasswords() {
   const type = document.getElementById("showPasswords").checked ? "text" : "password";
-  ["currentPassword", "newPassword", "confirmPassword"].forEach(id => {
+  ["currentPassword", "newPassword", "confirmPassword"].forEach(function (id) {
     document.getElementById(id).type = type;
   });
 }
@@ -1215,7 +1354,12 @@ function savePassword() {
   const current = getValue("currentPassword");
   const newPassword = getValue("newPassword");
   const confirm = getValue("confirmPassword");
-  const hasNumber = [...newPassword].some(character => "0123456789".includes(character));
+  let hasNumber = false;
+  for (const character of newPassword) {
+    if ("0123456789".includes(character)) {
+      hasNumber = true;
+    }
+  }
   let valid = true;
 
   if (current !== adminPassword) {
@@ -1247,48 +1391,54 @@ function savePassword() {
 }
 
 // EVENTS (everything is connected with addEventListener)
-const onClick = (id, handler) => document.getElementById(id).addEventListener("click", handler);
+function onClick(id, handler) {
+  document.getElementById(id).addEventListener("click", handler);
+}
 
 // Sidebar and top bar
-menuSections.forEach(name => onClick(`menu-${name}`, () => showSection(name)));
+menuSections.forEach(function (name) {
+  onClick("menu-" + name, function () { showSection(name); });
+});
 onClick("logoutBtn", logOut);
 onClick("menuLogout", logOut);
 onClick("bellButton", openNotifications);
 onClick("profileButton", toggleProfile);
-onClick("myProfileBtn", () => showSection("profile"));
-onClick("changePasswordBtn", () => showSection("password"));
+onClick("myProfileBtn", function () { showSection("profile"); });
+onClick("changePasswordBtn", function () { showSection("password"); });
 onClick("editProfileBtn", openProfileForm);
-onClick("cancelProfileBtn", () => closeModal("profileModal"));
+onClick("cancelProfileBtn", function () { closeModal("profileModal"); });
 document.getElementById("showPasswords").addEventListener("change", togglePasswords);
 
 // Tabs
-document.querySelectorAll("#roleTabs button").forEach(tab => {
-  tab.addEventListener("click", () => filterRole(tab.value));
+document.querySelectorAll("#roleTabs button").forEach(function (tab) {
+  tab.addEventListener("click", function () { filterRole(tab.value); });
 });
-analyticsTabs.forEach(name => onClick(`atab-${name}`, () => showAnalyticsTab(name)));
+analyticsTabs.forEach(function (name) {
+  onClick("atab-" + name, function () { showAnalyticsTab(name); });
+});
 
 // Search box and role dropdown
 document.getElementById("userSearch").addEventListener("keyup", showUsers);
-document.getElementById("roleFilter").addEventListener("change", () => filterRole(getValue("roleFilter")));
+document.getElementById("roleFilter").addEventListener("change", function () { filterRole(getValue("roleFilter")); });
 
 // "+ Add" buttons (0 means "a new item")
-onClick("addActivityBtn", () => openActivityForm(0));
-onClick("addUserBtn", () => openUserForm(0));
-onClick("addSellerBtn", () => openSellerForm(0));
-onClick("addProductBtn", () => openProductForm(0));
-onClick("addCategoryBtn", () => openCategoryForm(0));
-onClick("addCouponBtn", () => openCouponForm(0));
-onClick("addRevenueBtn", () => openRevenueForm(0));
-onClick("addNotificationBtn", () => openNotificationForm(0));
-onClick("addLogBtn", () => openLogForm(0));
+onClick("addActivityBtn", function () { openActivityForm(0); });
+onClick("addUserBtn", function () { openUserForm(0); });
+onClick("addSellerBtn", function () { openSellerForm(0); });
+onClick("addProductBtn", function () { openProductForm(0); });
+onClick("addCategoryBtn", function () { openCategoryForm(0); });
+onClick("addCouponBtn", function () { openCouponForm(0); });
+onClick("addRevenueBtn", function () { openRevenueForm(0); });
+onClick("addNotificationBtn", function () { openNotificationForm(0); });
+onClick("addLogBtn", function () { openLogForm(0); });
 
 // Forms: preventDefault() stops the page from reloading
-const onSubmit = (id, handler) => {
-  document.getElementById(id).addEventListener("submit", event => {
+function onSubmit(id, handler) {
+  document.getElementById(id).addEventListener("submit", function (event) {
     event.preventDefault();
     handler();
   });
-};
+}
 onSubmit("userForm", saveUser);
 onSubmit("activityForm", saveActivity);
 onSubmit("sellerForm", saveSeller);
@@ -1303,13 +1453,13 @@ onSubmit("profileForm", saveProfile);
 onSubmit("passwordForm", savePassword);
 
 // Close buttons: the x on a pop-up form and the Close button of a details box
-document.querySelectorAll(".close").forEach(button => button.addEventListener("click", closeAllModals));
-document.querySelectorAll(".details button").forEach(button => {
-  button.addEventListener("click", () => { button.parentNode.style.display = "none"; });
+document.querySelectorAll(".close").forEach(function (button) { button.addEventListener("click", closeAllModals); });
+document.querySelectorAll(".details button").forEach(function (button) {
+  button.addEventListener("click", function () { button.parentNode.style.display = "none"; });
 });
 
 // Keyboard: the Escape key closes any open pop-up form
-document.addEventListener("keydown", event => {
+document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     closeAllModals();
   }
@@ -1317,7 +1467,7 @@ document.addEventListener("keydown", event => {
 
 // Table rows are redrawn often, so each table body has one listener (button name = action, value = id)
 function listenToTable(bodyId, actions) {
-  document.getElementById(bodyId).addEventListener("click", event => {
+  document.getElementById(bodyId).addEventListener("click", function (event) {
     const button = event.target;
     if (button.tagName === "BUTTON" && actions[button.name]) {
       actions[button.name](Number(button.value));
