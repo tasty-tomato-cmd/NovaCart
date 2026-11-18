@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NovaCart login page for all users">
+  <meta name="author" content="NovaCart Group">
+  <title>NovaCart – Log In</title>
+  <link rel="stylesheet" href="../CSS/login.css">
+</head>
+<body>
+
+  <main class="login-page">
+    <section class="login-card">
+
+      <header class="brand">
+        <h1>🛒 NovaCart</h1>
+        <p class="tagline">Your Budget. Your Deals. Your World.</p>
+      </header>
+
+      <h2>Log In</h2>
+      <p class="intro">Enter your email and password to continue.</p>
+
+      <form id="loginForm">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="name@novacart.com" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+        <div class="show-password">
+          <input type="checkbox" id="showPassword" name="showPassword">
+          <label for="showPassword">Show password</label>
+        </div>
+
+        <p id="loginError" class="error" role="alert"></p>
+
+        <input type="submit" class="btn" value="Log In">
+      </form>
+
+    </section>
+
+    <footer class="footer">
+      © 2026 NovaCart · Your Budget. Your Deals. Your World.
+    </footer>
+  </main>
+
+  <script src="../JS/login.js"></script>
+</body>
+</html>
