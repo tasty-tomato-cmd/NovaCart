@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery Partner Dashboard | NovaCart</title>
+  <link rel="stylesheet" href="../CSS/delivery.css">
+  <script type="module" src="../JS/main.js"></script>
+</head>
+<body class="dashboard-page">
+
+  <div class="layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span aria-hidden="true">&#128722;</span>
+        <span class="brand-name">NovaCart</span>
+        <span class="role-badge">Delivery Partner</span>
+      </div>
+
+      <nav aria-label="Delivery partner menu">
+        <ul class="nav-list">
+          <li><a href="#assignedSection" class="nav-link active" data-tab="">My Deliveries</a></li>
+          <li><a href="#historyPanel" class="nav-link" data-tab="history">Delivery History</a></li>
+          <li><a href="#reportPanel" class="nav-link" data-tab="report">Report Issue</a></li>
+        </ul>
+      </nav>
+
+      <button type="button" class="btn-logout" id="logoutBtn">Log Out</button>
+    </aside>
+
+    <div class="content">
+
+      <!-- ============ TOP BAR ============ -->
+      <header class="topbar">
+        <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu">&#9776;</button>
+
+        <div class="welcome">
+          <h1 class="page-title">Welcome back, <span id="partnerName"></span>!</h1>
+          <p class="muted">Deliver smiles, one package at a time.</p>
+        </div>
+
+        <button type="button" class="notif-btn" id="notifBtn" aria-label="Notifications">
+          <span aria-hidden="true">&#128276;</span>
+          <span class="badge" id="notifCount">0</span>
+        </button>
+
+        <div class="profile">
+          <span class="avatar" id="avatar"></span>
+          <span id="profileName"></span>
+        </div>
+      </header>
+
+      <main class="main">
+
+        <!-- ===== Section 1: Assigned Deliveries ===== -->
+        <section class="card" id="assignedSection" aria-labelledby="assignedTitle">
+          <div class="section-header">
+            <div>
+              <h2 id="assignedTitle" class="section-title">Assigned Deliveries</h2>
+              <p class="muted">View and manage your assigned orders.</p>
+            </div>
+            <button type="button" class="btn btn-primary" id="refreshBtn">Refresh</button>
+          </div>
+
+          <div class="stats">
+            <article class="stat-card">
+              <h3 class="stat-label">Today's Deliveries</h3>
+              <p class="stat-value" id="statToday">0</p>
+            </article>
+            <article class="stat-card">
+              <h3 class="stat-label">Completed</h3>
+              <p class="stat-value stat-success" id="statCompleted">0</p>
+            </article>
+            <article class="stat-card">
+              <h3 class="stat-label">In Progress</h3>
+              <p class="stat-value" id="statProgress">0</p>
+            </article>
+            <article class="stat-card">
+              <h3 class="stat-label">Issues Reported</h3>
+              <p class="stat-value stat-danger" id="statIssues">0</p>
+            </article>
+          </div>
+
+          <!-- Search and filter (extra feature) -->
+          <div class="filters">
+            <label for="searchInput" class="visually-hidden">Search deliveries</label>
+            <input type="search" id="searchInput" placeholder="Search by order ID, customer or address">
+
+            <label for="statusFilter" class="visually-hidden">Filter by status</label>
+            <select id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="assigned">Assigned</option>
+              <option value="picked-up">Picked Up</option>
+              <option value="out-for-delivery">Out for Delivery</option>
+              <option value="delivered">Delivered</option>
+              <option value="failed">Failed Delivery</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <caption class="visually-hidden">Assigned deliveries</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Order ID</th>
+                  <th scope="col">Customer Name</th>
+                  <th scope="col">Delivery Address</th>
+                  <th scope="col">Instructions</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody id="deliveriesBody"></tbody>
+            </table>
+          </div>
+
+          <div class="table-footer">
+            <p id="tableInfo"></p>
+            <nav aria-label="Deliveries pagination">
+              <ul class="pagination" id="pagination"></ul>
+            </nav>
+          </div>
+        </section>
+
+        <div class="panel-row">
+
+          <!-- ===== Section 2: Update Delivery Status ===== -->
+          <section class="card" id="updateSection" aria-labelledby="updateTitle">
+            <div class="section-header">
+              <div>
+                <h2 id="updateTitle" class="section-title">Update Delivery Status</h2>
+                <p class="muted">Update the current status of your delivery.</p>
+              </div>
+              <span class="order-tag" id="selectedOrder"></span>
+            </div>
+
+            <ol class="timeline" id="timeline"></ol>
+
+            <div id="deliveryInfo"></div>
+
+            <p class="label">Update Status:</p>
+            <div class="button-group">
+              <button type="button" class="btn btn-primary status-btn" data-status="picked-up">Picked Up</button>
+              <button type="button" class="btn btn-primary status-btn" data-status="out-for-delivery">Out for Delivery</button>
+              <button type="button" class="btn btn-success status-btn" data-status="delivered">Delivered</button>
+              <button type="button" class="btn btn-danger status-btn" data-status="failed">Failed Delivery</button>
+            </div>
+
+            <!-- Shown only when "Failed Delivery" is clicked -->
+            <div class="fail-box" id="failBox" hidden>
+              <div class="form-group">
+                <label for="failReason">Reason for failed delivery</label>
+                <select id="failReason" name="failReason">
+                  <option value="">Select a reason</option>
+                  <option value="Customer not available">Customer not available</option>
+                  <option value="Wrong or incomplete address">Wrong or incomplete address</option>
+                  <option value="Customer refused the parcel">Customer refused the parcel</option>
+                  <option value="Customer unreachable by phone">Customer unreachable by phone</option>
+                </select>
+                <small class="error" id="failReasonError"></small>
+              </div>
+              <button type="button" class="btn btn-danger" id="confirmFailBtn">Confirm Failed Delivery</button>
+            </div>
+          </section>
+
+          <!-- ===== Section 3: Delivery History and Report Issue ===== -->
+          <section class="card" id="historySection" aria-labelledby="historyTitle">
+            <div class="section-header">
+              <div>
+                <h2 id="historyTitle" class="section-title">Delivery History &amp; Report Issue</h2>
+                <p class="muted">View your past deliveries and report any issues.</p>
+              </div>
+              <label for="historyFilter" class="visually-hidden">Show deliveries from</label>
+              <select id="historyFilter">
+                <option value="7">Last 7 Days</option>
+                <option value="30" selected>Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+              </select>
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Delivery history and issue reporting">
+              <button type="button" id="historyTab" class="tab active" data-tab="history" role="tab" aria-selected="true" aria-controls="historyPanel">Delivery History</button>
+              <button type="button" id="reportTab" class="tab" data-tab="report" role="tab" aria-selected="false" aria-controls="reportPanel">Report Issue</button>
+            </div>
+
+            <div id="historyPanel" role="tabpanel" aria-labelledby="historyTab">
+              <div class="table-wrap history-wrap">
+                <table class="data-table">
+                  <caption class="visually-hidden">Completed deliveries</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Order ID</th>
+                      <th scope="col">Customer Name</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Delivered On</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historyBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="reportPanel" role="tabpanel" aria-labelledby="reportTab" hidden>
+              <form id="reportForm" novalidate>
+                <div class="form-group">
+                  <label for="issueOrder">Order ID</label>
+                  <select id="issueOrder" name="issueOrder"></select>
+                  <small class="error" id="issueOrderError"></small>
+                </div>
+
+                <div class="form-group">
+                  <label for="issueType">Issue Type</label>
+                  <select id="issueType" name="issueType">
+                    <option value="">Select issue type</option>
+                    <option value="Customer unavailable">Customer unavailable</option>
+                    <option value="Wrong or incomplete address">Wrong or incomplete address</option>
+                    <option value="Customer unreachable by phone">Customer unreachable by phone</option>
+                    <option value="Package damaged">Package damaged</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <small class="error" id="issueTypeError"></small>
+                </div>
+
+                <div class="form-group">
+                  <label for="issueDescription">Description</label>
+                  <textarea id="issueDescription" name="issueDescription" rows="4" placeholder="Describe the problem (10 to 300 characters)"></textarea>
+                  <small class="error" id="issueDescriptionError"></small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Report</button>
+              </form>
+            </div>
+
+            <div class="help-note">
+              <p>Need help? Report any delivery issue using the button.</p>
+              <button type="button" class="btn btn-primary btn-small" id="goReportBtn">Report Issue</button>
+            </div>
+          </section>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Order details pop-up -->
+  <dialog id="detailsDialog" class="dialog" aria-labelledby="detailsTitle">
+    <h2 id="detailsTitle" class="section-title">Order Details</h2>
+    <div id="detailsContent"></div>
+    <button type="button" class="btn btn-primary" id="closeDialog">Close</button>
+  </dialog>
+
+  <!-- Short messages (success / error) -->
+  <div class="toast" id="toast" role="status" hidden></div>
+
+</body>
+</html>
