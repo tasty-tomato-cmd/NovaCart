@@ -237,7 +237,8 @@ function toggleProfile() {
 
 function logOut() {
   hide("profileMenu");
-  showMessage("You have been logged out.");
+  alert("You have been logged out.");
+  window.location.href = "../LOGIN/HTML/Login.html";
 }
 
 // The bell opens the Notifications tab
@@ -1497,3 +1498,4 @@ showNotifications();
 showLogs();
 showProfile();
 showSection("dashboard");
+
