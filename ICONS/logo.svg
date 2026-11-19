@@ -1,0 +1,18 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="novaBadgeGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#5925DC"/>
+    </linearGradient>
+    <linearGradient id="novaGlass" x1="20" y1="0" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="38" height="38" rx="10" fill="url(#novaBadgeGrad)" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>
+  <rect x="1" y="1" width="38" height="19" rx="10" fill="url(#novaGlass)"/>
+  <path d="M9.5 12H13.2L15.8 23.2C16.05 24.25 16.98 25 18.06 25H27.4C28.42 25 29.32 24.32 29.6 23.34L31.5 16.5H14.5" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M18 19.8H26.5" stroke="#DDD6FE" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="17.5" cy="29.5" r="2.1" fill="#FFFFFF"/>
+  <circle cx="27" cy="29.5" r="2.1" fill="#FFFFFF"/>
+</svg>

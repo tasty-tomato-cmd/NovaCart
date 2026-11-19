@@ -2,12 +2,20 @@
 
 // Accounts for the whole project. The other user types will be added here later.
 const accounts = [
-  { email: "ameya@novacart.com", password: "admin123", role: "Administrator" }
+  { email: "lubaba@novacart.com", password: "customer123", role: "Customer" },
+  { email: "sazin@novacart.com", password: "seller123", role: "Seller" },
+  { email: "fahad@novacart.com", password: "manager123", role: "Manager" },
+  { email: "ameya@novacart.com", password: "admin123", role: "Administrator" },
+  { email: "razeen@novacart.com", password: "delivery123", role: "Delivery Partner" }
 ];
 
 // The page each role opens after logging in (the path starts from this login page)
 const roleHomePages = {
-  Administrator: "../../HTML/admin.html"
+  Administrator: "../../HTML/admin.html",
+  Customer: "../../HTML/customer.html",
+  Seller: "../../HTML/seller.html",
+  Manager: "../../HTML/manager.html",
+  "Delivery Partner": "../../HTML/delivery.html"
 };
 
 function showLoginError(text) {
