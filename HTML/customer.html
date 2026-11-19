@@ -467,25 +467,73 @@
             </div>
         </div>
 <!-- 7. My Profile -->
+    <!-- 7. My Profile -->
         <div id="profile-page" class="hide">
             <div class="banner-box">
                 <h2>My Profile</h2>
-                <p class="sub-text">View and update your customer profile.</p>
+                <p class="sub-text">View, create, update or delete profile information.</p>
+            </div>
+
+            <div class="two-col">
+                <div class="panel">
+                    <h3>Profile Info</h3>
+                    <div class="profile-big-badge" id="p-badge">L</div>
+
+                    <p class="info-row"><span class="info-label">Name:</span> <span id="show-name">Lubaba</span></p>
+                    <p class="info-row"><span class="info-label">Email:</span> <span id="show-email">lubaba@novacart.com</span></p>
+                    <p class="info-row"><span class="info-label">Contact No:</span> <span id="show-phone">+8801812345678</span></p>
+                    <p class="info-row"><span class="info-label">Address:</span> <span id="show-addr">House 7, Road 3, Banani, Dhaka</span></p>
+                    <p class="info-row"><span class="info-label">Role:</span> <span id="show-role">Customer</span></p>
+                    <p class="info-row"><span class="info-label">Joined Date:</span> <span id="show-joined">2025-01-15</span></p>
+                </div>
+
+                <div class="panel">
+                    <h3>Profile Form</h3>
+
+                    <label>Name</label>
+                    <input type="text" id="in-name" placeholder="Enter name">
+
+                    <label>Email</label>
+                    <input type="email" id="in-email" placeholder="name@novacart.com">
+
+                    <label>Contact No</label>
+                    <input type="text" id="in-phone" placeholder="01812345678">
+
+                    <label>Address</label>
+                    <input type="text" id="in-addr" placeholder="House, road, area, city">
+
+                    <label>Role</label>
+                    <select id="in-role">
+                        <option>Customer</option>
+                        <option>Verified Student</option>
+                    </select>
+
+                    <label>Joined Date</label>
+                    <input type="date" id="in-joined">
+
+                    <button onclick="addProfile()">Create</button>
+                    <button class="btn-light" onclick="editProfileData()">Update</button>
+                    <button class="btn-danger" onclick="removeProfile()">Delete</button>
+                </div>
             </div>
 
             <div class="panel">
-                <h3>Profile Details</h3>
-                <div class="profile-big-badge">L</div>
-
-                <p class="info-row"><span class="info-label">Name:</span> Lubaba</p>
-                <p class="info-row"><span class="info-label">Email:</span> lubaba@novacart.com</p>
-                <p class="info-row"><span class="info-label">Contact No:</span> +8801812345678</p>
-                <p class="info-row"><span class="info-label">Date of Birth:</span> 2003-08-20</p>
-                <p class="info-row"><span class="info-label">Address:</span> House 7, Road 3, Banani, Dhaka</p>
-                <p class="info-row"><span class="info-label">Role:</span> Customer</p>
-                <p class="info-row"><span class="info-label">Joined Date:</span> 2025-01-15</p>
+                <h3>All Profiles</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Contact No</th>
+                            <th>Address</th>
+                            <th>Role</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-profiles-body"></tbody>
+                </table>
             </div>
-        </div>
+        </div> 
 
         <!-- 8. Change Password -->
         <div id="pass-page" class="hide">
