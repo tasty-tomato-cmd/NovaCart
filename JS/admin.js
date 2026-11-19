@@ -1240,7 +1240,8 @@ const profile = {
 
 // READ
 function showProfile() {
-  setText("profileInitial", profile.name.charAt(0).toUpperCase());
+  showPicture();
+  setText("welcomeName", profile.name);   // the greeting at the top uses the profile name
   setText("profileName", profile.name);
   setText("profileEmail", profile.email);
   setText("profilePhone", profile.phone);
@@ -1338,6 +1339,121 @@ function saveProfile() {
   showMessage("Profile updated successfully.");
 }
 
+// PROFILE PICTURE
+let savedPicture = "";   // "" means no picture
+const maxPictureSize = 2 * 1024 * 1024;   // 2 MB
+const pictureTypes = ["image/png", "image/jpeg", "image/webp"];
+
+// The PICTURES folder
+const picturesFolder = "../PICTURES/";
+const folderPictureNames = ["admin.jpg", "admin.jpeg", "admin.png", "admin.webp"];
+
+// Show the picture, or the first letter of the name when there is none
+function showPicture() {
+  const picture = savedPicture;
+  const big = document.getElementById("profileInitial");
+  const small = document.getElementById("topAvatar");
+  if (picture) {
+    big.innerText = "";
+    big.style.backgroundImage = 'url("' + picture + '")';
+    small.style.backgroundImage = 'url("' + picture + '")';
+    small.style.display = "inline-block";
+  } else {
+    big.innerText = profile.name.charAt(0).toUpperCase();
+    big.style.backgroundImage = "none";
+    small.style.display = "none";
+  }
+}
+
+// Draw the chosen image on a 200 x 200 canvas
+function shrinkPicture(image) {
+  const size = 200;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const side = Math.min(image.width, image.height);
+  const left = (image.width - side) / 2;
+  const top = (image.height - side) / 2;
+  const context = canvas.getContext("2d");
+  context.fillStyle = "white";   // JPEG has no transparency
+  context.fillRect(0, 0, size, size);
+  context.drawImage(image, left, top, side, side, 0, 0, size, size);
+  return canvas.toDataURL("image/jpeg", 0.85);
+}
+
+function savePicture() {
+  clearErrors(["pictureError"]);
+  const input = document.getElementById("pictureInput");
+  const file = input.files[0];
+  if (!file) {
+    return;
+  }
+  if (!pictureTypes.includes(file.type)) {
+    showError("pictureError", "Choose a PNG, JPG or WEBP image");
+    input.value = "";
+    return;
+  }
+  if (file.size > maxPictureSize) {
+    showError("pictureError", "The image must be smaller than 2 MB");
+    input.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.addEventListener("load", function () {
+    const image = new Image();
+    image.addEventListener("load", function () {
+      savedPicture = shrinkPicture(image);
+      showPicture();
+      showMessage("Profile picture saved.");
+    });
+    image.addEventListener("error", function () {
+      showError("pictureError", "This file is not a valid image");
+    });
+    image.src = reader.result;
+  });
+  reader.readAsDataURL(file);
+  input.value = "";   // so the same file can be chosen again later
+}
+
+// Find the first existing picture in the PICTURES folder (admin.jpg, admin.png or admin.webp)
+function findFolderPicture(index, done) {
+  if (index >= folderPictureNames.length) {
+    done("");
+    return;
+  }
+  const path = picturesFolder + folderPictureNames[index];
+  const image = new Image();
+  image.addEventListener("load", function () { done(path); });
+  image.addEventListener("error", function () { findFolderPicture(index + 1, done); });
+  image.src = path;
+}
+
+// Use the admin picture from the PICTURES folder
+function useFolderPicture(fromButton) {
+  clearErrors(["pictureError"]);
+  findFolderPicture(0, function (path) {
+    if (path === "") {
+      if (fromButton) {
+        showError("pictureError", "No admin.jpg, admin.png or admin.webp found in the PICTURES folder");
+      }
+      return;
+    }
+    savedPicture = path;
+    showPicture();
+    if (fromButton) {
+      showMessage("Profile picture loaded from the PICTURES folder.");
+    }
+  });
+}
+
+function removePicture() {
+  clearErrors(["pictureError"]);
+  savedPicture = "";
+  showPicture();
+  showMessage("Profile picture removed.");
+}
+
 // CHANGE PASSWORD
 let adminPassword = "admin123";
 
@@ -1408,6 +1524,10 @@ onClick("myProfileBtn", function () { showSection("profile"); });
 onClick("changePasswordBtn", function () { showSection("password"); });
 onClick("editProfileBtn", openProfileForm);
 onClick("cancelProfileBtn", function () { closeModal("profileModal"); });
+onClick("changePictureBtn", function () { document.getElementById("pictureInput").click(); });
+onClick("removePictureBtn", removePicture);
+onClick("folderPictureBtn", function () { useFolderPicture(true); });
+document.getElementById("pictureInput").addEventListener("change", savePicture);
 document.getElementById("showPasswords").addEventListener("change", togglePasswords);
 
 // Tabs
@@ -1497,5 +1617,5 @@ showRevenue();
 showNotifications();
 showLogs();
 showProfile();
+useFolderPicture(false);   // show the admin picture from the PICTURES folder, if there is one
 showSection("dashboard");
-
