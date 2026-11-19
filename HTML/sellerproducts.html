@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaCart | Seller Products</title>
+    <link rel="stylesheet" href="../CSS/sellerstyle.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">NovaCart</div>
+            <a href="sellerdashboard.html">Dashboard</a>
+            <a href="sellerproducts.html" class="active">Products &amp; Inventory</a>
+            <a href="sellerorders.html">Orders</a>
+            <a href="sellerpromotions.html">Sales &amp; Promotion</a>
+            <a href="sellerprofile.html">My Profile</a>
+        </div>
+
+        <!-- Main content -->
+        <main class="main">
+            <h1>Products &amp; Inventory</h1>
+            <p class="muted">Add, update and manage your product listings.</p>
+
+            <!-- Summary cards -->
+            <section class="cards">
+                <div class="card">
+                    <h2>Total Products</h2>
+                    <div class="number" id="totalProducts">3</div>
+                </div>
+                <div class="card">
+                    <h2>In Stock</h2>
+                    <div class="number" id="inStock">3</div>
+                </div>
+                <div class="card">
+                    <h2>Low Stock</h2>
+                    <div class="number" id="lowStock">0</div>
+                </div>
+            </section>
+
+            <!-- Add / edit product -->
+            <section class="panel">
+                <h2 id="formTitle">Add New Product</h2>
+
+                <form id="productForm">
+                    <input type="hidden" id="editIndex">
+
+                    <div class="form-grid">
+                        <div>
+                            <label for="productName">Product Name</label>
+                            <input type="text" id="productName" placeholder="e.g. Wireless Headphones" required>
+                        </div>
+                        <div>
+                            <label for="category">Category</label>
+                            <select id="category" required>
+                                <option value="">Select Category</option>
+                                <option>Electronics</option>
+                                <option>Fashion</option>
+                                <option>Footwear</option>
+                                <option>Home &amp; Living</option>
+                                <option>Accessories</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="price">Price (BDT)</label>
+                            <input type="number" id="price" min="1" placeholder="e.g. 2500" required>
+                        </div>
+                        <div>
+                            <label for="stock">Stock Quantity</label>
+                            <input type="number" id="stock" min="0" placeholder="e.g. 20" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="saveButton">Add Product</button>
+                    <button type="reset" class="secondary" id="cancelButton">Clear</button>
+                    <p id="formMessage" class="message"></p>
+                </form>
+            </section>
+
+            <!-- Product list -->
+            <section class="panel">
+                <div class="panel-head">
+                    <h2>My Product Listings</h2>
+                    <input type="text" id="searchInput" class="search" placeholder="Search products...">
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTable">
+                            <!-- JavaScript displays products here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <p id="emptyMessage" class="muted"></p>
+            </section>
+        </main>
+
+    </div>
+
+    <script src="../JS/sellerproducts.js"></script>
+</body>
+
+</html>

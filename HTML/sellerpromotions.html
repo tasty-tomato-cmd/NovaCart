@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales &amp; Promotion - NovaCart</title>
+    <link rel="stylesheet" href="../CSS/sellerstyle.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">NovaCart</div>
+            <a href="sellerdashboard.html">Dashboard</a>
+            <a href="sellerproducts.html">Products &amp; Inventory</a>
+            <a href="sellerorders.html">Orders</a>
+            <a href="sellerpromotions.html" class="active">Sales &amp; Promotion</a>
+            <a href="sellerprofile.html">My Profile</a>
+        </div>
+
+        <!-- Main content -->
+        <main class="main">
+            <h1>Sales &amp; Promotion</h1>
+            <p class="muted">Track sales and manage promotion requests.</p>
+
+            <!-- Summary cards -->
+            <section class="cards">
+                <div class="card">
+                    <h2>Total Sales</h2>
+                    <div class="number">৳ 85,400</div>
+                </div>
+                <div class="card">
+                    <h2>Commission</h2>
+                    <div class="number">৳ 4,270</div>
+                </div>
+                <div class="card">
+                    <h2>Promotion Requests</h2>
+                    <div class="number" id="promotionCount">0</div>
+                </div>
+            </section>
+
+            <!-- Create promotion request -->
+            <section class="panel">
+                <h2>Create Promotion Request</h2>
+
+                <form id="promotionForm">
+                    <div class="form-grid">
+                        <div>
+                            <label>Campaign Name</label>
+                            <input id="campaignName" required>
+                        </div>
+                        <div>
+                            <label>Discount (%)</label>
+                            <input id="discount" type="number" min="1" max="80" required>
+                        </div>
+                        <div>
+                            <label>Start Date</label>
+                            <input id="startDate" type="date" required>
+                        </div>
+                        <div>
+                            <label>End Date</label>
+                            <input id="endDate" type="date" required>
+                        </div>
+                    </div>
+                    <button id="promotionButton">Add Request</button>
+                    <button type="button" class="secondary" id="cancelPromotion" style="display:none">Cancel</button>
+                </form>
+
+                <p class="muted">Requests are pending platform approval in this demo.</p>
+            </section>
+
+            <!-- Promotion history -->
+            <section class="panel">
+                <h2>Promotion History</h2>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Campaign</th>
+                                <th>Discount</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="promotionTable"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+    </div>
+
+    <script src="../JS/sellerpromotions.js"></script>
+</body>
+
+</html>
