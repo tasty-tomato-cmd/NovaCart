@@ -1,5 +1,3 @@
-
-
 // Status keys and the labels shown on screen
 const STATUS = {
   'assigned': 'Assigned',

@@ -1,7 +1,4 @@
-/* =========================================================
-   NovaCart - Delivery Partner styles
-   Follows the team Quick Design Guide (Arial, shared palette)
-   ========================================================= */
+/* Delivery App CSS */
 
 :root {
   --primary: #5925DC;
@@ -988,33 +985,4 @@ input.invalid, select.invalid, textarea.invalid { border-color: var(--danger); }
   .sidebar {
     transition: none;
   }
-  margin: auto; width: min(420px, 92vw);
-  padding: 24px;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  color: var(--text);
-}
-.dialog::backdrop { background: rgba(40, 24, 88, 0.5); }
-.dialog .btn { margin-top: 8px; }
-
-.toast {
-  position: fixed; right: 24px; bottom: 24px; z-index: 50;
-  max-width: 340px; padding: 12px 18px;
-  border-radius: 8px; color: var(--white); font-size: 14px;
-  background: var(--success);
-}
-.toast-error { background: var(--danger); }
-
-/* ---------- Responsive ---------- */
-@media (max-width: 900px) {
-  .sidebar { position: fixed; left: -260px; z-index: 30; transition: left 0.2s; }
-  .sidebar.open { left: 0; }
-  .menu-toggle { display: block; }
-  .panel-row { grid-template-columns: 1fr; }
-  .stats { grid-template-columns: repeat(2, 1fr); }
-  .filters { flex-direction: column; }
-  .filters select { width: 100%; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sidebar { transition: none; }
 }

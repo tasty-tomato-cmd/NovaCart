@@ -1,5 +1,6 @@
 // NovaCart login page (one login for every type of user)
 
+
 // Accounts for the whole project. The other user types will be added here later.
 const accounts = [
   { email: "lubaba@novacart.com", password: "customer123", role: "Customer" },
