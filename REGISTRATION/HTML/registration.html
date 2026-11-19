@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NovaCart registration page for customers, sellers and delivery partners">
+  <meta name="author" content="NovaCart Group">
+  <title>NovaCart – Register</title>
+  <link rel="stylesheet" href="../CSS/registration.css">
+</head>
+<body>
+
+  <main class="register-page">
+    <section class="register-card">
+
+      <header class="brand">
+        <h1>🛒 NovaCart</h1>
+        <p class="tagline">Your Budget. Your Deals. Your World.</p>
+      </header>
+
+      <!-- Registration form -->
+      <div id="registerArea">
+        <h2 id="registerTitle">Create a Customer Account</h2>
+        <p class="intro">Choose your account type, then fill in your details.</p>
+
+        <div id="roleTabs" class="role-tabs" role="group" aria-label="Account type">
+          <button type="button" class="tab active" value="Customer">🛍️ Customer</button>
+          <button type="button" class="tab" value="Seller">🏪 Seller</button>
+          <button type="button" class="tab" value="Delivery Partner">🚚 Delivery Partner</button>
+        </div>
+
+        <form id="registerForm">
+
+          <!-- Details for every account type -->
+          <fieldset>
+            <legend>Account Details</legend>
+
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" minlength="2" required>
+            <span class="error" id="fullNameError"></span>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="name@novacart.com" required>
+            <span class="error" id="emailError"></span>
+
+            <label for="phone">Contact No</label>
+            <input type="text" id="phone" name="phone" placeholder="+8801712345678"
+                   pattern="(\+880|0)1[0-9]{9}" title="Use +880 followed by 10 digits starting with 1, or the 11-digit number starting with 01" required>
+            <span class="error" id="phoneError"></span>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="At least 8 characters with a number" minlength="8" required>
+            <span class="error" id="passwordError"></span>
+
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Type the password again" required>
+            <span class="error" id="confirmPasswordError"></span>
+
+            <div class="check-row">
+              <input type="checkbox" id="showPasswords" name="showPasswords">
+              <label for="showPasswords">Show passwords</label>
+            </div>
+          </fieldset>
+
+          <!-- Customer only -->
+          <fieldset id="customerFields">
+            <legend>Customer Details</legend>
+
+            <label for="customerAddress">Delivery Address</label>
+            <textarea id="customerAddress" name="customerAddress" rows="3" minlength="5" placeholder="House, road, area, city" required></textarea>
+            <span class="error" id="customerAddressError"></span>
+
+            <p class="label">Are you a student?</p>
+            <div class="check-row">
+              <input type="radio" id="studentNo" name="isStudent" value="No" checked>
+              <label for="studentNo">No</label>
+              <input type="radio" id="studentYes" name="isStudent" value="Yes">
+              <label for="studentYes">Yes (student offers)</label>
+            </div>
+
+            <fieldset id="studentFields" class="inner-fields">
+              <label for="university">University</label>
+              <input type="text" id="university" name="university" placeholder="e.g. AIUB" required>
+              <span class="error" id="universityError"></span>
+
+              <label for="studentId">Student ID</label>
+              <input type="text" id="studentId" name="studentId" placeholder="Enter your student ID" minlength="4" required>
+              <span class="error" id="studentIdError"></span>
+            </fieldset>
+          </fieldset>
+
+          <!-- Seller only -->
+          <fieldset id="sellerFields">
+            <legend>Store Details</legend>
+
+            <label for="storeName">Store Name</label>
+            <input type="text" id="storeName" name="storeName" placeholder="Enter your store name" minlength="2" required>
+            <span class="error" id="storeNameError"></span>
+
+            <label for="sellerAddress">Store Address</label>
+            <textarea id="sellerAddress" name="sellerAddress" rows="3" minlength="5" placeholder="House, road, area, city" required></textarea>
+            <span class="error" id="sellerAddressError"></span>
+
+            <label for="storeInfo">About My Store</label>
+            <textarea id="storeInfo" name="storeInfo" rows="3" minlength="5" placeholder="What does your store sell?" required></textarea>
+            <span class="error" id="storeInfoError"></span>
+
+            <p class="note">An administrator will verify your store before you can start selling.</p>
+          </fieldset>
+
+          <!-- Delivery partner only -->
+          <fieldset id="deliveryFields">
+            <legend>Delivery Details</legend>
+
+            <label for="vehicleType">Vehicle Type</label>
+            <select id="vehicleType" name="vehicleType" required>
+              <option value="">-- Select Vehicle --</option>
+              <option value="Bicycle">Bicycle</option>
+              <option value="Motorbike">Motorbike</option>
+              <option value="Van">Van</option>
+            </select>
+
+            <label for="deliveryArea">Delivery Area</label>
+            <input type="text" id="deliveryArea" name="deliveryArea" placeholder="e.g. Dhanmondi, Dhaka" minlength="3" required>
+            <span class="error" id="deliveryAreaError"></span>
+          </fieldset>
+
+          <div class="check-row terms">
+            <input type="checkbox" id="terms" name="terms" required>
+            <label for="terms">I agree to the NovaCart <button type="button" id="termsLink" class="text-button" aria-expanded="false" aria-controls="termsText">Terms and Conditions</button></label>
+          </div>
+
+          <!-- Hidden at first: it appears here when "Terms and Conditions" is clicked -->
+          <p id="termsText" class="terms-text">
+            By creating a NovaCart account you confirm that the details you give are true and that you will keep your
+            password private. Customers must follow the offer rules, and student offers need a valid student ID.
+            Sellers must list genuine products with honest prices, and a store can start selling only after an
+            administrator verifies it. NovaCart keeps a commission from each seller sale. Delivery partners must
+            deliver orders safely and report any problem. NovaCart may suspend an account that breaks these rules.
+          </p>
+          <span class="error" id="termsError"></span>
+
+          <input type="submit" class="btn" value="Create Account">
+        </form>
+
+        <p class="switch">Already have an account? <a href="../../LOGIN/HTML/login.html">Log in</a></p>
+      </div>
+
+      <!-- Shown after a successful registration -->
+      <div id="successBox" class="success-box" role="status">
+        <h2>Registration Successful</h2>
+        <p id="successText"></p>
+        <a class="btn link-btn" href="../../LOGIN/HTML/login.html">Go to Login</a>
+        <button type="button" id="registerAnotherBtn" class="btn light">Register Another Account</button>
+      </div>
+
+    </section>
+
+    <footer class="footer">
+      © 2026 NovaCart · Your Budget. Your Deals. Your World.
+    </footer>
+  </main>
+
+  <script src="../JS/registration.js"></script>
+</body>
+</html>
