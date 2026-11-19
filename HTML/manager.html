@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NovaCart Manager Portal</title>
+  <link rel="stylesheet" href="../CSS/manager.css">
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-title">
+        <img src="../icons/order.svg" alt="" width="22" height="22">
+        NovaCart
+      </div>
+      <div class="brand-subtitle">Manager Operations</div>
+    </div>
+
+    <div class="sidebar-menu">
+      <button type="button" class="menu-item active" id="menu-dashboard">
+        <img src="../icons/dashboard.svg" alt="" width="18" height="18">
+        <span>Dashboard</span>
+      </button>
+      <button type="button" class="menu-item" id="menu-campaigns">
+        <img src="../icons/campaign.svg" alt="" width="18" height="18">
+        <span>Campaigns</span>
+      </button>
+      <button type="button" class="menu-item" id="menu-monitoring">
+        <img src="../icons/order.svg" alt="" width="18" height="18">
+        <span>Orders &amp; Complaints</span>
+      </button>
+      <button type="button" class="menu-item" id="menu-reports">
+        <img src="../icons/report.svg" alt="" width="18" height="18">
+        <span>Reports &amp; Analytics</span>
+      </button>
+      <button type="button" class="menu-item" id="menu-profile">
+        <img src="../icons/profile.svg" alt="" width="18" height="18">
+        <span>My Profile</span>
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="manager-meta">
+        <strong id="sidebarManagerName">MD. ABDUR RAHMAN</strong>
+        <span>Operations Manager</span>
+      </div>
+      <button type="button" class="btn outline small sidebar-logout" id="logoutBtn" title="End Session">
+        <img src="../icons/logout.svg" alt="Logout" width="14" height="14">
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="welcome-msg">
+        Welcome back, Manager <span id="welcomeManagerName">MD. ABDUR RAHMAN</span>!
+      </div>
+
+      <div class="top-right">
+        <button type="button" class="profile-trigger" id="profileButton">
+          <span class="avatar-badge" id="avatarInitials">AR</span>
+          <span id="topbarManagerName">MD. ABDUR RAHMAN</span>
+          <img src="../icons/chevron-down.svg" alt="" width="12" height="12">
+        </button>
+
+        <div class="profile-menu" id="profileMenu">
+          <button type="button" id="myProfileBtn">
+            <img src="../icons/profile.svg" alt="" width="15" height="15"> My Profile
+          </button>
+          <button type="button" id="changePasswordBtn">
+            <img src="../icons/lock.svg" alt="" width="15" height="15"> Change Password
+          </button>
+          <div class="menu-divider"></div>
+          <button type="button" class="danger-text" id="menuLogout">
+            <img src="../icons/logout.svg" alt="" width="15" height="15"> Log Out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Banner -->
+    <p class="message" id="message"></p>
+
+    <!-- 1. DASHBOARD -->
+    <div id="section-dashboard" class="section">
+      <h1 class="page-title">Operations Overview</h1>
+      <p class="page-subtitle">Live calculated metrics from marketplace orders, promotional campaigns, and customer complaints</p>
+
+      <div class="cards">
+        <div class="stat-card">
+          <span>Total Sales Revenue</span>
+          <strong id="statTotalSales">0 ৳</strong>
+        </div>
+        <div class="stat-card">
+          <span>Total Orders Monitored</span>
+          <strong id="statTotalOrders">0</strong>
+        </div>
+        <div class="stat-card">
+          <span>Active Campaigns</span>
+          <strong id="statActiveCampaigns">0</strong>
+        </div>
+        <div class="stat-card">
+          <span>Open Complaints</span>
+          <strong class="danger-text" id="statPendingComplaints">0</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <h3>Promotional Campaigns Overview</h3>
+          <button type="button" class="btn small" id="dashManageCampaignsBtn">Manage Campaigns</button>
+        </div>
+        <div class="table-box">
+          <table>
+            <thead>
+              <tr>
+                <th>Campaign</th>
+                <th>Discount</th>
+                <th>Approved Budget</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="dashCampaignsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <h3>Recent Merchant Orders</h3>
+          <button type="button" class="btn outline small" id="dashViewOrdersBtn">View All Orders</button>
+        </div>
+        <div class="table-box">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer &amp; Seller</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Fulfillment Status</th>
+              </tr>
+            </thead>
+            <tbody id="dashOrdersTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CAMPAIGNS -->
+    <div id="section-campaigns" class="section">
+      <div class="card-title">
+        <div>
+          <h1 class="page-title">Promotional Campaign Management</h1>
+          <p class="page-subtitle no-margin">Create seasonal promotions, monitor discount caps (1%–90%), and allocate budgets</p>
+        </div>
+        <button type="button" class="btn" id="addCampaignBtn">
+          <img src="../icons/plus.svg" alt="" width="14" height="14" class="icon-white">
+          Create Campaign
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <input type="text" id="searchCampaign" placeholder="Search campaign by name or category...">
+
+        <div id="campaignTabs" class="tab-group">
+          <button type="button" class="tab active" value="All">All</button>
+          <button type="button" class="tab" value="Active">Active</button>
+          <button type="button" class="tab" value="Upcoming">Upcoming</button>
+          <button type="button" class="tab" value="Expired">Expired</button>
+          <button type="button" class="tab" value="Draft">Draft</button>
+        </div>
+      </div>
+
+      <div class="card no-padding">
+        <div class="table-box no-border">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Campaign Name</th>
+                <th>Discount</th>
+                <th>Schedule &amp; Duration</th>
+                <th>Approved Budget</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="campaignTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. ORDERS & COMPLAINTS -->
+    <div id="section-monitoring" class="section">
+      <h1 class="page-title">Operations Monitoring &amp; Complaint Resolution</h1>
+      <p class="page-subtitle">Track merchant progress, view distribution charts, and resolve customer complaints</p>
+
+      <div class="two-columns">
+        <div class="card">
+          <div class="card-title">
+            <h3>Order Distribution</h3>
+            <span class="badge badge-Active">Live</span>
+          </div>
+          <div id="orderStatusChart"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <h3>Complaint Priority Distribution</h3>
+            <span class="badge badge-Draft">Audit Breakdown</span>
+          </div>
+          <div id="grievanceChart"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Merchant Orders</h3>
+        <div class="table-box">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Merchant / Seller</th>
+                <th>Date</th>
+                <th>Total Amount</th>
+                <th>Payment</th>
+                <th>Order Status</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Customer Complaints &amp; Solutions</h3>
+        <div class="table-box">
+          <table>
+            <thead>
+              <tr>
+                <th>Complaint ID</th>
+                <th>Customer &amp; Order</th>
+                <th>Complaint Summary</th>
+                <th>Priority</th>
+                <th>Filed Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="complaintsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. REPORTS & ANALYTICS -->
+    <div id="section-reports" class="section">
+      <div class="card-title">
+        <div>
+          <h1 class="page-title">Executive Reports &amp; Performance Analytics</h1>
+          <p class="page-subtitle no-margin">Real-time calculation of marketplace sales performance and auditing</p>
+        </div>
+        <button type="button" class="btn" id="downloadCsvBtn">
+          <img src="../icons/download.svg" alt="" width="15" height="15" class="icon-white">
+          Download CSV Report
+        </button>
+      </div>
+
+      <div class="cards">
+        <div class="stat-card">
+          <span>Total Sales Revenue</span>
+          <strong id="reportSales">0 ৳</strong>
+        </div>
+        <div class="stat-card">
+          <span>Total Completed Orders</span>
+          <strong id="reportOrders">0</strong>
+        </div>
+        <div class="stat-card">
+          <span>Average Order Value</span>
+          <strong id="reportAov">0 ৳</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <h3>Sales Revenue Contribution by Merchant Store</h3>
+          <span class="badge badge-Upcoming">Revenue Share</span>
+        </div>
+        <div id="merchantRevenueChart"></div>
+      </div>
+
+      <div class="card">
+        <h3>Order Audit Dataset</h3>
+        <div class="table-box">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Merchant</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Payment Status</th>
+              </tr>
+            </thead>
+            <tbody id="reportOrdersTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. MY PROFILE & CHANGE PASSWORD -->
+    <div id="section-profile" class="section">
+      <h1 class="page-title">Manager Profile Management</h1>
+      <p class="page-subtitle">Manage personal contact credentials and update operational security password</p>
+
+      <div class="two-columns">
+        <div class="card">
+          <h3>Personal Credentials</h3>
+          <form id="profileForm" class="plain-form" novalidate>
+            <table>
+              <tr>
+                <td><label for="profileName">Full Name</label></td>
+                <td>
+                  <input type="text" id="profileName" required>
+                  <span class="error" id="profileNameError"></span>
+                </td>
+              </tr>
+              <tr>
+                <td><label for="profileEmail">Email Address</label></td>
+                <td>
+                  <input type="email" id="profileEmail" class="readonly-input" readonly>
+                </td>
+              </tr>
+              <tr>
+                <td><label for="profilePhone">Mobile Contact</label></td>
+                <td>
+                  <input type="text" id="profilePhone" required>
+                  <span class="error" id="profilePhoneError"></span>
+                </td>
+              </tr>
+              <tr>
+                <td><label for="profileDept">Department</label></td>
+                <td>
+                  <input type="text" id="profileDept" required>
+                  <span class="error" id="profileDeptError"></span>
+                </td>
+              </tr>
+            </table>
+            <button type="submit" class="btn">Save Profile Changes</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Change Password</h3>
+          <form id="passwordForm" class="plain-form" novalidate>
+            <table>
+              <tr>
+                <td><label for="oldPass">Current Password</label></td>
+                <td>
+                  <input type="password" id="oldPass" placeholder="Enter current password" required>
+                  <span class="error" id="oldPassError"></span>
+                </td>
+              </tr>
+              <tr>
+                <td><label for="newPass">New Password</label></td>
+                <td>
+                  <input type="password" id="newPass" placeholder="At least 6 characters" required>
+                  <span class="error" id="newPassError"></span>
+                </td>
+              </tr>
+              <tr>
+                <td><label for="confirmPass">Confirm Password</label></td>
+                <td>
+                  <input type="password" id="confirmPass" placeholder="Re-enter new password" required>
+                  <span class="error" id="confirmPassError"></span>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>
+                  <input type="checkbox" id="showPasswords">
+                  <label for="showPasswords">Show passwords</label>
+                </td>
+              </tr>
+            </table>
+            <button type="submit" class="btn">Update Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Campaign Pop-Up Modal -->
+  <div class="overlay" id="campaignModal">
+    <div class="dialog">
+      <button type="button" class="close" title="Close">&times;</button>
+      <form id="campaignForm" novalidate>
+        <fieldset>
+          <legend id="campaignLegend">Create Promotional Campaign</legend>
+          <table>
+            <tr>
+              <td><label for="campName">Campaign Name</label></td>
+              <td>
+                <input type="text" id="campName" placeholder="e.g. Eid Shopping Spree" required>
+                <span class="error" id="campNameError"></span>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="campCategory">Category</label></td>
+              <td>
+                <select id="campCategory">
+                  <option value="Fashion & Apparel">Fashion &amp; Apparel</option>
+                  <option value="Electronics & Gadgets">Electronics &amp; Gadgets</option>
+                  <option value="Home & Kitchen">Home &amp; Kitchen</option>
+                  <option value="Beauty & Wellness">Beauty &amp; Wellness</option>
+                  <option value="All-Store Holiday Deal">Holiday Deal</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="campDiscount">Discount (%)</label></td>
+              <td>
+                <input type="number" id="campDiscount" min="1" max="90" placeholder="e.g. 25" required>
+                <span class="error" id="campDiscountError"></span>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="campStartDate">Start Date</label></td>
+              <td>
+                <input type="date" id="campStartDate" required>
+                <span class="error" id="campStartDateError"></span>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="campEndDate">End Date</label></td>
+              <td>
+                <input type="date" id="campEndDate" required>
+                <span class="error" id="campEndDateError"></span>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="campBudget">Budget (BDT)</label></td>
+              <td>
+                <input type="number" id="campBudget" min="1000" step="500" placeholder="e.g. 50000" required>
+                <span class="error" id="campBudgetError"></span>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="campStatus">Status</label></td>
+              <td>
+                <select id="campStatus">
+                  <option value="Active">Active</option>
+                  <option value="Upcoming">Upcoming</option>
+                  <option value="Expired">Expired</option>
+                  <option value="Draft">Draft</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+        <button type="submit" class="btn">Save Campaign</button>
+        <button type="button" class="btn outline" id="cancelCampaignBtn">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Complaint Resolution Pop-Up Modal -->
+  <div class="overlay" id="arbitrateModal">
+    <div class="dialog">
+      <button type="button" class="close" title="Close">&times;</button>
+      <form id="arbitrateForm" novalidate>
+        <fieldset>
+          <legend id="arbitrateLegend">Resolve Customer Complaint</legend>
+          <table>
+            <tr>
+              <td><label for="arbitrateCustomerInfo">Customer &amp; Order</label></td>
+              <td>
+                <input type="text" id="arbitrateCustomerInfo" class="readonly-input" readonly>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="arbitrateSummary">Complaint</label></td>
+              <td>
+                <textarea id="arbitrateSummary" class="readonly-input" rows="2" readonly></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="arbitrateStatus">Status</label></td>
+              <td>
+                <select id="arbitrateStatus">
+                  <option value="Open">Open</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td><label for="arbitrateNotes">Solution Notes</label></td>
+              <td>
+                <textarea id="arbitrateNotes" rows="3" placeholder="Enter vendor action or resolution details..." required></textarea>
+                <span class="error" id="arbitrateNotesError"></span>
+              </td>
+            </tr>
+          </table>
+        </fieldset>
+        <button type="submit" class="btn">Save Resolution</button>
+        <button type="button" class="btn outline" id="cancelArbitrateBtn">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="../JS/manager.js"></script>
+</body>
+</html>
