@@ -33,12 +33,12 @@
     <!-- Top navigation bar -->
     <header class="topbar">
       <div>
-        <h2>Welcome back, Admin!</h2>
+        <h2>Welcome back, <span id="welcomeName">Admin</span>!</h2>
         <p id="description"></p>
       </div>
       <div class="top-right">
         <button id="bellButton" class="bell" aria-label="Notifications">🔔 <span id="bellCount">0</span></button>
-        <button id="profileButton" class="profile-button" aria-haspopup="true">Admin ▾</button>
+        <button id="profileButton" class="profile-button" aria-haspopup="true"><span id="topAvatar" class="top-avatar"></span>Admin ▾</button>
         <div id="profileMenu" class="profile-menu">
           <button id="myProfileBtn">My Profile</button>
           <button id="changePasswordBtn">Change Password</button>
@@ -362,15 +362,29 @@
         </div>
 
         <div class="card">
+          <div class="profile-head">
+            <div id="profileInitial" class="profile-picture" role="img" aria-label="Profile picture">A</div>
+            <div class="picture-actions">
+              <h3>Profile Picture</h3>
+              <p class="hint">PNG, JPG or WEBP, up to 2 MB. A file named admin.jpg, admin.png or admin.webp in the PICTURES folder is loaded automatically.</p>
+              <input type="file" id="pictureInput" accept="image/png, image/jpeg, image/webp" hidden>
+              <button type="button" id="changePictureBtn" class="btn">Change Picture</button>
+              <button type="button" id="folderPictureBtn" class="btn light">Use Pictures Folder</button>
+              <button type="button" id="removePictureBtn" class="btn light">Remove Picture</button>
+              <span class="error" id="pictureError"></span>
+            </div>
+          </div>
+
           <h3>Profile Details</h3>
-          <div id="profileInitial" class="profile-picture">A</div>
-          <p>Name: <strong id="profileName"></strong></p>
-          <p>Email: <strong id="profileEmail"></strong></p>
-          <p>Contact No: <strong id="profilePhone"></strong></p>
-          <p>Date of Birth: <strong id="profileBirth"></strong></p>
-          <p>Address: <strong id="profileAddress"></strong></p>
-          <p>Role: <strong id="profileRole"></strong></p>
-          <p>Joined Date: <strong id="profileJoined"></strong></p>
+          <div class="profile-info">
+            <p><span>Name</span> <strong id="profileName"></strong></p>
+            <p><span>Email</span> <strong id="profileEmail"></strong></p>
+            <p><span>Contact No</span> <strong id="profilePhone"></strong></p>
+            <p><span>Date of Birth</span> <strong id="profileBirth"></strong></p>
+            <p><span>Address</span> <strong id="profileAddress"></strong></p>
+            <p><span>Role</span> <strong id="profileRole"></strong></p>
+            <p><span>Joined Date</span> <strong id="profileJoined"></strong></p>
+          </div>
         </div>
       </section>
 

@@ -65,6 +65,7 @@ button {
   background-color: #6d44e0;
   color: white;
   font-weight: bold;
+  box-shadow: inset 4px 0 0 #c9b8ff;   /* light bar on the left of the open page */
 }
 
 .logout {
@@ -110,6 +111,17 @@ button {
 
 .top-right button:hover {
   background-color: #ede7fb;
+}
+
+.top-right .profile-button {
+  background-color: white;
+  border: 1px solid #e2dbf5;
+  border-radius: 24px;
+  padding: 5px 14px 5px 6px;
+}
+
+.top-right .bell {
+  border-radius: 24px;
 }
 
 #bellCount {
@@ -204,6 +216,11 @@ button {
   box-shadow: 0 4px 12px #e4def5;
   padding: 20px;
   margin-bottom: 18px;
+  transition: box-shadow 0.3s;
+}
+
+.card:hover {
+  box-shadow: 0 6px 16px #d9cff3;
 }
 
 .card h3 {
@@ -236,6 +253,7 @@ button {
   border-radius: 14px;
   box-shadow: 0 4px 12px #e4def5;
   padding: 18px;
+  border-top: 4px solid #6d44e0;   /* small accent on top of each number card */
 }
 
 .stat-card span {
@@ -571,17 +589,71 @@ form .btn {
 }
 
 /* Profile page */
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e2dbf5;
+}
+
 .profile-picture {
-  width: 90px;
-  height: 90px;
-  line-height: 90px;
+  flex-shrink: 0;
+  width: 110px;
+  height: 110px;
+  line-height: 102px;
   border-radius: 50%;
   background-color: #5b2fd1;
   color: white;
-  font-size: 38px;
+  font-size: 44px;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 14px;
+  border: 4px solid white;
+  box-shadow: 0 0 0 2px #d9cdf7, 0 4px 12px #cfc5ee;
+  background-size: cover;       /* a saved picture fills the circle */
+  background-position: center;
+}
+
+.picture-actions h3 {
+  margin-bottom: 4px;
+}
+
+.hint {
+  margin: 0 0 12px 0;
+  color: #6b6685;
+  font-size: 13px;
+}
+
+.picture-actions .error {
+  display: block;
+  margin-top: 6px;
+}
+
+.profile-info p {
+  display: flex;
+  margin: 0;
+  padding: 11px 0;
+  border-top: 1px solid #efeaff;
+}
+
+.profile-info span {
+  width: 150px;
+  flex-shrink: 0;
+  color: #6b6685;
+}
+
+.top-avatar {
+  display: none;                /* shown only when a picture is saved */
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #d9cdf7;
+  background-size: cover;
+  background-position: center;
+  vertical-align: middle;
+  margin-right: 8px;
 }
 
 .two-columns li {
