@@ -14,7 +14,7 @@ const accounts = [
 const roleHomePages = {
   Administrator: "../../HTML/admin.html",
   Customer: "../../HTML/customer.html",
-  Seller: "../../HTML/seller.html",
+  Seller: "../../HTML/sellerdashboard.html",
   Manager: "../../HTML/manager.html",
   "Delivery Partner": "../../HTML/delivery.html"
 };
