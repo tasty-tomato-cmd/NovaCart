@@ -1,0 +1,260 @@
+/* NovaCart Registration */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #2d1b69;
+  color: #1f1a3d;
+}
+
+/* Page and card */
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 20px;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 600px;
+  background-color: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 24px #1a0f40;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.brand h1 {
+  margin: 0;
+  color: #5b2fd1;
+  font-size: 32px;
+}
+
+.tagline {
+  margin: 6px 0 0 0;
+  color: #6b6685;
+  font-size: 14px;
+}
+
+.register-card h2 {
+  margin: 0 0 6px 0;
+  font-size: 22px;
+}
+
+.intro {
+  margin: 0 0 16px 0;
+  color: #6b6685;
+  font-size: 14px;
+}
+
+/* Account type tabs */
+.role-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.tab {
+  flex: 1;
+  background-color: #f3effd;
+  color: #6b6685;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: background-color 0.3s;
+}
+
+.tab:hover {
+  background-color: #ede7fb;
+}
+
+.tab.active {
+  background-color: #5b2fd1;
+  color: white;
+  font-weight: bold;
+}
+
+/* Form */
+fieldset {
+  border: 1px solid #e2dbf5;
+  border-radius: 12px;
+  margin: 0 0 16px 0;
+  padding: 6px 18px 14px 18px;
+}
+
+legend {
+  font-weight: bold;
+  color: #5b2fd1;
+  padding: 0 6px;
+}
+
+.inner-fields {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+label,
+.label {
+  display: block;
+  font-weight: bold;
+  font-size: 14px;
+  margin: 14px 0 6px 0;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid #e2dbf5;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+textarea {
+  resize: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: 2px solid #5b2fd1;
+}
+
+/* Checkboxes and radio buttons */
+.check-row {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.check-row label {
+  display: inline;
+  font-weight: normal;
+  margin: 0 14px 0 4px;
+}
+
+.terms {
+  margin: 0 0 4px 2px;
+}
+
+/* "Terms and Conditions" looks like a link but is a button inside the label */
+.text-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: #5b2fd1;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.terms-text {
+  background-color: #f3effd;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 8px 0 4px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #4a4568;
+}
+
+.error {
+  display: block;
+  color: #e0443e;
+  font-size: 13px;
+  min-height: 16px;
+  margin-top: 4px;
+}
+
+.note {
+  background-color: #ede7fb;
+  color: #5b2fd1;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+/* Buttons and links */
+.btn {
+  display: block;
+  width: 100%;
+  background-color: #5b2fd1;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: inherit;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #4a22b8;
+}
+
+.btn.light {
+  background-color: #ede7fb;
+  color: #5b2fd1;
+}
+
+.switch {
+  margin: 18px 0 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: #6b6685;
+}
+
+.switch a {
+  color: #5b2fd1;
+  font-weight: bold;
+}
+
+/* Hidden at first: JavaScript shows them */
+#successBox,
+#sellerFields,
+#deliveryFields,
+#studentFields,
+#termsText {
+  display: none;
+}
+
+.success-box {
+  text-align: center;
+}
+
+.success-box p {
+  color: #6b6685;
+  line-height: 1.6;
+}
+
+/* Footer */
+.footer {
+  margin-top: 20px;
+  color: #d9d0f5;
+  font-size: 13px;
+  text-align: center;
+}

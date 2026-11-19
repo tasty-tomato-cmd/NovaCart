@@ -116,6 +116,19 @@ button:focus {
   background-color: #4a22b8;
 }
 
+/* Link to the registration page */
+.switch {
+  margin: 18px 0 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: #6b6685;
+}
+
+.switch a {
+  color: #5b2fd1;
+  font-weight: bold;
+}
+
 /* Footer */
 .footer {
   margin-top: 20px;
