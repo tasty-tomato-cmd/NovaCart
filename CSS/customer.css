@@ -1,0 +1,387 @@
+body {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    background-color: #F8F6FF;
+    color: #171044;
+    margin: 0;
+}
+
+.hide {
+    display: none;
+}
+
+h1 {
+    font-size: 30px;
+    color: #171044;
+    margin: 0 0 6px 0;
+}
+
+h2 {
+    font-size: 22px;
+    color: #171044;
+    margin: 0 0 6px 0;
+}
+
+h3 {
+    font-size: 18px;
+    color: #171044;
+    margin: 0 0 12px 0;
+}
+
+.sub-text {
+    color: #716B8C;
+    font-size: 15px;
+    margin: 0;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 230px;
+    background-color: #281858;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding-top: 22px;
+}
+
+.brand {
+    color: #FFFFFF;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 0 22px;
+    display: block;
+}
+
+.role-tag {
+    color: #F0EAFF;
+    font-size: 12px;
+    padding: 5px 22px 22px 22px;
+    display: block;
+}
+
+.sidebar a {
+    display: block;
+    color: #F0EAFF;
+    text-decoration: none;
+    padding: 13px 22px;
+    font-size: 15px;
+}
+
+.sidebar a:hover, .active-link {
+    background-color: #5925DC;
+    color: #FFFFFF;
+}
+
+.logout-box {
+    position: absolute;
+    bottom: 25px;
+    width: 100%;
+}
+
+/* Main Area */
+.main-area {
+    margin-left: 230px;
+    padding: 25px 35px;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #E5DEFF;
+    margin-bottom: 22px;
+}
+
+.user-badge {
+    background-color: #7C4DFF;
+    color: #FFFFFF;
+    padding: 6px 10px;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 6px;
+}
+
+.banner-box {
+    background-color: #FFFFFF;
+    border: 1px solid #E5DEFF;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 22px;
+}
+
+/* Stats Cards */
+.stats-row {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.stat-box {
+    flex: 1;
+    background-color: #FFFFFF;
+    border: 1px solid #E5DEFF;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.stat-num {
+    font-size: 26px;
+    font-weight: bold;
+    color: #5925DC;
+    margin: 10px 0 0 0;
+}
+
+.two-col {
+    display: flex;
+    gap: 22px;
+    margin-bottom: 22px;
+}
+
+.panel {
+    flex: 1;
+    background-color: #FFFFFF;
+    border: 1px solid #E5DEFF;
+    border-radius: 8px;
+    padding: 22px;
+    margin-bottom: 22px;
+    font-size: 15px;
+}
+
+/* Shop Cards */
+.filter-bar {
+    margin-bottom: 14px;
+}
+
+.search-box {
+    width: 260px;
+    padding: 10px;
+    border: 1px solid #E5DEFF;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+
+.product-card {
+    display: inline-block;
+    width: 195px;
+    background-color: #FFFFFF;
+    border: 1px solid #E5DEFF;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 0 12px 14px 0;
+    text-align: center;
+    vertical-align: top;
+}
+
+.seller-name {
+    color: #716B8C;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.price-text {
+    color: #5925DC;
+    font-weight: bold;
+    font-size: 16px;
+    margin: 8px 0 12px 0;
+}
+
+/* Buttons & Inputs */
+button {
+    background-color: #5925DC;
+    color: #FFFFFF;
+    border: none;
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 4px;
+}
+
+button:hover {
+    background-color: #7C4DFF;
+}
+
+.btn-light {
+    background-color: #F0EAFF;
+    color: #171044;
+    border: 1px solid #E5DEFF;
+}
+
+.btn-danger {
+    background-color: #EF4444;
+    color: #FFFFFF;
+}
+
+label {
+    display: block;
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 12px;
+    margin-bottom: 5px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    color: #171044;
+    background-color: #FFFFFF;
+    border: 1px solid #E5DEFF;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    margin-top: 12px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #E5DEFF;
+}
+
+th {
+    color: #716B8C;
+    background-color: #F8F6FF;
+}
+
+/* Pill-Shaped Status Badges */
+.badge-red {
+    background-color: #FEE2E2;
+    color: #EF4444;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.badge-green {
+    background-color: #DCFCE7;
+    color: #16A34A;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.badge-purple {
+    background-color: #F0EAFF;
+    color: #5925DC;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.text-green {
+    color: #16A34A;
+    font-weight: bold;
+}
+
+.text-red {
+    color: #EF4444;
+    font-weight: bold;
+}
+
+.footer {
+    text-align: center;
+    color: #716B8C;
+    font-size: 14px;
+    padding: 22px 0;
+    border-top: 1px solid #E5DEFF;
+    margin-top: 30px;
+}
+.profile-big-badge {
+    background-color: #5925DC;
+    color: #FFFFFF;
+    width: 54px;
+    height: 54px;
+    line-height: 54px;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.info-row {
+    margin: 10px 0;
+    font-size: 15px;
+}
+
+.info-label {
+    color: #716B8C;
+    font-weight: bold;
+}
+
+.check-row {
+    margin: 10px 0 15px 0;
+    font-size: 14px;
+}
+
+.check-row input {
+    width: auto;
+    margin-right: 6px;
+}
+
+.inst-list p {
+    color: #716B8C;
+    font-size: 14px;
+    margin: 8px 0;
+}
+.notif-btn {
+    cursor: pointer;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.notif-count {
+    background-color: #EF4444;
+    color: #FFFFFF;
+    padding: 2px 7px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.profile-area {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.dropdown-box {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 32px;
+    background-color: #FFFFFF;
+    border: 1px solid #E5DEFF;
+    border-radius: 6px;
+    width: 170px;
+    padding: 6px 0;
+}
+
+.dropdown-box a {
+    display: block;
+    padding: 10px 15px;
+    color: #171044;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.dropdown-box a:hover {
+    background-color: #F0EAFF;
+}

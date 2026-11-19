@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>NovaCart - Customer</title>
+    <link rel="stylesheet" href="../CSS/customer.css">
+</head>
+<body>
+
+    <div class="sidebar">
+        <span class="brand">NovaCart</span>
+        <span class="role-tag">CUSTOMER</span>
+        <a href="#" id="link-dash" class="active-link" onclick="showDash()">Dashboard</a>
+        <a href="#" id="link-shop" onclick="showShop()">Shop</a>
+        <a href="#" id="link-cart" onclick="showCart()">Cart (<span id="nav-cart-count">0</span>)</a>
+        <a href="#" id="link-orders" onclick="showOrders()">My Orders</a>
+        <a href="#" id="link-offers" onclick="showOffers()">Offers & Coupons</a>
+
+        <div class="logout-box">
+        <a href="#" onclick="logOut()">Log Out</a>
+        </div>
+    </div>
+
+    <div class="main-area">
+       <div class="top-bar">
+            <div>
+                <h1>Welcome back, Lubaba!</h1>
+                <p class="sub-text">Overview of your orders, cart and offers.</p>
+            </div>
+            <div>
+                <span class="notif-btn" onclick="showNotif()">🔔
+                <span id="top-notif-count" class="notif-count">2</span>
+                </span>
+
+                <div class="profile-area">
+                    <span class="user-badge">L</span>
+                    <span onclick="toggleMenu()">Lubaba &#9662;</span>
+                    <div id="user-menu" class="dropdown-box">
+                        <a href="#" onclick="showProfile()">My Profile</a>
+                        <a href="#" onclick="showPassPage()">Change Password</a>
+                  <a href="#" onclick="logOut()">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1. Dashboard -->
+        <div id="dash-page">
+            <div class="banner-box">
+                <h2>Customer Dashboard</h2>
+                <p class="sub-text">A quick overview of your orders, cart and activity on NovaCart.</p>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-box">
+                    <p class="sub-text">Total Orders</p>
+                    <p class="stat-num" id="dash-orders">3</p>
+                </div>
+                <div class="stat-box">
+                    <p class="sub-text">Items in Cart</p>
+                    <p class="stat-num" id="dash-cart">0</p>
+                </div>
+                <div class="stat-box">
+                    <p class="sub-text">Total Spent</p>
+                    <p class="stat-num">Tk <span id="dash-spent">8250</span></p>
+                </div>
+                <div class="stat-box">
+                    <p class="sub-text">Unread Notifications</p>
+                    <p class="stat-num">2</p>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="panel">
+                    <h3>Account Overview</h3>
+                    <p>Student status: <span id="dash-stu-status" class="badge-red">Not Verified</span></p>
+                    <p>Applied coupon: <b id="dash-coupon">None</b></p>
+                    <p>Orders in progress: <b id="dash-progress">2</b></p>
+                    <p>Delivered orders: <b>1</b></p>
+                </div>
+
+                <div class="panel">
+                    <h3>Recent Orders</h3>
+                    <table>
+                        <tr>
+                            <th>Order No</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                        <tr>
+                            <td>NC-1003</td>
+                            <td>2026-11-17</td>
+                            <td>Tk 3100</td>
+                            <td><span class="badge-purple">Placed</span></td>
+                        </tr>
+                        <tr>
+                            <td>NC-1002</td>
+                            <td>2026-11-12</td>
+                            <td>Tk 2800</td>
+                            <td><span class="badge-purple">Shipped</span></td>
+                        </tr>
+                        <tr>
+                            <td>NC-1001</td>
+                            <td>2026-10-05</td>
+                            <td>Tk 2350</td>
+                            <td><span class="badge-green">Delivered</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Shop -->
+        <div id="shop-page" class="hide">
+            <div class="banner-box">
+                <h2>Shop Products</h2>
+                <p class="sub-text">Browse products from NovaCart sellers and add them to your cart.</p>
+            </div>
+
+            <div class="filter-bar">
+                <button onclick="filterItems('All')">All</button>
+                <button class="btn-light" onclick="filterItems('Clothing')">Clothing</button>
+                <button class="btn-light" onclick="filterItems('Electronics')">Electronics</button>
+                <button class="btn-light" onclick="filterItems('Furniture')">Furniture</button>
+                <button class="btn-light" onclick="filterItems('Others')">Others</button>
+            </div>
+
+            <input type="text" id="search-box" class="search-box" onkeyup="searchItems()" placeholder="Search product...">
+
+            <div>
+                <div class="product-card" data-category="Clothing">
+                    <h3>Kurti Set</h3>
+                    <p class="seller-name">Fashion Mart</p>
+                    <p class="price-text">Tk 1650</p>
+                    <button onclick="addItem('Kurti Set', 'Fashion Mart', 1650)">Add to Cart</button>
+                    <button class="btn-light" onclick="alert('Kurti Set | Seller: Fashion Mart | Price: Tk 1650')">Details</button>
+                </div>
+
+                <div class="product-card" data-category="Clothing">
+                    <h3>Floral Tops</h3>
+                    <p class="seller-name">Tailor Fit</p>
+                    <p class="price-text">Tk 850</p>
+                    <button onclick="addItem('Floral Tops', 'Tailor Fit', 850)">Add to Cart</button>
+                    <button class="btn-light" onclick="alert('Floral Tops | Seller: Tailor Fit | Price: Tk 850')">Details</button>
+                </div>
+
+                <div class="product-card" data-category="Electronics">
+                    <h3>Mouse</h3>
+                    <p class="seller-name">Gadget Hub</p>
+                    <p class="price-text">Tk 1200</p>
+                    <button onclick="addItem('Mouse', 'Gadget Hub', 1200)">Add to Cart</button>
+                    <button class="btn-light" onclick="alert('Mouse | Seller: Gadget Hub | Price: Tk 1200')">Details</button>
+                </div>
+
+                <div class="product-card" data-category="Electronics">
+                    <h3>Keyboard</h3>
+                    <p class="seller-name">Gadget Hub</p>
+                    <p class="price-text">Tk 2800</p>
+                    <button onclick="addItem('Keyboard', 'Gadget Hub', 2800)">Add to Cart</button>
+                    <button class="btn-light" onclick="alert('Keyboard | Seller: Gadget Hub | Price: Tk 2800')">Details</button>
+                </div>
+
+                <div class="product-card" data-category="Electronics">
+                    <h3>Smart Watch</h3>
+                    <p class="seller-name">Gadget Hub</p>
+                    <p class="price-text">Tk 3200</p>
+                    <button onclick="addItem('Smart Watch', 'Gadget Hub', 3200)">Add to Cart</button>
+                    <button class="btn-light" onclick="alert('Smart Watch | Seller: Gadget Hub | Price: Tk 3200')">Details</button>
+                </div>
+
+                <div class="product-card" data-category="Electronics">
+                    <h3>Wireless Earbuds</h3>
+                    <p class="seller-name">Gadget Hub</p>
+                    <p class="price-text">Tk 1850</p>
+                    <button onclick="addItem('Wireless Earbuds', 'Gadget Hub', 1850)">Add to Cart</button>
+                    <button class="btn-light" onclick="alert('Wireless Earbuds | Seller: Gadget Hub | Price: Tk 1850')">Details</button>
+                </div>
+
+                <div class="product-card" data-category="Furniture">
+                    <h3>Study Desk</h3>
+                    <p class="seller-name">Home Mart</p>
+                    <p class="price-text">Tk 5400</p>
+                    <button onclick="addItem('Study Desk', 'Home Mart', 5400)">Add to Cart</button>
+                    <button class="btn-light" onclick="alert('Study Desk | Seller: Home Mart | Price: Tk 5400')">Details</button>
+                </div>
+
+                <div class="product-card" data-category="Furniture">
+                    <h3>Chair</h3>
+                    <p class="seller-name">Home Mart</p>
+                    <p class="price-text">Tk 6900</p>
+                    <button onclick="addItem('Chair', 'Home Mart', 6900)">Add to Cart</button>
+                    <button class="btn-light" onclick="alert('Chair | Seller: Home Mart | Price: Tk 6900')">Details</button>
+                </div>
+
+                <div class="product-card" data-category="Others">
+                    <h3>Handbag</h3>
+                    <p class="seller-name">Urban Fit</p>
+                    <p class="price-text">Tk 1450</p>
+                    <button onclick="addItem('Handbag', 'Urban Fit', 1450)">Add to Cart</button>
+                    <button class="btn-light" onclick="alert('Handbag | Seller: Urban Fit | Price: Tk 1450')">Details</button>
+                </div>
+
+                <div class="product-card" data-category="Others">
+                    <h3>Notebook</h3>
+                    <p class="seller-name">Pen House</p>
+                    <p class="price-text">Tk 250</p>
+                    <button onclick="addItem('Notebook', 'Pen House', 250)">Add to Cart</button>
+                    <button class="btn-light" onclick="alert('Notebook | Seller: Pen House | Price: Tk 250')">Details</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Cart -->
+        <div id="cart-page" class="hide">
+            <div class="banner-box">
+                <h2>My Cart</h2>
+                <p class="sub-text">Review your items, then add your delivery details to place the order.</p>
+            </div>
+
+            <div class="panel">
+                <h3>Cart Items</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Seller</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-table-body">
+                        <tr>
+                            <td colspan="6" class="sub-text">Your cart is empty.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="sub-text" style="margin-top: 10px;">Total quantity: <span id="cart-qty-text">0</span></p>
+            </div>
+
+            <div class="two-col">
+                <div class="panel">
+                    <h3>Order Summary</h3>
+                    <p>Subtotal: <b>Tk <span id="sum-sub">0</span></b></p>
+                    <p>Discount: <b class="text-green">- Tk <span id="sum-disc">0</span></b></p>
+                    <p>Total: <b class="price-text">Tk <span id="sum-total">0</span></b></p>
+                    <p class="sub-text">Coupons can be added from the Offers & Coupons page.</p>
+                </div>
+
+                <div class="panel">
+                    <h3>Delivery & Payment</h3>
+                    <label>Delivery Address</label>
+                    <input type="text" id="del-address" placeholder="House, road, area, city">
+
+                    <label>Phone Number</label>
+                    <input type="text" id="del-phone" placeholder="01712345678">
+
+                    <label>Payment Method</label>
+                    <select id="del-payment">
+                        <option>Cash on Delivery</option>
+                        <option>bKash</option>
+                        <option>Nagad</option>
+                        <option>Credit or Debit Card</option>
+                    </select>
+
+                    <label>Order Note (Optional)</label>
+                    <input type="text" id="del-note" placeholder="e.g. Fragile items, deliver after 5 PM">
+
+                    <button onclick="submitOrder()">Place Order</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. My Orders -->
+        <div id="orders-page" class="hide">
+            <div class="banner-box">
+                <h2>My Orders</h2>
+                <p class="sub-text">Track your orders, update the delivery address or cancel an order.</p>
+            </div>
+
+            <div class="panel">
+                <div class="filter-bar">
+                    <button onclick="filterOrders('All')">All Orders</button>
+                    <button class="btn-light" onclick="filterOrders('Placed')">Placed</button>
+                    <button class="btn-light" onclick="filterOrders('Shipped')">Shipped</button>
+                    <button class="btn-light" onclick="filterOrders('Delivered')">Delivered</button>
+                    <button class="btn-light" onclick="filterOrders('Cancelled')">Cancelled</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order No</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                        <tr id="row-1003" data-status="Placed">
+                            <td>NC-1003</td>
+                            <td>2026-11-17</td>
+                            <td>Kurti Set x 1, Handbag x 1</td>
+                            <td>Tk 3100</td>
+                            <td>Nagad</td>
+                            <td><span class="badge-purple" id="st-1003">Placed</span></td>
+                            <td>
+                                <button class="btn-light" onclick="alert('Order NC-1003 | Address: Bashundhara R/A')">View</button>
+                                <button class="btn-light" onclick="updateOrderAddress('1003')">Edit Address</button>
+                                <button class="btn-danger" onclick="cancelOrderRow('1003', 'st-1003')">Cancel</button>
+                            </td>
+                        </tr>
+                        <tr id="row-1002" data-status="Shipped">
+                            <td>NC-1002</td>
+                            <td>2026-11-12</td>
+                            <td>Keyboard x 1</td>
+                            <td>Tk 2800</td>
+                            <td>Cash on Delivery</td>
+                            <td><span class="badge-purple">Shipped</span></td>
+                            <td>
+                                <button class="btn-light" onclick="alert('Order NC-1002 is Shipped')">View</button>
+                            </td>
+                        </tr>
+                        <tr id="row-1001" data-status="Delivered">
+                            <td>NC-1001</td>
+                            <td>2026-10-05</td>
+                            <td>Wireless Earbuds x 1, Notebook x 2</td>
+                            <td>Tk 2350</td>
+                            <td>bKash</td>
+                            <td><span class="badge-green">Delivered</span></td>
+                            <td>
+                                <button class="btn-light" onclick="alert('Order NC-1001 Delivered')">View</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. Offers & Coupons -->
+        <div id="offers-page" class="hide">
+            <div class="banner-box">
+                <h2>Student Discount & Offers</h2>
+                <p class="sub-text">Verify your student status and use coupons on your cart.</p>
+            </div>
+
+            <div class="two-col">
+                <div class="panel">
+                    <h3>Student Verification</h3>
+                    <p>Status: <span id="stu-badge" class="badge-red">Not Verified</span></p>
+
+                    <label>Name</label>
+                    <input type="text" id="v-name" placeholder="Your full name">
+
+                    <label>Student ID</label>
+                    <input type="text" id="v-id" placeholder="Enter student ID">
+
+                    <label>University</label>
+                    <input type="text" id="v-uni" placeholder="Enter university name">
+
+                    <button onclick="saveStudent()">Apply</button>
+                    <button class="btn-light" onclick="removeStudent()">Delete</button>
+                </div>
+
+                <div class="panel">
+                    <h3>How Coupons Work</h3>
+                    <p class="sub-text"> Only verified students can use student offers.</p>
+                    <p class="sub-text">You can apply one coupon at a time.</p>
+                    <p class="sub-text">The discount is shown in your cart before you place the order.</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>My Coupons</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Discount</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>EID20</b></td>
+                            <td>20%</td>
+                            <td>2026-12-31</td>
+                            <td><span class="badge-green">Available</span></td>
+                            <td><button onclick="useCoupon('EID20', 0.20)">Apply</button></td>
+                        </tr>
+                        <tr>
+                            <td><b>BOISHAKH15</b></td>
+                            <td>15%</td>
+                            <td>2027-04-30</td>
+                            <td><span class="badge-green">Available</span></td>
+                            <td><button onclick="useCoupon('BOISHAKH15', 0.15)">Apply</button></td>
+                        </tr>
+                        <tr>
+                            <td><b>STUDENTS15</b></td>
+                            <td>15%</td>
+                            <td>2026-12-31</td>
+                            <td><span class="badge-green">Available</span></td>
+                            <td><button onclick="useCoupon('STUDENTS15', 0.15)">Apply</button></td>
+                        </tr>
+                        <tr>
+                            <td><b>EID100</b></td>
+                            <td>Tk 100</td>
+                            <td>2025-06-30</td>
+                            <td><span class="badge-red">Expired</span></td>
+                            <td><button class="btn-light" onclick="alert('This coupon is expired!')">Apply</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- 6. Notifications -->
+        <div id="notif-page" class="hide">
+            <div class="banner-box">
+                <h2>Notifications</h2>
+                <p class="sub-text">Updates about your orders, offers and account.</p>
+                <button onclick="markAllRead()">Mark All Read</button>
+            </div>
+
+            <div class="panel">
+                <table>
+                    <tr>
+                        <th>Notification</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    <tr id="n-row-1">
+                        <td>Your order NC-1002 has been shipped</td>
+                        <td>2026-11-14</td>
+                        <td><span id="n-st-1" class="badge-purple">Unread</span></td>
+                        <td>
+                            <button class="btn-light" onclick="toggleRead('n-st-1', 'n-btn-1')" id="n-btn-1">Mark Read</button>
+                            <button class="btn-danger" onclick="deleteNotif('n-row-1')">Delete</button>
+                        </td>
+                    </tr>
+                    <tr id="n-row-2">
+                        <td>EID20 coupon is available for verified students</td>
+                        <td>2026-11-10</td>
+                        <td><span id="n-st-2" class="badge-purple">Unread</span></td>
+                        <td>
+                            <button class="btn-light" onclick="toggleRead('n-st-2', 'n-btn-2')" id="n-btn-2">Mark Read</button>
+                            <button class="btn-danger" onclick="deleteNotif('n-row-2')">Delete</button>
+                        </td>
+                    </tr>
+                    <tr id="n-row-3">
+                        <td>Your order NC-1001 was delivered</td>
+                        <td>2026-10-09</td>
+                        <td><span id="n-st-3" class="badge-green">Read</span></td>
+                        <td>
+                            <button class="btn-light" onclick="toggleRead('n-st-3', 'n-btn-3')" id="n-btn-3">Mark Unread</button>
+                            <button class="btn-danger" onclick="deleteNotif('n-row-3')">Delete</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+<!-- 7. My Profile -->
+        <div id="profile-page" class="hide">
+            <div class="banner-box">
+                <h2>My Profile</h2>
+                <p class="sub-text">View and update your customer profile.</p>
+            </div>
+
+            <div class="panel">
+                <h3>Profile Details</h3>
+                <div class="profile-big-badge">L</div>
+
+                <p class="info-row"><span class="info-label">Name:</span> Lubaba</p>
+                <p class="info-row"><span class="info-label">Email:</span> lubaba@novacart.com</p>
+                <p class="info-row"><span class="info-label">Contact No:</span> +8801812345678</p>
+                <p class="info-row"><span class="info-label">Date of Birth:</span> 2003-08-20</p>
+                <p class="info-row"><span class="info-label">Address:</span> House 7, Road 3, Banani, Dhaka</p>
+                <p class="info-row"><span class="info-label">Role:</span> Customer</p>
+                <p class="info-row"><span class="info-label">Joined Date:</span> 2025-01-15</p>
+            </div>
+        </div>
+
+        <!-- 8. Change Password -->
+        <div id="pass-page" class="hide">
+            <div class="banner-box">
+                <h2>Change Password</h2>
+                <p class="sub-text">Keep your account secure by changing your password.</p>
+            </div>
+
+            <div class="two-col">
+                <div class="panel">
+                    <h3>New Password</h3>
+
+                    <label>Current Password</label>
+                    <input type="password" id="curr-pass" placeholder="Current Password">
+
+                    <label>New Password</label>
+                    <input type="password" id="new-pass" placeholder="New Password">
+
+                    <label>Confirm Password</label>
+                    <input type="password" id="conf-pass" placeholder="Confirm Password">
+
+                    <div class="check-row">
+                        <input type="checkbox" id="show-pass-box" onclick="togglePassView()">
+                        <label for="show-pass-box" style="display: inline; font-weight: normal;">Show passwords</label>
+                    </div>
+
+                    <button onclick="updatePassword()">Change Password</button>
+                </div>
+
+                <div class="panel inst-list">
+                    <h3>Instructions</h3>
+                    <p>&bull; Enter your current password first</p>
+                    <p>&bull; Use at least 8 characters</p>
+                    <p>&bull; Include at least one number</p>
+                    <p>&bull; The new password must be different from the current one</p>
+                    <p>&bull; Type the new password again to confirm it</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            © 2026 NovaCart · Your Budget, Your Deals, Your World.
+        </div>
+    </div>
+
+    <script src="../JS/customer.js"></script>
+</body>
+</html>
