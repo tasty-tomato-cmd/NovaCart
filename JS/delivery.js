@@ -79,13 +79,6 @@ function validateFailReason(reason) {
   return reason === '' ? 'Select a reason for the failed delivery.' : '';
 }
 
-
-//LOGOUT
-function logOut() {
-  alert("You have been logged out.");
-  window.location.href = "../LOGIN/HTML/Login.html";
-}
-
 //An order is "active" while it can still move to another status
 const isActive = order => NEXT_STATUS[order.status].length > 0;
 
@@ -838,7 +831,8 @@ function bindEvents() {
   });
   document.getElementById('closeDialog').addEventListener('click', () => document.getElementById('detailsDialog').close());
   document.getElementById('logoutBtn').addEventListener('click', () => {
-    window.location.replace('login.html');
+  alert("You have been logged out.");
+    window.location.href = "../LOGIN/HTML/login.html";
   });
 }
 

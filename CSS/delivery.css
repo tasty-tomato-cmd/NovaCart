@@ -1,15 +1,28 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+
+:root {
+  --primary: #5925DC;
+  --secondary: #7C4DFF;
+  --sidebar: #281858;
+  --lavender: #F0EAFF;
+  --bg: #F8F6FF;
+  --white: #FFFFFF;
+  --text: #171044;
+  --muted: #716B8C;
+  --success: #16A34A;
+  --danger: #EF4444;
+  --border: #E5DEFF;
+  --radius: 12px;
 }
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  color: #171044;
-  background: #F8F6FF;
+  color: var(--text);
+  background: var(--bg);
 }
 
 button,
@@ -20,7 +33,7 @@ textarea {
 }
 
 a {
-  color: #5925DC;
+  color: var(--primary);
 }
 
 [hidden] {
@@ -50,7 +63,7 @@ a {
 }
 
 .muted {
-  color: #716B8C;
+  color: var(--muted);
   font-size: 14px;
 }
 
@@ -61,7 +74,7 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid #7C4DFF;
+  outline: 3px solid var(--secondary);
   outline-offset: 2px;
 }
 
@@ -76,40 +89,40 @@ a {
 }
 
 .btn-primary {
-  background: #5925DC;
-  color: #FFFFFF;
+  background: var(--primary);
+  color: var(--white);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #7C4DFF;
+  background: var(--secondary);
 }
 
 .btn-success {
-  background: #FFFFFF;
-  color: #16A34A;
-  border-color: #16A34A;
+  background: var(--white);
+  color: var(--success);
+  border-color: var(--success);
 }
 
 .btn-success:hover:not(:disabled) {
-  background: #16A34A;
-  color: #FFFFFF;
+  background: var(--success);
+  color: var(--white);
 }
 
 .btn-danger {
-  background: #FFFFFF;
-  color: #EF4444;
-  border-color: #EF4444;
+  background: var(--white);
+  color: var(--danger);
+  border-color: var(--danger);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #EF4444;
-  color: #FFFFFF;
+  background: var(--danger);
+  color: var(--white);
 }
 
 .btn-outline {
-  background: #F0EAFF;
-  color: #5925DC;
-  border-color: #E5DEFF;
+  background: var(--lavender);
+  color: var(--primary);
+  border-color: var(--border);
 }
 
 .btn-small {
@@ -147,29 +160,29 @@ select,
 textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #E5DEFF;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: #FFFFFF;
-  color: #171044;
+  background: var(--white);
+  color: var(--text);
   font-size: 14px;
 }
 
 input.invalid,
 select.invalid,
 textarea.invalid {
-  border-color: #EF4444;
+  border-color: var(--danger);
 }
 
 .error {
   display: block;
   min-height: 18px;
-  color: #EF4444;
+  color: var(--danger);
   font-size: 13px;
   margin-top: 4px;
 }
 
 .form-error {
-  color: #EF4444;
+  color: var(--danger);
   font-size: 14px;
   min-height: 20px;
   margin-bottom: 8px;
@@ -187,9 +200,9 @@ textarea.invalid {
 .login-card {
   width: 100%;
   max-width: 420px;
-  background: #FFFFFF;
-  border: 1px solid #E5DEFF;
-  border-radius: 12px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 32px;
 }
 
@@ -197,7 +210,7 @@ textarea.invalid {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #5925DC;
+  color: var(--primary);
   font-size: 20px;
   font-weight: bold;
   margin-bottom: 20px;
@@ -222,7 +235,7 @@ textarea.invalid {
   transform: translateY(-50%);
   background: none;
   border: 0;
-  color: #5925DC;
+  color: var(--primary);
   font-size: 13px;
   font-weight: bold;
   cursor: pointer;
@@ -250,7 +263,7 @@ textarea.invalid {
 
 .demo-hint {
   text-align: center;
-  color: #716B8C;
+  color: var(--muted);
   font-size: 13px;
   margin-top: 12px;
 }
@@ -279,8 +292,8 @@ textarea.invalid {
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
-  background: #281858;
-  color: #FFFFFF;
+  background: var(--sidebar);
+  color: var(--white);
 }
 
 .brand {
@@ -296,7 +309,7 @@ textarea.invalid {
 }
 
 .role-badge {
-  background: #7C4DFF;
+  background: var(--secondary);
   border-radius: 20px;
   padding: 2px 12px;
   font-size: 13px;
@@ -312,14 +325,14 @@ textarea.invalid {
   padding: 12px 14px;
   margin-bottom: 6px;
   border-radius: 8px;
-  color: #FFFFFF;
+  color: var(--white);
   text-decoration: none;
   font-size: 15px;
 }
 
 .nav-link:hover,
 .nav-link.active {
-  background: #5925DC;
+  background: var(--primary);
 }
 
 .btn-logout {
@@ -328,7 +341,7 @@ textarea.invalid {
   background: none;
   border: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  color: #FFFFFF;
+  color: var(--white);
   text-align: left;
   cursor: pointer;
 }
@@ -339,8 +352,8 @@ textarea.invalid {
   align-items: center;
   gap: 16px;
   padding: 16px 24px;
-  background: #FFFFFF;
-  border-bottom: 1px solid #E5DEFF;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
 }
 
 .welcome {
@@ -352,7 +365,7 @@ textarea.invalid {
   background: none;
   border: 0;
   font-size: 24px;
-  color: #5925DC;
+  color: var(--primary);
   cursor: pointer;
 }
 
@@ -370,8 +383,8 @@ textarea.invalid {
   right: -8px;
   min-width: 18px;
   padding: 0 5px;
-  background: #EF4444;
-  color: #FFFFFF;
+  background: var(--danger);
+  color: var(--white);
   border-radius: 10px;
   font-size: 12px;
   text-align: center;
@@ -392,16 +405,16 @@ textarea.invalid {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #5925DC;
-  color: #FFFFFF;
+  background: var(--primary);
+  color: var(--white);
   font-size: 16px;
 }
 
 /* ---------- Cards and sections ---------- */
 .card {
-  background: #FFFFFF;
-  border: 1px solid #E5DEFF;
-  border-radius: 12px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 20px;
 }
@@ -437,29 +450,29 @@ textarea.invalid {
 }
 
 .stat-card {
-  background: #F0EAFF;
+  background: var(--lavender);
   border-radius: 10px;
   padding: 14px 16px;
 }
 
 .stat-label {
   font-size: 14px;
-  color: #716B8C;
+  color: var(--muted);
   font-weight: normal;
 }
 
 .stat-value {
   font-size: 26px;
   font-weight: bold;
-  color: #5925DC;
+  color: var(--primary);
 }
 
 .stat-success {
-  color: #16A34A;
+  color: var(--success);
 }
 
 .stat-danger {
-  color: #EF4444;
+  color: var(--danger);
 }
 
 /* Filters */
@@ -480,7 +493,7 @@ textarea.invalid {
 /* ---------- Tables ---------- */
 .table-wrap {
   overflow-x: auto;
-  border: 1px solid #E5DEFF;
+  border: 1px solid var(--border);
   border-radius: 10px;
 }
 
@@ -496,7 +509,7 @@ textarea.invalid {
 }
 
 .data-table th {
-  background: #F0EAFF;
+  background: var(--lavender);
   text-align: left;
   padding: 12px;
   white-space: nowrap;
@@ -504,16 +517,16 @@ textarea.invalid {
 
 .data-table td {
   padding: 12px;
-  border-top: 1px solid #E5DEFF;
+  border-top: 1px solid var(--border);
 }
 
 .data-table tr.selected td {
-  background: #F8F6FF;
+  background: var(--bg);
 }
 
 .empty-row {
   text-align: center;
-  color: #716B8C;
+  color: var(--muted);
 }
 
 .status {
@@ -525,24 +538,24 @@ textarea.invalid {
 }
 
 .status-assigned {
-  background: #F0EAFF;
-  color: #716B8C;
+  background: var(--lavender);
+  color: var(--muted);
 }
 
 .status-picked-up,
 .status-out-for-delivery {
-  background: #F0EAFF;
-  color: #5925DC;
+  background: var(--lavender);
+  color: var(--primary);
 }
 
 .status-delivered {
   background: rgba(22, 163, 74, 0.12);
-  color: #16A34A;
+  color: var(--success);
 }
 
 .status-failed {
   background: rgba(239, 68, 68, 0.12);
-  color: #EF4444;
+  color: var(--danger);
 }
 
 .table-footer {
@@ -562,17 +575,17 @@ textarea.invalid {
 .page-btn {
   min-width: 34px;
   padding: 6px 10px;
-  background: #FFFFFF;
-  border: 1px solid #E5DEFF;
+  background: var(--white);
+  border: 1px solid var(--border);
   border-radius: 6px;
-  color: #171044;
+  color: var(--text);
   cursor: pointer;
 }
 
 .page-btn.active {
-  background: #5925DC;
-  border-color: #5925DC;
-  color: #FFFFFF;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
 }
 
 .page-btn:disabled {
@@ -582,8 +595,8 @@ textarea.invalid {
 
 /* ---------- Update status panel ---------- */
 .order-tag {
-  background: #F0EAFF;
-  color: #5925DC;
+  background: var(--lavender);
+  color: var(--primary);
   border-radius: 8px;
   padding: 6px 12px;
   font-size: 14px;
@@ -599,8 +612,8 @@ textarea.invalid {
   position: relative;
   margin-left: 8px;
   padding: 0 0 14px 24px;
-  border-left: 2px solid #E5DEFF;
-  color: #716B8C;
+  border-left: 2px solid var(--border);
+  color: var(--muted);
   font-size: 14px;
 }
 
@@ -612,8 +625,8 @@ textarea.invalid {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #FFFFFF;
-  border: 2px solid #E5DEFF;
+  background: var(--white);
+  border: 2px solid var(--border);
 }
 
 .timeline-step strong,
@@ -622,23 +635,23 @@ textarea.invalid {
 }
 
 .timeline-step.done::before {
-  background: #5925DC;
-  border-color: #5925DC;
+  background: var(--primary);
+  border-color: var(--primary);
 }
 
 .timeline-step.current {
-  color: #171044;
+  color: var(--text);
 }
 
 .timeline-step.current::before {
-  background: #7C4DFF;
-  border-color: #7C4DFF;
-  box-shadow: 0 0 0 4px #F0EAFF;
+  background: var(--secondary);
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 4px var(--lavender);
 }
 
 .timeline-step.failed::before {
-  background: #EF4444;
-  border-color: #EF4444;
+  background: var(--danger);
+  border-color: var(--danger);
   box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
 }
 
@@ -651,7 +664,7 @@ textarea.invalid {
 }
 
 .details-list dt {
-  color: #716B8C;
+  color: var(--muted);
 }
 
 .button-group {
@@ -663,8 +676,8 @@ textarea.invalid {
 .fail-box {
   margin-top: 16px;
   padding: 16px;
-  background: #F8F6FF;
-  border: 1px solid #E5DEFF;
+  background: var(--bg);
+  border: 1px solid var(--border);
   border-radius: 10px;
 }
 
@@ -678,8 +691,8 @@ textarea.invalid {
 .tab {
   flex: 1;
   padding: 10px;
-  background: #F0EAFF;
-  color: #5925DC;
+  background: var(--lavender);
+  color: var(--primary);
   border: 0;
   border-radius: 8px;
   font-size: 14px;
@@ -688,8 +701,8 @@ textarea.invalid {
 }
 
 .tab.active {
-  background: #5925DC;
-  color: #FFFFFF;
+  background: var(--primary);
+  color: var(--white);
 }
 
 .help-note {
@@ -699,7 +712,7 @@ textarea.invalid {
   gap: 12px;
   margin-top: 16px;
   padding: 12px 16px;
-  background: #F0EAFF;
+  background: var(--lavender);
   border-radius: 10px;
   font-size: 14px;
 }
@@ -709,9 +722,9 @@ textarea.invalid {
   margin: auto;
   width: min(420px, 92vw);
   padding: 24px;
-  border: 1px solid #E5DEFF;
-  border-radius: 12px;
-  color: #171044;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
 }
 
 .dialog::backdrop {
@@ -730,13 +743,13 @@ textarea.invalid {
   max-width: 340px;
   padding: 12px 18px;
   border-radius: 8px;
-  color: #FFFFFF;
+  color: var(--white);
   font-size: 14px;
-  background: #16A34A;
+  background: var(--success);
 }
 
 .toast-error {
-  background: #EF4444;
+  background: var(--danger);
 }
 
 /* ---------- Responsive ---------- */

@@ -8,69 +8,73 @@
 </head>
 <body class="dashboard-page">
 
-<div class="layout">
+  <div class="layout">
 
-    <!-- sidebar -->
-  <aside class="sidebar" id="sidebar">
-  <div class="brand">
+    <!-- ============ SIDEBAR ============ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
         <span aria-hidden="true">&#128722;</span>
         <span class="brand-name">NovaCart</span>
         <span class="role-badge">Delivery Partner</span>
-  </div>
+      </div>
 
-  <nav aria-label="Delivery partner menu">
-  <ul class="nav-list">
-      <li><a href="#assignedSection" id="navDeliveries" class="nav-link active">My Deliveries</a></li>
-      <li><a href="#historyPanel" id="navHistory" class="nav-link">Delivery History</a></li>
-      <li><a href="#reportPanel" id="navReport" class="nav-link">Report Issue</a></li>
-      </ul>
-  </nav>
+      <nav aria-label="Delivery partner menu">
+        <ul class="nav-list">
+          <li><a href="#assignedSection" id="navDeliveries" class="nav-link active">My Deliveries</a></li>
+          <li><a href="#historyPanel" id="navHistory" class="nav-link">Delivery History</a></li>
+          <li><a href="#reportPanel" id="navReport" class="nav-link">Report Issue</a></li>
+        </ul>
+      </nav>
 
-    <button type="button" class="btn-logout" id="logoutBtn">Log Out</button>
+      <button type="button" class="btn-logout" id="logoutBtn">Log Out</button>
     </aside>
 
-<div class="content">
-      <!-- Top bar -->
-    <header class="topbar">
-    <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu">&#9776;</button>
+    <div class="content">
+
+      <!-- ============ TOP BAR ============ -->
+      <header class="topbar">
+        <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu">&#9776;</button>
+
         <div class="welcome">
           <h1 class="page-title">Welcome back, <span id="partnerName"></span>!</h1>
           <p class="muted">Deliver smiles, one package at a time.</p>
- </div>
+        </div>
 
-    <button type="button" class="notif-btn" id="notifBtn" aria-label="Notifications">
+        <button type="button" class="notif-btn" id="notifBtn" aria-label="Notifications">
           <span aria-hidden="true">&#128276;</span>
           <span class="badge" id="notifCount">0</span>
-    </button>
+        </button>
 
         <div class="profile">
           <span class="avatar" id="avatar"></span>
           <span id="profileName"></span>
         </div>
-  </header>
+      </header>
+
       <main class="main">
-        <!-- Section 1: Assigned Deliveries  -->
-      <section class="card" id="assignedSection" aria-labelledby="assignedTitle">
-      <div class="section-header">
-      <div>
+
+        <!-- ===== Section 1: Assigned Deliveries ===== -->
+        <section class="card" id="assignedSection" aria-labelledby="assignedTitle">
+          <div class="section-header">
+            <div>
               <h2 id="assignedTitle" class="section-title">Assigned Deliveries</h2>
               <p class="muted">View and manage your assigned orders.</p>
-          </div>
-        <div class="button-group">
+            </div>
+            <div class="button-group">
               <button type="button" class="btn btn-primary" id="addDeliveryBtn">Add Delivery</button>
               <button type="button" class="btn btn-outline" id="refreshBtn">Refresh</button>
-        </div>
-     </div>
+            </div>
+          </div>
 
-       <div class="stats">
-          <article class="stat-card">
-          <h3 class="stat-label">Today's Deliveries</h3>
-           <p class="stat-value" id="statToday">0</p>
-          </article>
-          <article class="stat-card">
+          <div class="stats">
+            <article class="stat-card">
+              <h3 class="stat-label">Today's Deliveries</h3>
+              <p class="stat-value" id="statToday">0</p>
+            </article>
+            <article class="stat-card">
               <h3 class="stat-label">Completed</h3>
               <p class="stat-value stat-success" id="statCompleted">0</p>
-          </article>
+            </article>
             <article class="stat-card">
               <h3 class="stat-label">In Progress</h3>
               <p class="stat-value" id="statProgress">0</p>
@@ -79,102 +83,103 @@
               <h3 class="stat-label">Issues Reported</h3>
               <p class="stat-value stat-danger" id="statIssues">0</p>
             </article>
-       </div>
+          </div>
 
           <!-- Search and filter -->
-  <div class="filters">
+          <div class="filters">
             <label for="searchInput" class="visually-hidden">Search deliveries</label>
             <input type="search" id="searchInput" placeholder="Search by order ID, customer or address">
 
             <label for="statusFilter" class="visually-hidden">Filter by status</label>
-      <select id="statusFilter">
-          <option value="all">All statuses</option>
-          <option value="assigned">Assigned</option>
-          <option value="picked-up">Picked Up</option>
-          <option value="out-for-delivery">Out for Delivery</option>
-          <option value="delivered">Delivered</option>
-          <option value="failed">Failed Delivery</option>
-      </select>
-   </div>
-
-       <div class="table-wrap">
-          <table class="data-table">
-        <caption class="visually-hidden">Assigned deliveries</caption>
-          <thead>
-             <tr>
-              <th scope="col">Order ID</th>
-              <th scope="col">Customer Name</th>
-              <th scope="col">Delivery Address</th>
-              <th scope="col">Instructions</th>
-              <th scope="col">Status</th>
-              <th scope="col">Action</th>
-            </tr>
-          </thead>
-          <tbody id="deliveriesBody"></tbody>
-          </table>
+            <select id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="assigned">Assigned</option>
+              <option value="picked-up">Picked Up</option>
+              <option value="out-for-delivery">Out for Delivery</option>
+              <option value="delivered">Delivered</option>
+              <option value="failed">Failed Delivery</option>
+            </select>
           </div>
 
-    <div class="table-footer">
-      <p id="tableInfo"></p>
-       <nav aria-label="Deliveries pagination">
-       <ul class="pagination" id="pagination"></ul>
-     </nav>
-     </div>
-    </section>
-
-    <div class="panel-row">
- <!-- ===== Section 2: Update Delivery Status ===== -->
-      <section class="card" id="updateSection" aria-labelledby="updateTitle">
-      <div class="section-header">
-      <div>
-          <h2 id="updateTitle" class="section-title">Update Delivery Status</h2>
-          <p class="muted">Update the current status of your delivery.</p>
-          </div>
-          <span class="order-tag" id="selectedOrder"></span>
+          <div class="table-wrap">
+            <table class="data-table">
+              <caption class="visually-hidden">Assigned deliveries</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Order ID</th>
+                  <th scope="col">Customer Name</th>
+                  <th scope="col">Delivery Address</th>
+                  <th scope="col">Instructions</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody id="deliveriesBody"></tbody>
+            </table>
           </div>
 
-        <ol class="timeline" id="timeline"></ol>
+          <div class="table-footer">
+            <p id="tableInfo"></p>
+            <nav aria-label="Deliveries pagination">
+              <ul class="pagination" id="pagination"></ul>
+            </nav>
+          </div>
+        </section>
 
-        <div id="deliveryInfo"></div>
+        <div class="panel-row">
 
-        <p class="label">Update Status:</p>
-        <div class="button-group">
-        <button type="button" id="statusPickedUp" class="btn btn-primary status-btn">Picked Up</button>
-        <button type="button" id="statusOutForDelivery" class="btn btn-primary status-btn">Out for Delivery</button>
-        <button type="button" id="statusDelivered" class="btn btn-success status-btn">Delivered</button>
-        <button type="button" id="statusFailed" class="btn btn-danger status-btn">Failed Delivery</button>
-        </div>
+          <!-- ===== Section 2: Update Delivery Status ===== -->
+          <section class="card" id="updateSection" aria-labelledby="updateTitle">
+            <div class="section-header">
+              <div>
+                <h2 id="updateTitle" class="section-title">Update Delivery Status</h2>
+                <p class="muted">Update the current status of your delivery.</p>
+              </div>
+              <span class="order-tag" id="selectedOrder"></span>
+            </div>
+
+            <ol class="timeline" id="timeline"></ol>
+
+            <div id="deliveryInfo"></div>
+
+            <p class="label">Update Status:</p>
+            <div class="button-group">
+              <button type="button" id="statusPickedUp" class="btn btn-primary status-btn">Picked Up</button>
+              <button type="button" id="statusOutForDelivery" class="btn btn-primary status-btn">Out for Delivery</button>
+              <button type="button" id="statusDelivered" class="btn btn-success status-btn">Delivered</button>
+              <button type="button" id="statusFailed" class="btn btn-danger status-btn">Failed Delivery</button>
+            </div>
 
             <!-- Shown only when "Failed Delivery" is clicked -->
-        <div class="fail-box" id="failBox" hidden>
-        <div class="form-group">
-            <label for="failReason">Reason for failed delivery</label>
-            <select id="failReason" name="failReason">
+            <div class="fail-box" id="failBox" hidden>
+              <div class="form-group">
+                <label for="failReason">Reason for failed delivery</label>
+                <select id="failReason" name="failReason">
                   <option value="">Select a reason</option>
                   <option value="Customer not available">Customer not available</option>
                   <option value="Wrong or incomplete address">Wrong or incomplete address</option>
                   <option value="Customer refused the parcel">Customer refused the parcel</option>
                   <option value="Customer unreachable by phone">Customer unreachable by phone</option>
-            </select>
-            <small class="error" id="failReasonError"></small>
-        </div>
-        <button type="button" class="btn btn-danger" id="confirmFailBtn">Confirm Failed Delivery</button>
-        </div>
-        </section>
+                </select>
+                <small class="error" id="failReasonError"></small>
+              </div>
+              <button type="button" class="btn btn-danger" id="confirmFailBtn">Confirm Failed Delivery</button>
+            </div>
+          </section>
 
-         <!--Section 3: Delivery History and Report Issue-->
-        <section class="card" id="historySection" aria-labelledby="historyTitle">
-        <div class="section-header">
-        <div>
-            <h2 id="historyTitle" class="section-title">Delivery History &amp; Report Issue</h2>
-            <p class="muted">View your past deliveries and report any issues.</p>
-         </div>
+          <!-- ===== Section 3: Delivery History and Report Issue ===== -->
+          <section class="card" id="historySection" aria-labelledby="historyTitle">
+            <div class="section-header">
+              <div>
+                <h2 id="historyTitle" class="section-title">Delivery History &amp; Report Issue</h2>
+                <p class="muted">View your past deliveries and report any issues.</p>
+              </div>
               <label for="historyFilter" class="visually-hidden">Show deliveries from</label>
               <select id="historyFilter">
-              <option value="7">Last 7 Days</option>
-              <option value="30" selected>Last 30 Days</option>
-              <option value="90">Last 90 Days</option>
-            </select>
+                <option value="7">Last 7 Days</option>
+                <option value="30" selected>Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+              </select>
             </div>
 
             <div class="tabs" role="tablist" aria-label="Delivery history and issue reporting">
@@ -183,30 +188,31 @@
             </div>
 
             <div id="historyPanel" role="tabpanel" aria-labelledby="historyTab">
-            <div class="table-wrap history-wrap">
-            <table class="data-table">
-            <caption class="visually-hidden">Completed deliveries</caption>
-            <thead>
-                  <tr>
+              <div class="table-wrap history-wrap">
+                <table class="data-table">
+                  <caption class="visually-hidden">Completed deliveries</caption>
+                  <thead>
+                    <tr>
                       <th scope="col">Order ID</th>
                       <th scope="col">Customer Name</th>
                       <th scope="col">Status</th>
                       <th scope="col">Delivered On</th>
                       <th scope="col">Action</th>
-                  </tr>
+                    </tr>
                   </thead>
-                <tbody id="historyBody"></tbody>
+                  <tbody id="historyBody"></tbody>
                 </table>
-               </div>
-               </div>
+              </div>
+            </div>
 
             <div id="reportPanel" role="tabpanel" aria-labelledby="reportTab" hidden>
-            <form id="reportForm" novalidate>
-            <h3 class="card-heading" id="issueFormTitle">Report an Issue</h3>
-              <div class="form-group">
-               <label for="issueOrder">Order ID</label>
-               <select id="issueOrder" name="issueOrder"></select>
-                <small class="error" id="issueOrderError"></small>
+              <form id="reportForm" novalidate>
+                <h3 class="card-heading" id="issueFormTitle">Report an Issue</h3>
+
+                <div class="form-group">
+                  <label for="issueOrder">Order ID</label>
+                  <select id="issueOrder" name="issueOrder"></select>
+                  <small class="error" id="issueOrderError"></small>
                 </div>
 
                 <div class="form-group">
@@ -309,11 +315,11 @@
         <button type="button" class="btn btn-outline" id="cancelDeliveryBtn">Cancel</button>
         <button type="submit" class="btn btn-primary" id="saveDeliveryBtn">Save Delivery</button>
       </div>
- </form>
-</dialog>
+    </form>
+  </dialog>
 
-<!-- Short messages for error or success -->
-<div class="toast" id="toast" role="status" hidden></div>
+  <!-- Short messages (success / error) -->
+  <div class="toast" id="toast" role="status" hidden></div>
 
   <script src="../JS/delivery.js"></script>
 </body>
