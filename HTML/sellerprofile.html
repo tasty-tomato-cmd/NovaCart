@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - NovaCart</title>
+    <link rel="stylesheet" href="../CSS/sellerstyle.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">NovaCart</div>
+            <a href="sellerdashboard.html">Dashboard</a>
+            <a href="sellerproducts.html">Products &amp; Inventory</a>
+            <a href="sellerorders.html">Orders</a>
+            <a href="sellerpromotions.html">Sales &amp; Promotion</a>
+            <a href="sellerprofile.html" class="active">My Profile</a>
+        </div>
+
+        <!-- Main content -->
+        <main class="main">
+           <h1>My Profile</h1>
+<p class="muted">Manage your personal details, store information and account security.</p>
+
+            <!-- Store information -->
+            <!-- Personal details -->
+<section class="panel">
+    <h2>Personal Details</h2>
+
+    <div class="profile-top">
+        <div class="avatar" id="profileAvatar"></div>
+        <div>
+            <h3 id="profileName"></h3>
+            <p class="muted" id="profileStore"></p>
+            <input type="file" id="photoInput" accept="image/*">
+            <button type="button" class="secondary small" id="removePhoto">Remove Photo</button>
+        </div>
+    </div>
+
+    <form id="profileForm">
+        <div class="form-grid">
+            <div>
+                <label>Full Name</label>
+                <input id="ownerName" required>
+            </div>
+            <div>
+                <label>Email</label>
+                <input id="storeEmail" type="email" required>
+            </div>
+            <div>
+                <label>Phone</label>
+                <input id="storePhone" required>
+            </div>
+            <div>
+                <label>Store Name</label>
+                <input id="storeName" required>
+            </div>
+            <div>
+                <label>Address</label>
+                <input id="storeAddress" required>
+            </div>
+            <div>
+                <label>About My Store</label>
+                <textarea id="storeDescription"></textarea>
+            </div>
+        </div>
+        <button>Save Profile</button>
+        <button type="button" class="danger" id="resetProfile">Reset Profile</button>
+    </form>
+
+    <p id="profileMessage" class="message"></p>
+</section>
+
+<!-- Change password -->
+<section class="panel">
+    <h2>Change Password</h2>
+
+    <form id="passwordForm">
+        <div class="form-grid">
+            <div>
+                <label>Current Password</label>
+                <input id="currentPassword" type="password" autocomplete="current-password" required>
+            </div>
+            <div>
+                <label>New Password</label>
+                <input id="newPassword" type="password" autocomplete="new-password" required>
+            </div>
+            <div>
+                <label>Confirm New Password</label>
+                <input id="confirmPassword" type="password" autocomplete="new-password" required>
+            </div>
+        </div>
+        <button>Update Password</button>
+    </form>
+
+    <p id="passwordMessage" class="message"></p>
+</section>
+
+            <!-- Store policies -->
+            <section class="panel">
+                <h2>Store Policies</h2>
+
+                <form id="policyForm">
+                    <div class="form-grid">
+                        <div>
+                            <label>Policy Title</label>
+                            <input id="policyTitle" required>
+                        </div>
+                        <div>
+                            <label>Details</label>
+                            <input id="policyDetails" required>
+                        </div>
+                    </div>
+                    <button id="policyButton">Add Policy</button>
+                    <button type="button" class="secondary" id="cancelPolicy" style="display:none">Cancel</button>
+                </form>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Policy</th>
+                                <th>Details</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="policyTable"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+    </div>
+
+    <script src="../JS/sellerprofile.js"></script>
+</body>
+
+</html>
