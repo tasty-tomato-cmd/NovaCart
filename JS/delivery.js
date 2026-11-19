@@ -1,4 +1,4 @@
-// Status keys and the labels shown on screen
+//Status keys and the labels shown on screen
 const STATUS = {
   'assigned': 'Assigned',
   'picked-up': 'Picked Up',
@@ -7,7 +7,7 @@ const STATUS = {
   'failed': 'Failed Delivery'
 };
 
-// Allowed status changes (an order can only move forward)
+//Allowed status changes
 const NEXT_STATUS = {
   'assigned': ['picked-up'],
   'picked-up': ['out-for-delivery'],
@@ -18,7 +18,7 @@ const NEXT_STATUS = {
 
 const DELIVERY_PARTNER = { name: 'Razeen' };
 
-// ----- Sample orders -----
+//Sample orders 
 const ago = (days, minutes = 0) =>
   new Date(Date.now() - days * 86400000 - minutes * 60000).toISOString();
 
@@ -55,8 +55,7 @@ const SAMPLE_ISSUES = [
 ];
 let nextIssueNumber = 2;
 
-// VALIDATION
-
+//validation
 function validateIssue({ orderId, type, description }) {
   const errors = {};
   const text = description.trim();
@@ -75,21 +74,17 @@ function validateIssue({ orderId, type, description }) {
   return errors;
 }
 
-// Returns an error message, or an empty string when valid
+//Returns an error message, or an empty string when valid
 function validateFailReason(reason) {
   return reason === '' ? 'Select a reason for the failed delivery.' : '';
 }
 
-
-// DELIVERY AND ISSUE OPERATIONS
-
-
-// An order is "active" while it can still move to another status
+//An order is "active" while it can still move to another status
 const isActive = order => NEXT_STATUS[order.status].length > 0;
 
 const isToday = iso => new Date(iso).toDateString() === new Date().toDateString();
 
-// Moves an order to a new status if the change is allowed
+//Moves an order to a new status if the change is allowed
 function updateStatus(orders, id, newStatus, failReason = '') {
   let order = null;
   for (const item of orders) {
@@ -151,7 +146,7 @@ function getStats(orders, issues) {
   };
 }
 
-// Search by order ID, customer or address, and filter by status
+//Search by order ID, customer or address, and filter by status
 function filterOrders(orders, search, status) {
   const term = search.trim().toLowerCase();
   const results = [];
@@ -164,7 +159,7 @@ function filterOrders(orders, search, status) {
   return results;
 }
 
-// Delivered orders from the last N days, newest first
+//Delivered orders from the last N days, newest first
 function getHistory(orders, days) {
   const cutoff = Date.now() - days * 86400000;
   const history = [];
@@ -191,12 +186,7 @@ function getHistory(orders, days) {
 }
 
 
-// PAGE DISPLAY
-
-
-
-
-// Stops data from being read as HTML
+//Stops data from being read as HTML
 const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]
 ));
@@ -210,7 +200,7 @@ const formatDate = iso => new Date(iso).toLocaleDateString('en-GB', {
   day: 'numeric', month: 'short', year: 'numeric'
 });
 
-// ----- Top bar and stats -----
+//Top bar and stats 
 function renderProfile(name) {
   document.getElementById('partnerName').textContent = name;
   document.getElementById('profileName').textContent = name;
@@ -225,7 +215,7 @@ function renderStats(stats, activeCount) {
   document.getElementById('notifCount').textContent = activeCount;
 }
 
-// ----- Deliveries table -----
+//Deliveries table 
 function renderDeliveries(list, selectedId) {
   if (list.length === 0) {
     document.getElementById('deliveriesBody').innerHTML = '<tr><td colspan="6" class="empty-row">No deliveries match your search.</td></tr>';
@@ -264,7 +254,7 @@ function renderPagination(pages, current) {
   document.getElementById('pagination').innerHTML = html;
 }
 
-// ----- Update status panel -----
+//Update status panel 
 const TIMELINE_STEPS = ['picked-up', 'out-for-delivery', 'delivered', 'failed'];
 
 function detailsHtml(order) {
@@ -316,7 +306,7 @@ function toggleFailBox(show) {
   }
 }
 
-// ----- History and report form -----
+//History and report form 
 function renderHistory(list) {
   if (list.length === 0) {
     document.getElementById('historyBody').innerHTML = '<tr><td colspan="5" class="empty-row">No deliveries in this period.</td></tr>';
@@ -356,8 +346,7 @@ function showTab(name) {
   document.getElementById('reportPanel').hidden = name !== 'report';
 }
 
-// ----- Messages, errors, dialog -----
-// Shows (or clears) the error text under a field and marks the field red
+//Messages, errors, dialog 
 function setError(fieldId, message = '') {
   document.getElementById(fieldId + 'Error').textContent = message;
   document.getElementById(fieldId).classList.toggle('invalid', message !== '');
@@ -380,7 +369,7 @@ function openDetails(order) {
 }
 
 
-// DASHBOARD STATE AND OPERATIONS
+//dashboard and status
 const PER_PAGE = 4;
 
 const state = {
@@ -553,7 +542,7 @@ function deleteDelivery(id) {
   renderAll();
 }
 
-// ----- Rendering -----
+//Rendering 
 function renderAll() {
   let activeCount = 0;
   for (const order of state.orders) {
@@ -622,7 +611,7 @@ function renderSelected() {
   toggleFailBox(false);
 }
 
-// ----- Actions -----
+//Actions 
 function showResult(result) {
   showToast(result.message, result.ok ? 'success' : 'error');
   if (result.ok) renderAll();
@@ -630,7 +619,7 @@ function showResult(result) {
 
 function changeStatus(newStatus) {
   if (newStatus === 'failed') {
-    toggleFailBox(true); // ask for a reason first
+    toggleFailBox(true); //ask for a reason first
     return;
   }
   showResult(updateStatus(state.orders, state.selectedId, newStatus));
@@ -719,7 +708,7 @@ function deleteIssue(id) {
   renderAll();
 }
 
-// ----- Events -----
+//Events 
 function bindEvents() {
   // Search and filter
   document.getElementById('searchInput').addEventListener('input', e => {
@@ -733,7 +722,7 @@ function bindEvents() {
     renderTable();
   });
 
-  // Deliveries table buttons (one listener for all rows)
+  //Deliveries table buttons
   document.getElementById('deliveriesBody').addEventListener('click', e => {
     const btn = e.target.closest('button.update-action, button.view-action, button.edit-delivery-action, button.delete-delivery-action');
     if (!btn) return;
@@ -753,7 +742,7 @@ function bindEvents() {
     }
   });
 
-  // Pagination
+  //Pagination
   document.getElementById('pagination').addEventListener('click', e => {
     const btn = e.target.closest('button.page-btn');
     if (!btn) return;
@@ -762,7 +751,7 @@ function bindEvents() {
     renderTable();
   });
 
-  // Refresh
+  //Refresh
   document.getElementById('addDeliveryBtn').addEventListener('click', () => openDeliveryForm(null));
   document.getElementById('refreshBtn').addEventListener('click', () => {
     loadData();
@@ -777,14 +766,14 @@ function bindEvents() {
     document.getElementById(fieldId).addEventListener('input', () => setError(fieldId, ''));
   }
 
-  // Status buttons
+  //Status buttons
   document.getElementById('statusPickedUp').addEventListener('click', () => changeStatus('picked-up'));
   document.getElementById('statusOutForDelivery').addEventListener('click', () => changeStatus('out-for-delivery'));
   document.getElementById('statusDelivered').addEventListener('click', () => changeStatus('delivered'));
   document.getElementById('statusFailed').addEventListener('click', () => changeStatus('failed'));
   document.getElementById('confirmFailBtn').addEventListener('click', confirmFailed);
 
-  // History
+  //History
   document.getElementById('historyFilter').addEventListener('change', e => {
     state.historyDays = Number(e.target.value);
     renderHistory(getHistory(state.orders, state.historyDays));
@@ -801,19 +790,19 @@ function bindEvents() {
     else deleteIssue(id);
   });
 
-  // Tabs and report form
+  //Tabs and report form
   document.getElementById('historyTab').addEventListener('click', () => showTab('history'));
   document.getElementById('reportTab').addEventListener('click', () => showTab('report'));
   document.getElementById('goReportBtn').addEventListener('click', () => showTab('report'));
   document.getElementById('reportForm').addEventListener('submit', submitIssue);
   document.getElementById('cancelIssueEditBtn').addEventListener('click', resetIssueForm);
 
-  // Clear a field's error as soon as the user fixes it
+  //Clear a field's error as soon as the user fixes it
   ['issueOrder', 'issueType', 'issueDescription', 'failReason'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => setError(id, ''));
   });
 
-  // Sidebar navigation
+  //Sidebar navigation
   const navItems = ['navDeliveries', 'navHistory', 'navReport'];
   function setActiveNav(activeId) {
     for (const id of navItems) {
@@ -832,7 +821,7 @@ function bindEvents() {
   });
   document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
 
-  // Notifications, dialog, logout
+  //Notifications, dialog, logout
   document.getElementById('notifBtn').addEventListener('click', () => {
     let count = 0;
     for (const order of state.orders) {
@@ -840,15 +829,16 @@ function bindEvents() {
     }
     showToast('You have ' + count + ' active deliveries.');
   });
-  
   document.getElementById('closeDialog').addEventListener('click', () => document.getElementById('detailsDialog').close());
-  
-  // Logout button redirects to the login page
   document.getElementById('logoutBtn').addEventListener('click', () => {
-    alert('You have been logged out.');
-    window.location.href = "../LOGIN/HTML/login.html";
+    window.location.replace('login.html');
   });
 }
 
-// Start the delivery dashboard after its HTML has loaded
 if (document.getElementById('deliveriesBody')) init();
+
+// Logout
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  alert('You have been logged out.');
+  window.location.href = "../LOGIN/HTML/login.html";
+});

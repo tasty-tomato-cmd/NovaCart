@@ -1,6 +1,5 @@
 // NovaCart Admin Panel
 
-
 // DATA (arrays of objects)
 const users = [
   { id: 1, name: "Lubaba", email: "lubaba@novacart.com", role: "Customer", status: "Active", joined: "2025-01-15" },
