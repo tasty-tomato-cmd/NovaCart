@@ -360,3 +360,132 @@ function logOut() {
   alert("You have been logged out.");
   window.location.href = "../LOGIN/HTML/Login.html";
 }
+// Profile CRUD using a normal array
+let profilesData = [
+    {
+        name: "Lubaba",
+        email: "lubaba@novacart.com",
+        phone: "+8801812345678",
+        addr: "House 7, Road 3, Banani, Dhaka",
+        role: "Customer",
+        joined: "2025-01-15"
+    }
+];
+
+let selectedIndex = 0;
+
+function loadProfile(index) {
+    if (profilesData.length === 0) {
+        document.getElementById("p-badge").innerText = "-";
+        document.getElementById("show-name").innerText = "None";
+        document.getElementById("show-email").innerText = "-";
+        document.getElementById("show-phone").innerText = "-";
+        document.getElementById("show-addr").innerText = "-";
+        document.getElementById("show-role").innerText = "-";
+        document.getElementById("show-joined").innerText = "-";
+        return;
+    }
+
+    selectedIndex = index;
+    let item = profilesData[index];
+
+    document.getElementById("p-badge").innerText = item.name.charAt(0).toUpperCase();
+    document.getElementById("show-name").innerText = item.name;
+    document.getElementById("show-email").innerText = item.email;
+    document.getElementById("show-phone").innerText = item.phone;
+    document.getElementById("show-addr").innerText = item.addr;
+    document.getElementById("show-role").innerText = item.role;
+    document.getElementById("show-joined").innerText = item.joined;
+
+    document.getElementById("in-name").value = item.name;
+    document.getElementById("in-email").value = item.email;
+    document.getElementById("in-phone").value = item.phone;
+    document.getElementById("in-addr").value = item.addr;
+    document.getElementById("in-role").value = item.role;
+    document.getElementById("in-joined").value = item.joined;
+}
+
+function showProfileTable() {
+    let rows = "";
+    for (let i = 0; i < profilesData.length; i++) {
+        let p = profilesData[i];
+        rows = rows +
+            "<tr>" +
+            "<td>" + p.name + "</td>" +
+            "<td>" + p.email + "</td>" +
+            "<td>" + p.phone + "</td>" +
+            "<td>" + p.addr + "</td>" +
+            "<td><span class='badge-purple'>" + p.role + "</span></td>" +
+            "<td><button class='btn-light' onclick='loadProfile(" + i + ")'>View</button></td>" +
+            "</tr>";
+    }
+    document.getElementById("all-profiles-body").innerHTML = rows;
+}
+
+function addProfile() {
+    let n = document.getElementById("in-name").value;
+    let e = document.getElementById("in-email").value;
+    let ph = document.getElementById("in-phone").value;
+    let a = document.getElementById("in-addr").value;
+    let r = document.getElementById("in-role").value;
+    let j = document.getElementById("in-joined").value;
+
+    if (n === "" || e === "" || ph === "" || a === "") {
+        alert("Please fill Name, Email, Contact No and Address!");
+        return;
+    }
+
+    profilesData.push({
+        name: n,
+        email: e,
+        phone: ph,
+        addr: a,
+        role: r,
+        joined: j
+    });
+
+    let lastIndex = profilesData.length - 1;
+    loadProfile(lastIndex);
+    showProfileTable();
+    alert("Profile created!");
+}
+
+function editProfileData() {
+    if (profilesData.length === 0) {
+        alert("No profile to update!");
+        return;
+    }
+
+    profilesData[selectedIndex] = {
+        name: document.getElementById("in-name").value,
+        email: document.getElementById("in-email").value,
+        phone: document.getElementById("in-phone").value,
+        addr: document.getElementById("in-addr").value,
+        role: document.getElementById("in-role").value,
+        joined: document.getElementById("in-joined").value
+    };
+
+    loadProfile(selectedIndex);
+    showProfileTable();
+    alert("Profile updated!");
+}
+
+function removeProfile() {
+    if (profilesData.length === 0) {
+        alert("No profile to delete!");
+        return;
+    }
+
+    profilesData.splice(selectedIndex, 1);
+
+    if (profilesData.length > 0) {
+        loadProfile(0);
+    } else {
+        loadProfile(0);
+    }
+    showProfileTable();
+    alert("Profile deleted!");
+}
+
+loadProfile(0);
+showProfileTable();
