@@ -6,41 +6,55 @@
   <meta name="description" content="NovaCart login page for all users">
   <meta name="author" content="NovaCart Group">
   <title>NovaCart – Log In</title>
+  <link rel="icon" type="image/svg+xml" href="../../ICONS/logo.svg">
   <link rel="stylesheet" href="../CSS/login.css">
 </head>
 <body>
 
   <main class="login-page">
-    <section class="login-card">
+    <div class="login-shell">
 
-      <header class="brand">
-        <h1>🛒 NovaCart</h1>
-        <p class="tagline">Your Budget. Your Deals. Your World.</p>
-      </header>
+      <!-- Brand panel (left on desktop, compact header on phones) -->
+      <aside class="brand-panel">
+        <header class="brand">
+          <img class="brand-logo" src="../../ICONS/logo.svg" alt="" width="64" height="64">
+          <h1>NovaCart</h1>
+          <p class="tagline">Your Budget. Your Deals. Your World.</p>
+        </header>
 
-      <h2>Log In</h2>
-      <p class="intro">Enter your email and password to continue.</p>
+        <ul class="highlights">
+          <li><span class="dot"></span>One account for customers, sellers, managers and delivery partners</li>
+          <li><span class="dot"></span>Great deals and simple ordering in one place</li>
+          <li><span class="dot"></span>Track orders from checkout to your door</li>
+        </ul>
+      </aside>
 
-      <form id="loginForm">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="name@novacart.com" required>
+      <!-- Login form -->
+      <section class="login-card">
+        <h2>Welcome back</h2>
+        <p class="intro">Log in with your email and password to continue.</p>
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        <form id="loginForm">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" class="with-icon icon-mail" placeholder="name@novacart.com" autocomplete="email" required>
 
-        <div class="show-password">
-          <input type="checkbox" id="showPassword" name="showPassword">
-          <label for="showPassword">Show password</label>
-        </div>
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" class="with-icon icon-lock" placeholder="Enter your password" autocomplete="current-password" required>
 
-        <p id="loginError" class="error" role="alert"></p>
+          <div class="show-password">
+            <input type="checkbox" id="showPassword" name="showPassword">
+            <label for="showPassword">Show password</label>
+          </div>
 
-        <input type="submit" class="btn" value="Log In">
-      </form>
+          <p id="loginError" class="error" role="alert"></p>
 
-      <p class="switch">Don't have an account? <a href="../../REGISTRATION/HTML/registration.html">Register</a></p>
+          <input type="submit" class="btn" value="Log In">
+        </form>
 
-    </section>
+        <p class="switch">Don't have an account? <a href="../../REGISTRATION/HTML/registration.html">Register</a></p>
+      </section>
+
+    </div>
 
     <footer class="footer">
       © 2026 NovaCart · Your Budget. Your Deals. Your World.
