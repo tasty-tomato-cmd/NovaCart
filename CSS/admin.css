@@ -7,11 +7,14 @@
 body {
   margin: 0;
   font-family: "Segoe UI", Arial, sans-serif;
-  background-color: #f3effd;
+  background-color: #f5f2fd;
   color: #1f1a3d;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
 }
 
 button {
+  cursor: pointer;
   font-family: inherit;
 }
 
@@ -22,9 +25,10 @@ button {
   left: 0;
   bottom: 0;
   width: 230px;
-  background-color: #2d1b69;
+  background: linear-gradient(180deg, #34207a 0%, #231454 100%);
   color: white;
   padding: 20px 12px;
+  box-shadow: 4px 0 20px rgba(45, 27, 105, 0.18);
 }
 
 .sidebar h2 {
@@ -33,23 +37,43 @@ button {
   margin-top: 0;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 21px;
+  letter-spacing: 0.3px;
+  margin-bottom: 14px;
+}
+
+/* Icons from the ICONS folder are black strokes: make them white inside dark/purple areas */
+.menu-item img,
+.btn img,
+.icon img {
+  filter: brightness(0) invert(1);
+}
+
 .admin-label {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 13px;
   text-align: center;
-  background-color: #4a3190;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   padding: 6px;
-  margin-bottom: 30px;
+  margin-bottom: 26px;
 }
 
 .menu-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
-  padding: 12px;
+  padding: 12px 14px;
   margin-bottom: 6px;
-  background-color: #2d1b69;
+  background-color: transparent;
   color: #d9d0f5;
   border: none;
   border-radius: 10px;
@@ -57,15 +81,29 @@ button {
   font-size: 15px;
 }
 
+.menu-item .mi {
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
 .menu-item:hover {
-  background-color: #4a3190;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.menu-item:hover .mi {
+  opacity: 1;
 }
 
 .menu-item.active {
   background-color: #6d44e0;
   color: white;
   font-weight: bold;
-  box-shadow: inset 4px 0 0 #c9b8ff;   /* light bar on the left of the open page */
+  box-shadow: inset 4px 0 0 #c9b8ff, 0 4px 12px rgba(109, 68, 224, 0.45);   /* light bar on the left of the open page */
+}
+
+.menu-item.active .mi {
+  opacity: 1;
 }
 
 .logout {
@@ -73,6 +111,13 @@ button {
   bottom: 20px;
   left: 12px;
   width: 206px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0 0 10px 10px;
+  padding-top: 14px;
+}
+
+.logout:hover {
+  background-color: rgba(224, 68, 62, 0.25);
 }
 
 /* Main area and top bar */
@@ -88,7 +133,7 @@ button {
   padding: 14px 0;
   position: sticky;
   top: 0;
-  background-color: #f3effd;
+  background-color: #f5f2fd;
   z-index: 5;
 }
 
@@ -101,27 +146,52 @@ button {
   color: #6b6685;
 }
 
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .top-right button {
-  background-color: #f3effd;
-  border: none;
-  font-size: 16px;
-  font-weight: bold;
+  background-color: white;
+  border: 1px solid #e2dbf5;
+  font-size: 15px;
+  font-weight: 600;
   padding: 8px 12px;
+  color: #1f1a3d;
+  transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 .top-right button:hover {
   background-color: #ede7fb;
+  box-shadow: 0 2px 8px #e4def5;
+}
+
+.top-right button img {
+  vertical-align: middle;
+  opacity: 0.7;
 }
 
 .top-right .profile-button {
-  background-color: white;
-  border: 1px solid #e2dbf5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
   border-radius: 24px;
   padding: 5px 14px 5px 6px;
 }
 
 .top-right .bell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   border-radius: 24px;
+  padding: 8px 14px;
+}
+
+.top-right .profile-menu button {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 #bellCount {
@@ -130,6 +200,7 @@ button {
   border-radius: 10px;
   padding: 1px 7px;
   font-size: 12px;
+  line-height: 1.5;
 }
 
 .profile-menu {
@@ -139,8 +210,9 @@ button {
   width: 180px;
   background-color: white;
   border: 1px solid #e2dbf5;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px #cfc5ee;
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(45, 27, 105, 0.18);
+  overflow: hidden;
   z-index: 10;
 }
 
@@ -181,6 +253,7 @@ button {
   box-shadow: 0 4px 12px #e4def5;
   padding: 18px 22px;
   margin-bottom: 18px;
+  border-left: 5px solid #6d44e0;
 }
 
 .page-header h1 {
@@ -194,13 +267,15 @@ button {
 }
 
 .icon {
-  font-size: 32px;
-  background-color: #ede7fb;
-  border-radius: 40px;
-  width: 64px;
-  height: 64px;
-  line-height: 64px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #8b5cf6, #5925dc);
+  box-shadow: 0 6px 14px rgba(89, 37, 220, 0.3);
+  border-radius: 16px;
+  width: 56px;
+  height: 56px;
   margin-right: 16px;
 }
 
@@ -216,11 +291,11 @@ button {
   box-shadow: 0 4px 12px #e4def5;
   padding: 20px;
   margin-bottom: 18px;
-  transition: box-shadow 0.3s;
+  transition: box-shadow 0.3s, transform 0.3s;
 }
 
 .card:hover {
-  box-shadow: 0 6px 16px #d9cff3;
+  box-shadow: 0 8px 20px #d9cff3;
 }
 
 .card h3 {
@@ -252,20 +327,34 @@ button {
   border: 1px solid #e2dbf5;
   border-radius: 14px;
   box-shadow: 0 4px 12px #e4def5;
-  padding: 18px;
+  padding: 18px 20px;
   border-top: 4px solid #6d44e0;   /* small accent on top of each number card */
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px #d9cff3;
 }
 
 .stat-card span {
   display: block;
   color: #6b6685;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   margin-bottom: 6px;
 }
 
 .stat-card strong {
-  font-size: 28px;
+  font-size: 30px;
   color: #5b2fd1;
 }
+
+.stat-card:nth-child(2) { border-top-color: #8b5cf6; }
+.stat-card:nth-child(3) { border-top-color: #1a9e55; }
+.stat-card:nth-child(4) { border-top-color: #e0443e; }
 
 .two-columns {
   display: flex;
@@ -280,6 +369,9 @@ button {
 
 /* Buttons */
 .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background-color: #5b2fd1;
   color: white;
   border: none;
@@ -287,6 +379,11 @@ button {
   padding: 10px 18px;
   font-weight: bold;
   font-size: 14px;
+  box-shadow: 0 3px 8px rgba(91, 47, 209, 0.25);
+}
+
+input.btn {
+  display: inline-block;
 }
 
 .btn:hover {
@@ -303,6 +400,11 @@ button {
 .btn.light {
   background-color: #ede7fb;
   color: #5b2fd1;
+  box-shadow: none;
+}
+
+.btn.light:hover {
+  background-color: #d9cdf7;
 }
 
 .small {
@@ -335,7 +437,7 @@ button {
 }
 
 .tab {
-  background-color: #f3effd;
+  background-color: #efeafc;
   color: #6b6685;
   border: none;
   border-radius: 10px;
@@ -358,25 +460,49 @@ input,
 select,
 textarea {
   padding: 9px 12px;
-  border: 1px solid #e2dbf5;
+  border: 1px solid #d9cfef;
   border-radius: 10px;
   font-size: 14px;
   font-family: inherit;
+  background-color: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input:focus,
 select:focus,
-textarea:focus,
-button:focus {
+textarea:focus {
+  outline: none;
+  border-color: #5b2fd1;
+  box-shadow: 0 0 0 3px rgba(91, 47, 209, 0.18);
+}
+
+button:focus-visible {
   outline: 2px solid #5b2fd1;
+  outline-offset: 2px;
 }
 
 textarea {
   resize: none;
 }
 
+.search-box {
+  position: relative;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.search-box img {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 #userSearch {
   width: 280px;
+  padding-left: 36px;
 }
 
 /* Tables */
@@ -394,8 +520,13 @@ table {
 
 th {
   background-color: #ede7fb;
+  color: #4a3190;
   text-align: left;
   padding: 12px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 td {
@@ -403,8 +534,12 @@ td {
   border-top: 1px solid #e2dbf5;
 }
 
+tbody tr:nth-child(even) td {
+  background-color: #fcfbff;
+}
+
 tr:hover td {
-  background-color: #faf8ff;
+  background-color: #f3eefe;
 }
 
 /* Status badges */
@@ -412,7 +547,8 @@ tr:hover td {
   display: inline-block;
   padding: 4px 12px;
   border-radius: 20px;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .status-Active,
@@ -500,7 +636,8 @@ h3 {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(31, 26, 61, 0.55);
+  backdrop-filter: blur(2px);
   z-index: 20;
   display: none;
   overflow: auto;
@@ -515,8 +652,9 @@ h3 {
   max-width: 480px;
   margin: 50px auto;
   background-color: white;
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 24px;
+  box-shadow: 0 20px 50px rgba(31, 26, 61, 0.35);
 }
 
 .close {
@@ -527,10 +665,20 @@ h3 {
   border: none;
   font-size: 26px;
   color: #6b6685;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  line-height: 1;
+  padding: 0;
+}
+
+.close:hover {
+  background-color: #ede7fb;
+  color: #5b2fd1;
 }
 
 .dialog fieldset {
-  border: 1px solid #5b2fd1;
+  border: 1px solid #d9cdf7;
   border-radius: 12px;
   margin-bottom: 16px;
 }
@@ -538,6 +686,7 @@ h3 {
 .dialog legend {
   font-weight: bold;
   color: #5b2fd1;
+  padding: 0 8px;
 }
 
 .dialog table,
@@ -584,8 +733,9 @@ form .btn {
   text-align: center;
   color: #6b6685;
   font-size: 13px;
-  padding: 10px;
+  padding: 14px 10px;
   margin-top: 20px;
+  border-top: 1px solid #e2dbf5;
 }
 
 /* Profile page */
@@ -605,7 +755,7 @@ form .btn {
   height: 110px;
   line-height: 102px;
   border-radius: 50%;
-  background-color: #5b2fd1;
+  background: linear-gradient(135deg, #8b5cf6, #5925dc);
   color: white;
   font-size: 44px;
   font-weight: bold;
@@ -659,4 +809,3 @@ form .btn {
 .two-columns li {
   margin-bottom: 8px;
 }
-
