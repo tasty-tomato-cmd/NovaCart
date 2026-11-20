@@ -1,3 +1,4 @@
+/* NovaCart Manager Portal */
 
 * {
   box-sizing: border-box;
@@ -176,8 +177,17 @@ button {
   border-color: #7c4dff;
 }
 
+.topbar-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #5925dc;
+  margin-right: 10px;
+}
+
 .avatar-badge {
-  display: inline-block;
+  display: none;
   width: 32px;
   height: 32px;
   line-height: 32px;
@@ -190,7 +200,7 @@ button {
   margin-right: 10px;
 }
 
-.profile-trigger img {
+.chevron-icon {
   margin-left: 10px;
 }
 
@@ -332,6 +342,51 @@ button {
   flex: 1;
   min-width: 310px;
   margin-bottom: 0;
+}
+
+/* Profile Photo Section (90px x 90px) */
+.profile-photo-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.profile-photo {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #5925dc;
+  display: block;
+}
+
+.profile-picture {
+  width: 90px;
+  height: 90px;
+  line-height: 90px;
+  border-radius: 50%;
+  background-color: #5925dc;
+  color: #ffffff;
+  font-size: 34px;
+  font-weight: bold;
+  text-align: center;
+  display: none;
+}
+
+.photo-actions {
+  flex: 1;
+}
+
+.photo-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.hidden-input {
+  display: none;
 }
 
 /* Buttons */

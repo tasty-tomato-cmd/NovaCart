@@ -63,9 +63,10 @@
 
       <div class="top-right">
         <button type="button" class="profile-trigger" id="profileButton">
+          <img src="../PICTURES/manager.jpg" alt="" width="32" height="32" class="topbar-avatar-img" id="topbarAvatarImg">
           <span class="avatar-badge" id="avatarInitials">AR</span>
           <span id="topbarManagerName">MD. ABDUR RAHMAN</span>
-          <img src="../icons/chevron-down.svg" alt="" width="12" height="12">
+          <img src="../icons/chevron-down.svg" alt="" width="12" height="12" class="chevron-icon">
         </button>
 
         <div class="profile-menu" id="profileMenu">
@@ -325,6 +326,20 @@
       <div class="two-columns">
         <div class="card">
           <h3>Personal Credentials</h3>
+
+          <!-- Profile Photo Section -->
+          <div class="profile-photo-row">
+            <img src="../PICTURES/manager.jpg" alt="Manager Photo" width="90" height="90" class="profile-photo" id="profilePhoto">
+            <div class="profile-picture" id="profileInitial">AR</div>
+
+            <div class="photo-actions">
+              <input type="file" id="photoInput" accept="image/*" class="hidden-input">
+              <button type="button" class="btn small btn-gap" id="changePhotoBtn">Change Photo</button>
+              <button type="button" class="btn danger small" id="removePhotoBtn">Remove Photo</button>
+              
+            </div>
+          </div>
+
           <form id="profileForm" class="plain-form" novalidate>
             <table>
               <tr>
