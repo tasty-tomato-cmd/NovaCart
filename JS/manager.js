@@ -1,12 +1,11 @@
-// NovaCart Manager Portal
-
 // DATA (objects and arrays of objects)
 const profile = {
   name: "MD. ABDUR RAHMAN",
-  email: "fahad@novacart.com",
+  email: "manager@novacart.com",
   phone: "+880 1521 799704",
   department: "Management & Operations",
-  location: "Mirpur, Dhaka, Bangladesh"
+  location: "Mirpur, Dhaka, Bangladesh",
+  photo: "../PICTURES/manager.jpg"
 };
 
 let managerPassword = "manager123";
@@ -139,7 +138,6 @@ const complaints = [
   }
 ];
 
-// Which item is being edited? "" means "adding a new item".
 let editingCampaignId = "";
 let editingComplaintId = "";
 let currentCampaignFilter = "All";
@@ -230,6 +228,52 @@ function calculateDays(startDate, endDate) {
   }
   const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
   return diffDays + (diffDays > 1 ? " Days" : " Day");
+}
+
+
+function getInitials(fullName) {
+  const clean = fullName.replace(".", "").trim();
+  const parts = clean.split(" ");
+  const validParts = [];
+  for (const part of parts) {
+    if (part !== "" && part.toUpperCase() !== "MD") {
+      validParts.push(part);
+    }
+  }
+  if (validParts.length >= 2) {
+    return (validParts[0].charAt(0) + validParts[1].charAt(0)).toUpperCase();
+  }
+  if (validParts.length === 1) {
+    return validParts[0].charAt(0).toUpperCase();
+  }
+  return "M";
+}
+
+// Sync photo and initials across both Profile section and Top Bar header
+function syncManagerHeaderAndPhoto() {
+  const initials = getInitials(profile.name);
+  setText("profileInitial", initials);
+  setText("avatarInitials", initials);
+  setText("sidebarManagerName", profile.name);
+  setText("topbarManagerName", profile.name);
+  setText("welcomeManagerName", profile.name);
+
+  const profileImg = document.getElementById("profilePhoto");
+  const topbarImg = document.getElementById("topbarAvatarImg");
+
+  if (profile.photo !== "") {
+    profileImg.src = profile.photo;
+    topbarImg.src = profile.photo;
+    show("profilePhoto");
+    hide("profileInitial");
+    topbarImg.style.display = "inline-block";
+    hide("avatarInitials");
+  } else {
+    hide("profilePhoto");
+    show("profileInitial");
+    hide("topbarAvatarImg");
+    document.getElementById("avatarInitials").style.display = "inline-block";
+  }
 }
 
 // SIDEBAR AND TOP BAR
@@ -341,7 +385,7 @@ function showDashboard() {
   document.getElementById("dashOrdersTable").innerHTML = orderRows;
 }
 
-// 2. CAMPAIGNS (CRUD)
+// 2. CAMPAIGNS 
 function showCampaigns() {
   const search = getValue("searchCampaign").toLowerCase().trim();
   let rows = "";
@@ -747,12 +791,34 @@ function downloadCSV() {
   showMessage("Performance Report CSV downloaded successfully.");
 }
 
-// 5. MY PROFILE & CHANGE PASSWORD
+// 5. MY PROFILE, PHOTO & CHANGE PASSWORD
 function showProfile() {
+  syncManagerHeaderAndPhoto();
   setValue("profileName", profile.name);
   setValue("profileEmail", profile.email);
   setValue("profilePhone", profile.phone);
   setValue("profileDept", profile.department);
+}
+
+function changePhoto(event) {
+  const file = event.target.files[0];
+  if (!file) {
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function () {
+    profile.photo = reader.result;
+    syncManagerHeaderAndPhoto();
+    showMessage("Profile photo updated.");
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  profile.photo = "";
+  setValue("photoInput", "");
+  syncManagerHeaderAndPhoto();
+  showMessage("Profile photo removed.");
 }
 
 function saveProfile() {
@@ -782,9 +848,7 @@ function saveProfile() {
   profile.phone = phone;
   profile.department = dept;
 
-  setText("sidebarManagerName", name);
-  setText("topbarManagerName", name);
-  setText("welcomeManagerName", name);
+  syncManagerHeaderAndPhoto();
   showMessage("Profile updated successfully.");
 }
 
@@ -854,6 +918,23 @@ onClick("myProfileBtn", function () {
 });
 onClick("changePasswordBtn", goToChangePassword);
 document.getElementById("showPasswords").addEventListener("change", togglePasswords);
+
+// Profile Photo Change, Remove & Fallback
+onClick("changePhotoBtn", function () {
+  document.getElementById("photoInput").click();
+});
+document.getElementById("photoInput").addEventListener("change", changePhoto);
+onClick("removePhotoBtn", removePhoto);
+
+document.getElementById("profilePhoto").addEventListener("error", function () {
+  hide("profilePhoto");
+  show("profileInitial");
+});
+
+document.getElementById("topbarAvatarImg").addEventListener("error", function () {
+  hide("topbarAvatarImg");
+  document.getElementById("avatarInitials").style.display = "inline-block";
+});
 
 // Dashboard quick buttons
 onClick("dashManageCampaignsBtn", function () {
@@ -927,11 +1008,8 @@ document.getElementById("ordersTable").addEventListener("change", function (even
     updateOrderStatus(select.name, select.value);
   }
 });
-
 // START THE PAGE
-setText("sidebarManagerName", profile.name);
-setText("topbarManagerName", profile.name);
-setText("welcomeManagerName", profile.name);
+syncManagerHeaderAndPhoto();
 showDashboard();
 showCampaigns();
 showMonitoring();
