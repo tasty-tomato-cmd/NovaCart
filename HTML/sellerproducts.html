@@ -11,33 +11,73 @@
 <body>
     <div class="container">
 
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="logo">NovaCart</div>
-            <a href="sellerdashboard.html">Dashboard</a>
-            <a href="sellerproducts.html" class="active">Products &amp; Inventory</a>
-            <a href="sellerorders.html">Orders</a>
-            <a href="sellerpromotions.html">Sales &amp; Promotion</a>
-            <a href="sellerprofile.html">My Profile</a>
+         <!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <div class="brand-title">
+            <img src="../ICONS/logo.svg" alt="" width="34" height="34">
+            NovaCart
         </div>
+        <div class="brand-subtitle">Seller Panel</div>
+    </div>
 
+    <div class="sidebar-menu">
+        <a href="sellerdashboard.html" class="menu-item"><img src="../ICONS/dashboard.svg" alt="" width="18" height="18"><span>Dashboard</span></a>
+        <a href="sellerproducts.html" class="menu-item active"><span class="menu-emoji">📦</span><span>Products &amp; Inventory</span></a>
+        <a href="sellerorders.html" class="menu-item"><span class="menu-emoji">🛒</span><span>Orders</span></a>
+        <a href="sellerpromotions.html" class="menu-item"><span class="menu-emoji">🏷️</span><span>Sales &amp; Promotion</span></a>
+        <a href="sellerprofile.html" class="menu-item"><span class="menu-emoji">👤</span><span>My Profile</span></a>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="seller-meta">
+            <strong id="sidebarName">Mahir</strong>
+            <span>Seller Account</span>
+        </div>
+        <button type="button" class="logout-btn" id="logoutBtn" title="Log out">
+            <img src="../ICONS/logout.svg" alt="Logout" width="16" height="16">
+        </button>
+    </div>
+</div>
         <!-- Main content -->
         <main class="main">
+            <!-- Top bar -->
+<div class="topbar">
+    <div class="welcome-msg">Welcome back, <span id="welcomeName">Mahir</span>!</div>
+
+    <div class="top-right">
+        <div class="notif-wrap">
+            <button type="button" class="icon-btn" id="notifBtn" title="Notifications">
+                <img src="../ICONS/notification_bell.svg" alt="Notifications" width="18" height="18">
+                <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+            </button>
+            <div class="notif-panel" id="notifPanel">
+                <h3>Notifications</h3>
+                <div id="notifList"></div>
+            </div>
+        </div>
+
+        <a href="sellerprofile.html" class="icon-btn" title="Settings">
+            <img src="../ICONS/settings_icon.svg" alt="Settings" width="18" height="18">
+        </a>
+        <a href="sellerprofile.html" class="avatar small" id="headerAvatar" title="My Profile"></a>
+    </div>
+</div>
             <h1>Products &amp; Inventory</h1>
             <p class="muted">Add, update and manage your product listings.</p>
 
             <!-- Summary cards -->
             <section class="cards">
                 <div class="card">
-                    <h2>Total Products</h2>
+                    <h2><span class="card-icon">📦</span> Total Products</h2>
                     <div class="number" id="totalProducts">3</div>
                 </div>
                 <div class="card">
-                    <h2>In Stock</h2>
+                    <h2><span class="card-icon">✅</span> In Stock</h2>
                     <div class="number" id="inStock">3</div>
                 </div>
                 <div class="card">
-                    <h2>Low Stock</h2>
+                    <h2><span class="card-icon">⚠️</span> Low Stock</h2>
                     <div class="number" id="lowStock">0</div>
                 </div>
             </section>
@@ -84,8 +124,11 @@
             <!-- Product list -->
             <section class="panel">
                 <div class="panel-head">
-                    <h2>My Product Listings</h2>
-                    <input type="text" id="searchInput" class="search" placeholder="Search products...">
+                    <h2>📋 My Product Listings</h2>
+                    <div class="search-box">
+                    <img src="../ICONS/search.svg" alt="" width="16" height="16">
+                    <input type="text" id="searchInput" placeholder="Search products...">
+                    </div>
                 </div>
 
                 <div class="table-wrap">
@@ -111,7 +154,7 @@
         </main>
 
     </div>
-
+    <script src="../JS/sellertopbar.js"></script>
     <script src="../JS/sellerproducts.js"></script>
 </body>
 

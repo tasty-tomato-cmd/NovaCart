@@ -22,7 +22,7 @@ function displayPromotions() {
             "<td>" + promotions[i].discount + "%</td>" +
             "<td>" + promotions[i].start + "</td>" +
             "<td>" + promotions[i].end + "</td>" +
-            "<td>" + promotions[i].status + "</td>" +
+            '<td><span class="status status-pending">' + promotions[i].status + "</span></td>" +
             '<td><button class="small" onclick="editPromotion(' + i + ')">Edit</button>' +
             '<button class="small danger" onclick="deletePromotion(' + i + ')">Delete</button></td>' +
             "</tr>";

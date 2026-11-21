@@ -1,15 +1,38 @@
-const sellerName = "Mahir";
-const tasks = [];
+// ----- Save and load tasks (plain text, one line per task: name|date) -----
+// Remove the character we use as a separator
+function cleanTaskText(text) {
+    return text.split("|").join("").split("\n").join("");
+}
+
+function saveTasks() {
+    const lines = [];
+
+    for (let i = 0; i < tasks.length; i++) {
+        lines.push(tasks[i].name + "|" + tasks[i].date);
+    }
+
+    localStorage.setItem("sellerTasks", lines.join("\n"));
+}
+
+function loadTasks() {
+    const saved = localStorage.getItem("sellerTasks");
+    const list = [];
+
+    if (saved !== null && saved !== "") {
+        const lines = saved.split("\n");
+        for (let i = 0; i < lines.length; i++) {
+            const parts = lines[i].split("|");
+            list.push({ name: parts[0], date: parts[1] });
+        }
+    }
+
+    return list;
+}
+
+// ----- Data -----
+const tasks = loadTasks();
 let editIndex = -1;
-
-// Sample numbers for the cards and notifications
-const totalOrders = 3;
-const pendingOrders = 1;
 const totalPromotions = 0;
-const pendingPromotions = 0;
-
-// Seen notifications (used to hide the red badge after opening the bell)
-let seenCount = -1;
 
 // ----- Get HTML elements -----
 const taskForm = document.getElementById("taskForm");
@@ -19,16 +42,10 @@ const taskButton = document.getElementById("taskButton");
 const cancelTask = document.getElementById("cancelTask");
 const taskTable = document.getElementById("taskTable");
 
-const notifBtn = document.getElementById("notifBtn");
-const notifPanel = document.getElementById("notifPanel");
-const notifList = document.getElementById("notifList");
-const notifBadge = document.getElementById("notifBadge");
-
-// ----- Welcome message, summary cards and avatar -----
-document.getElementById("welcomeName").innerHTML = sellerName;
-document.getElementById("totalOrders").innerHTML = totalOrders;
+// ----- Summary cards -----
+// Total orders comes from the orders saved by the Orders page (see sellertopbar.js)
+document.getElementById("totalOrders").innerHTML = getOrderCounts().total;
 document.getElementById("totalPromotions").innerHTML = totalPromotions;
-document.getElementById("headerAvatar").innerHTML = sellerName.charAt(0).toUpperCase();
 
 // ----- Tasks -----
 function displayTasks() {
@@ -53,8 +70,13 @@ function displayTasks() {
     if (tasks.length == 0) {
         taskTable.innerHTML = '<tr><td colspan="3">No tasks yet.</td></tr>';
     }
+}
 
-    showNotifications();
+// Save the tasks, redraw the table and update the bell
+function tasksChanged() {
+    saveTasks();
+    displayTasks();
+    refreshNotifications();
 }
 
 // Add or update a task
@@ -62,7 +84,7 @@ taskForm.addEventListener("submit", function(event) {
     event.preventDefault();
 
     const task = {
-        name: taskName.value,
+        name: cleanTaskText(taskName.value),
         date: taskDate.value
     };
 
@@ -76,7 +98,7 @@ taskForm.addEventListener("submit", function(event) {
     }
 
     taskForm.reset();
-    displayTasks();
+    tasksChanged();
 });
 
 // Put task into the form for editing
@@ -95,7 +117,7 @@ function deleteTask(index) {
 
     if (answer == true) {
         tasks.splice(index, 1);
-        displayTasks();
+        tasksChanged();
     }
 }
 
@@ -106,90 +128,6 @@ cancelTask.addEventListener("click", function() {
     taskButton.innerHTML = "Add Task";
     cancelTask.style.display = "none";
 });
-
-// ----- Notifications -----
-// Today's date as YYYY-MM-DD
-function getToday() {
-    const d = new Date();
-    let month = d.getMonth() + 1;
-    let day = d.getDate();
-
-    if (month < 10) {
-        month = "0" + month;
-    }
-    if (day < 10) {
-        day = "0" + day;
-    }
-
-    return d.getFullYear() + "-" + month + "-" + day;
-}
-
-function showNotifications() {
-    const messages = [];
-
-    if (pendingOrders > 0) {
-        messages.push(pendingOrders + " pending order(s) waiting for you.");
-    }
-
-    if (pendingPromotions > 0) {
-        messages.push(pendingPromotions + " promotion request(s) awaiting approval.");
-    }
-
-    // Count tasks that are due today or overdue
-    const today = getToday();
-    let dueTasks = 0;
-    for (let i = 0; i < tasks.length; i++) {
-        if (tasks[i].date != "" && tasks[i].date <= today) {
-            dueTasks++;
-        }
-    }
-    if (dueTasks > 0) {
-        messages.push(dueTasks + " task(s) due today or overdue.");
-    }
-
-    // Show messages in the panel
-    notifList.innerHTML = "";
-    for (let i = 0; i < messages.length; i++) {
-        notifList.innerHTML += '<div class="notif-item">' + messages[i] + "</div>";
-    }
-    if (messages.length == 0) {
-        notifList.innerHTML = '<div class="notif-item">You are all caught up!</div>';
-    }
-
-    // Show the red badge only for notifications not seen yet
-    if (messages.length > 0 && messages.length != seenCount) {
-        notifBadge.innerHTML = messages.length;
-        notifBadge.style.display = "flex";
-    } else {
-        notifBadge.style.display = "none";
-    }
-
-    notifBadge.setAttribute("data-count", messages.length);
-}
-
-// Open / close the notification panel
-notifBtn.addEventListener("click", function(event) {
-    event.stopPropagation();
-    notifPanel.classList.toggle("open");
-
-    seenCount = Number(notifBadge.getAttribute("data-count"));
-    notifBadge.style.display = "none";
-});
-
-// Close the panel when clicking anywhere else
-document.addEventListener("click", function(event) {
-    if (!notifPanel.contains(event.target)) {
-        notifPanel.classList.remove("open");
-    }
-});
-
-// ----- Logout -----
-function logOut() {
-    alert("You have been logged out.");
-    window.location.href = "../LOGIN/HTML/login.html";
-}
-
-document.getElementById("logoutBtn").addEventListener("click", logOut);
 
 // ----- Show everything when the page opens -----
 displayTasks();

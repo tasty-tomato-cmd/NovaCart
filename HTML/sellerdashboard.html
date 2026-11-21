@@ -12,59 +12,84 @@
     <div class="container">
 
         <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="logo">NovaCart</div>
-            <a href="sellerdashboard.html" class="active">Dashboard</a>
-            <a href="sellerproducts.html">Products &amp; Inventory</a>
-            <a href="sellerorders.html">Orders</a>
-            <a href="sellerpromotions.html">Sales &amp; Promotion</a>
-            <a href="sellerprofile.html">My Profile</a>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <div class="brand-title">
+            <img src="../ICONS/logo.svg" alt="" width="34" height="34">
+            NovaCart
         </div>
+        <div class="brand-subtitle">Seller Panel</div>
+    </div>
+
+    <div class="sidebar-menu">
+        <a href="sellerdashboard.html" class="menu-item active"><img src="../ICONS/dashboard.svg" alt="" width="18" height="18"><span>Dashboard</span></a>
+        <a href="sellerproducts.html" class="menu-item"><span class="menu-emoji">📦</span><span>Products &amp; Inventory</span></a>
+        <a href="sellerorders.html" class="menu-item"><span class="menu-emoji">🛒</span><span>Orders</span></a>
+        <a href="sellerpromotions.html" class="menu-item"><span class="menu-emoji">🏷️</span><span>Sales &amp; Promotion</span></a>
+        <a href="sellerprofile.html" class="menu-item"><span class="menu-emoji">👤</span><span>My Profile</span></a>
+    </div>
+
+    <div class="sidebar-footer">
+        <div class="seller-meta">
+            <strong id="sidebarName">Mahir</strong>
+            <span>Seller Account</span>
+        </div>
+        <button type="button" class="logout-btn" id="logoutBtn" title="Log out">
+            <img src="../ICONS/logout.svg" alt="Logout" width="16" height="16">
+        </button>
+    </div>
+</div>
 
         <!-- Main content -->
         <main class="main">
+            <!-- Top bar -->
+<div class="topbar">
+    <div class="welcome-msg">Welcome back, <span id="welcomeName">Mahir</span>!</div>
 
-            <!-- Header -->
-            <div class="page-header">
-                <div>
-                    <h1>Welcome back, <span id="welcomeName">Mahir</span>!</h1>
-                    <p class="muted">Here is your store overview.</p>
-                </div>
-
-                <div class="header-right">
-                    <button type="button" class="notif-btn" id="notifBtn">🔔<span class="badge" id="notifBadge" style="display:none">0</span></button>
-                    <div class="notif-panel" id="notifPanel">
-                        <h3>Notifications</h3>
-                        <div id="notifList"></div>
-                    </div>
-                    <a href="sellerprofile.html" class="avatar small" id="headerAvatar" title="My Profile"></a>
-                    <button type="button" class="secondary" id="logoutBtn">Logout</button>
-                </div>
+    <div class="top-right">
+        <div class="notif-wrap">
+            <button type="button" class="icon-btn" id="notifBtn" title="Notifications">
+                <img src="../ICONS/notification_bell.svg" alt="Notifications" width="18" height="18">
+                <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+            </button>
+            <div class="notif-panel" id="notifPanel">
+                <h3>Notifications</h3>
+                <div id="notifList"></div>
             </div>
+        </div>
+
+        <a href="sellerprofile.html" class="icon-btn" title="Settings">
+            <img src="../ICONS/settings_icon.svg" alt="Settings" width="18" height="18">
+        </a>
+        <a href="sellerprofile.html" class="avatar small" id="headerAvatar" title="My Profile"></a>
+    </div>
+</div>
+            <h1>Seller Dashboard</h1>
+<p class="muted">Here is your store overview.</p>
 
             <!-- Summary cards -->
             <section class="cards">
                 <div class="card">
-                    <h2>Total Orders</h2>
+                    <h2><span class="card-icon">🛒</span> Total Orders</h2>
                     <div class="number" id="totalOrders">0</div>
                 </div>
                 <div class="card">
-                    <h2>Products Listed</h2>
+                    <h2><span class="card-icon">📦</span> Products Listed</h2>
                     <div class="number" id="totalProducts">3</div>
                 </div>
                 <div class="card">
-                    <h2>Promotion Requests</h2>
+                    <h2><span class="card-icon">🏷️</span> Promotion Requests</h2>
                     <div class="number" id="totalPromotions">0</div>
                 </div>
                 <div class="card">
-                    <h2>Store Rating</h2>
+                    <h2><span class="card-icon">⭐</span> Store Rating</h2>
                     <div class="number">4.8 / 5</div>
                 </div>
             </section>
 
             <!-- Tasks -->
             <section class="panel">
-                <h2>My Tasks</h2>
+                <h2>📝 My Tasks</h2>
 
                 <form id="taskForm">
                     <div class="form-grid">
@@ -97,7 +122,7 @@
         </main>
 
     </div>
-
+    <script src="../JS/sellertopbar.js"></script>
     <script src="../JS/sellerdashboard.js"></script>
 </body>
 
