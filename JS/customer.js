@@ -1,67 +1,51 @@
-function clearActiveLinks() {
-    document.getElementById("link-dash").className = "";
-    document.getElementById("link-shop").className = "";
-    document.getElementById("link-cart").className = "";
-    document.getElementById("link-orders").className = "";
-    document.getElementById("link-offers").className = "";
+// Page navigation
+const PAGES = ["dash-page", "shop-page", "cart-page", "orders-page", "offers-page", "notif-page", "profile-page", "pass-page"];
+const LINKS = ["link-dash", "link-shop", "link-cart", "link-orders", "link-offers"];
+
+function showPage(pageId, linkId) {
+    for (let i = 0; i < PAGES.length; i++) {
+        document.getElementById(PAGES[i]).style.display = "none";
+    }
+    for (let i = 0; i < LINKS.length; i++) {
+        document.getElementById(LINKS[i]).classList.remove("active");
+    }
+    document.getElementById("user-menu").style.display = "none";
+    document.getElementById(pageId).style.display = "block";
+    if (linkId) {
+        document.getElementById(linkId).classList.add("active");
+    }
+    showMessage("");
 }
 
-function hideAllPages() {
-    document.getElementById("dash-page").style.display = "none";
-    document.getElementById("shop-page").style.display = "none";
-    document.getElementById("cart-page").style.display = "none";
-    document.getElementById("orders-page").style.display = "none";
-    document.getElementById("offers-page").style.display = "none";
-    document.getElementById("notif-page").style.display = "none";
-    document.getElementById("profile-page").style.display = "none";
-    document.getElementById("pass-page").style.display = "none";
-}
+function showDash() { showPage("dash-page", "link-dash"); }
+function showShop() { showPage("shop-page", "link-shop"); }
+function showCart() { showPage("cart-page", "link-cart"); }
+function showOrders() { showPage("orders-page", "link-orders"); }
+function showOffers() { showPage("offers-page", "link-offers"); }
 
-function showDash() {
-    hideAllPages();
-    clearActiveLinks();
-    document.getElementById("dash-page").style.display = "block";
-    document.getElementById("link-dash").className = "active-link";
-}
-
-function showShop() {
-    hideAllPages();
-    clearActiveLinks();
-    document.getElementById("shop-page").style.display = "block";
-    document.getElementById("link-shop").className = "active-link";
-}
-
-function showCart() {
-    hideAllPages();
-    clearActiveLinks();
-    document.getElementById("cart-page").style.display = "block";
-    document.getElementById("link-cart").className = "active-link";
-}
-
-function showOrders() {
-    hideAllPages();
-    clearActiveLinks();
-    document.getElementById("orders-page").style.display = "block";
-    document.getElementById("link-orders").className = "active-link";
-}
-
-function showOffers() {
-    hideAllPages();
-    clearActiveLinks();
-    document.getElementById("offers-page").style.display = "block";
-    document.getElementById("link-offers").className = "active-link";
+// Confirmation message under the top bar (same pattern as the other portals)
+let messageTimer;
+function showMessage(text, isError) {
+    let box = document.getElementById("message");
+    box.innerText = text;
+    box.className = isError ? "message error" : "message";
+    clearTimeout(messageTimer);
+    if (text !== "") {
+        messageTimer = setTimeout(function () { box.innerText = ""; }, 4000);
+    }
 }
 
 // Shop Filter & Search
 function filterItems(cat) {
     let cards = document.getElementsByClassName("product-card");
+    let names = ["All", "Clothing", "Electronics", "Furniture", "Others"];
+    for (let i = 0; i < names.length; i++) {
+        document.getElementById("shop-filter-" + names[i]).className = names[i] === cat ? "" : "btn-light";
+    }
+    document.getElementById("search-box").value = "";
     for (let i = 0; i < cards.length; i++) {
         let c = cards[i].getAttribute("data-category");
-        if (cat === "All" || c === cat) {
-            cards[i].style.display = "inline-block";
-        } else {
-            cards[i].style.display = "none";
-        }
+        cards[i].style.display = (cat === "All" || c === cat) ? "" : "none";
     }
 }
 
@@ -70,11 +54,7 @@ function searchItems() {
     let cards = document.getElementsByClassName("product-card");
     for (let i = 0; i < cards.length; i++) {
         let name = cards[i].getElementsByTagName("h3")[0].innerText.toLowerCase();
-        if (name.includes(text)) {
-            cards[i].style.display = "inline-block";
-        } else {
-            cards[i].style.display = "none";
-        }
+        cards[i].style.display = name.includes(text) ? "" : "none";
     }
 }
 
@@ -102,7 +82,7 @@ function addItem(name, seller, price) {
         "</tr>";
 
     refreshCart();
-    alert(name + " added to cart!");
+    showMessage(name + " added to cart!");
 }
 
 function clearCartTable() {
@@ -136,7 +116,7 @@ function saveStudent() {
     let u = document.getElementById("v-uni").value;
 
     if (n === "" || id === "" || u === "") {
-        alert("Please fill Name, Student ID, and University!");
+        showMessage("Please fill Name, Student ID, and University!", true);
         return;
     }
 
@@ -145,7 +125,7 @@ function saveStudent() {
     document.getElementById("stu-badge").className = "badge-green";
     document.getElementById("dash-stu-status").innerText = "Verified";
     document.getElementById("dash-stu-status").className = "badge-green";
-    alert("Student verified!");
+    showMessage("Student verified!");
 }
 
 function removeStudent() {
@@ -165,14 +145,14 @@ function removeStudent() {
 
 function useCoupon(code, rate) {
     if (code === "STUDENTS15" && !studentVerified) {
-        alert("Please verify your student status first!");
+        showMessage("Please verify your student status first!", true);
         return;
     }
     discountRate = rate;
     couponCode = code;
     document.getElementById("dash-coupon").innerText = code;
     refreshCart();
-    alert("Coupon " + code + " applied!");
+    showMessage("Coupon " + code + " applied!");
 }
 
 // Place Order & Orders Table Actions
@@ -182,7 +162,7 @@ let spentAmount = 8250;
 
 function submitOrder() {
     if (cartCount === 0) {
-        alert("Your cart is empty!");
+        showMessage("Your cart is empty!", true);
         return;
     }
 
@@ -192,11 +172,11 @@ function submitOrder() {
     let totalTk = document.getElementById("sum-total").innerText;
 
     if (addr === "") {
-        alert("Please enter delivery address!");
+        showMessage("Please enter delivery address!", true);
         return;
     }
     if (phone.length !== 11 || isNaN(phone)) {
-        alert("Phone number must be 11 digits!");
+        showMessage("Phone number must be 11 digits!", true);
         return;
     }
 
@@ -212,7 +192,7 @@ function submitOrder() {
         "<td>" + pay + "</td>" +
         "<td><span class='badge-purple' id='st-" + idNum + "'>Placed</span></td>" +
         "<td>" +
-        "<button class='btn-light' onclick=\"alert('Address: " + addr + " | Phone: " + phone + "')\">View</button> " +
+        "<button class='btn-light' onclick=\"showMessage('Address: " + addr + " | Phone: " + phone + "')\">View</button> " +
         "<button class='btn-light' onclick=\"updateOrderAddress('" + idNum + "')\">Edit Address</button> " +
         "<button class='btn-danger' onclick=\"cancelOrderRow('" + idNum + "', 'st-" + idNum + "')\">Cancel</button>" +
         "</td>" +
@@ -231,14 +211,14 @@ function submitOrder() {
     document.getElementById("del-note").value = "";
 
     clearCartTable();
-    alert("Order NC-" + idNum + " placed!");
     showOrders();
+    showMessage("Order NC-" + idNum + " placed!");
 }
 
 function updateOrderAddress(idNum) {
     let updated = prompt("Enter new delivery address:");
     if (updated !== null && updated !== "") {
-        alert("Address updated to: " + updated);
+        showMessage("Address updated to: " + updated);
     }
 }
 
@@ -276,23 +256,23 @@ function updatePassword() {
     let confP = document.getElementById("conf-pass").value;
 
     if (currP === "" || newP === "" || confP === "") {
-        alert("Please fill all password fields!");
+        showMessage("Please fill all password fields!", true);
         return;
     }
     if (newP.length < 8) {
-        alert("New password must be at least 8 characters!");
+        showMessage("New password must be at least 8 characters!", true);
         return;
     }
     if (newP === currP) {
-        alert("New password must be different from current password!");
+        showMessage("New password must be different from current password!", true);
         return;
     }
     if (newP !== confP) {
-        alert("New password and confirm password do not match!");
+        showMessage("New password and confirm password do not match!", true);
         return;
     }
 
-    alert("Password changed successfully!");
+    showMessage("Password changed successfully!");
     document.getElementById("curr-pass").value = "";
     document.getElementById("new-pass").value = "";
     document.getElementById("conf-pass").value = "";
@@ -307,23 +287,30 @@ function toggleMenu() {
 }
 
 function showNotif() {
-    hideAllPages();
-    clearActiveLinks();
-    document.getElementById("notif-page").style.display = "block";
+    showPage("notif-page", null);
 }
 
 function showProfile() {
-    hideAllPages();
-    clearActiveLinks();
-    document.getElementById("user-menu").style.display = "none";
-    document.getElementById("profile-page").style.display = "block";
+    showPage("profile-page", null);
 }
 
 function showPassPage() {
-    hideAllPages();
-    clearActiveLinks();
-    document.getElementById("user-menu").style.display = "none";
-    document.getElementById("pass-page").style.display = "block";
+    showPage("pass-page", null);
+}
+
+// Keeps the bell badge and the dashboard card in step with the notification list
+function updateNotifCount() {
+    let unread = 0;
+    for (let i = 1; i <= 3; i++) {
+        let st = document.getElementById("n-st-" + i);
+        let row = document.getElementById("n-row-" + i);
+        if (st && row.style.display !== "none" && st.innerText === "Unread") {
+            unread++;
+        }
+    }
+    document.getElementById("top-notif-count").innerText = unread;
+    document.getElementById("top-notif-count").style.display = unread === 0 ? "none" : "flex";
+    document.getElementById("dash-unread").innerText = unread;
 }
 
 function toggleRead(statusId, btnId) {
@@ -339,26 +326,24 @@ function toggleRead(statusId, btnId) {
         st.className = "badge-purple";
         btn.innerText = "Mark Read";
     }
+    updateNotifCount();
 }
 
 function markAllRead() {
-    document.getElementById("n-st-1").innerText = "Read";
-    document.getElementById("n-st-1").className = "badge-green";
-    document.getElementById("n-btn-1").innerText = "Mark Unread";
-
-    document.getElementById("n-st-2").innerText = "Read";
-    document.getElementById("n-st-2").className = "badge-green";
-    document.getElementById("n-btn-2").innerText = "Mark Unread";
-
-    document.getElementById("top-notif-count").innerText = "0";
+    for (let i = 1; i <= 3; i++) {
+        document.getElementById("n-st-" + i).innerText = "Read";
+        document.getElementById("n-st-" + i).className = "badge-green";
+        document.getElementById("n-btn-" + i).innerText = "Mark Unread";
+    }
+    updateNotifCount();
 }
 
 function deleteNotif(rowId) {
     document.getElementById(rowId).style.display = "none";
+    updateNotifCount();
 }
 function logOut() {
-  alert("You have been logged out.");
-  window.location.href = "../LOGIN/HTML/Login.html";
+    window.location.href = "../LOGIN/HTML/login.html";
 }
 // Profile CRUD using a normal array
 let profilesData = [
@@ -390,6 +375,9 @@ function loadProfile(index) {
     let item = profilesData[index];
 
     document.getElementById("p-badge").innerText = item.name.charAt(0).toUpperCase();
+    document.getElementById("top-badge").innerText = item.name.charAt(0).toUpperCase();
+    document.getElementById("top-name").innerText = item.name;
+    document.getElementById("welcome-name").innerText = item.name;
     document.getElementById("show-name").innerText = item.name;
     document.getElementById("show-email").innerText = item.email;
     document.getElementById("show-phone").innerText = item.phone;
@@ -431,7 +419,7 @@ function addProfile() {
     let j = document.getElementById("in-joined").value;
 
     if (n === "" || e === "" || ph === "" || a === "") {
-        alert("Please fill Name, Email, Contact No and Address!");
+        showMessage("Please fill Name, Email, Contact No and Address!", true);
         return;
     }
 
@@ -447,12 +435,12 @@ function addProfile() {
     let lastIndex = profilesData.length - 1;
     loadProfile(lastIndex);
     showProfileTable();
-    alert("Profile created!");
+    showMessage("Profile created!");
 }
 
 function editProfileData() {
     if (profilesData.length === 0) {
-        alert("No profile to update!");
+        showMessage("No profile to update!", true);
         return;
     }
 
@@ -467,12 +455,12 @@ function editProfileData() {
 
     loadProfile(selectedIndex);
     showProfileTable();
-    alert("Profile updated!");
+    showMessage("Profile updated!");
 }
 
 function removeProfile() {
     if (profilesData.length === 0) {
-        alert("No profile to delete!");
+        showMessage("No profile to delete!", true);
         return;
     }
 
@@ -484,8 +472,16 @@ function removeProfile() {
         loadProfile(0);
     }
     showProfileTable();
-    alert("Profile deleted!");
+    showMessage("Profile deleted!");
 }
+
+document.addEventListener("click", function (e) {
+    let menu = document.getElementById("user-menu");
+    if (menu.style.display === "block" && !e.target.closest(".profile-trigger") && !e.target.closest("#user-menu")) {
+        menu.style.display = "none";
+    }
+});
 
 loadProfile(0);
 showProfileTable();
+updateNotifCount();
