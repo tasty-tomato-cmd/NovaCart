@@ -1,54 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NovaCart - Customer</title>
+    <link rel="icon" type="image/svg+xml" href="../ICONS/logo.svg">
     <link rel="stylesheet" href="../CSS/customer.css">
 </head>
 <body>
 
+    <!-- Sidebar -->
     <div class="sidebar">
-        <span class="brand">NovaCart</span>
-        <span class="role-tag">CUSTOMER</span>
-        <a href="#" id="link-dash" class="active-link" onclick="showDash()">Dashboard</a>
-        <a href="#" id="link-shop" onclick="showShop()">Shop</a>
-        <a href="#" id="link-cart" onclick="showCart()">Cart (<span id="nav-cart-count">0</span>)</a>
-        <a href="#" id="link-orders" onclick="showOrders()">My Orders</a>
-        <a href="#" id="link-offers" onclick="showOffers()">Offers & Coupons</a>
+        <div class="sidebar-header">
+            <div class="brand-title">
+                <img src="../ICONS/logo.svg" alt="" width="34" height="34">
+                NovaCart
+            </div>
+            <div class="brand-subtitle">Customer Panel</div>
+        </div>
 
-        <div class="logout-box">
-        <a href="#" onclick="logOut()">Log Out</a>
+        <div class="sidebar-menu">
+            <a href="#" id="link-dash" class="menu-item active" onclick="showDash(); return false;"><img src="../ICONS/dashboard.svg" alt="" width="18" height="18"><span>Dashboard</span></a>
+            <a href="#" id="link-shop" class="menu-item" onclick="showShop(); return false;"><img src="../ICONS/search.svg" alt="" width="18" height="18"><span>Shop</span></a>
+            <a href="#" id="link-cart" class="menu-item" onclick="showCart(); return false;"><img src="../ICONS/order.svg" alt="" width="18" height="18"><span>Cart</span><span class="cart-count" id="nav-cart-count">0</span></a>
+            <a href="#" id="link-orders" class="menu-item" onclick="showOrders(); return false;"><img src="../ICONS/report.svg" alt="" width="18" height="18"><span>My Orders</span></a>
+            <a href="#" id="link-offers" class="menu-item" onclick="showOffers(); return false;"><img src="../ICONS/campaign.svg" alt="" width="18" height="18"><span>Offers &amp; Coupons</span></a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="customer-meta">
+                <strong>Lubaba</strong>
+                <span>Customer Account</span>
+            </div>
+            <button type="button" class="logout-btn" title="Log out" onclick="logOut()">
+                <img src="../ICONS/logout.svg" alt="Logout" width="16" height="16">
+            </button>
         </div>
     </div>
 
     <div class="main-area">
-       <div class="top-bar">
-            <div>
-                <h1>Welcome back, Lubaba!</h1>
-                <p class="sub-text">Overview of your orders, cart and offers.</p>
-            </div>
-            <div>
-                <span class="notif-btn" onclick="showNotif()">🔔
-                <span id="top-notif-count" class="notif-count">2</span>
-                </span>
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="welcome-msg">Welcome back, <span id="welcome-name">Lubaba</span>!</div>
 
-                <div class="profile-area">
-                    <span class="user-badge">L</span>
-                    <span onclick="toggleMenu()">Lubaba &#9662;</span>
-                    <div id="user-menu" class="dropdown-box">
-                        <a href="#" onclick="showProfile()">My Profile</a>
-                        <a href="#" onclick="showPassPage()">Change Password</a>
-                  <a href="#" onclick="logOut()">Log Out</a>
-                    </div>
+            <div class="top-right">
+                <button type="button" class="icon-btn" title="Notifications" onclick="showNotif()">
+                    <img src="../ICONS/notification_bell.svg" alt="Notifications" width="18" height="18">
+                    <span id="top-notif-count" class="notif-count">2</span>
+                </button>
+
+                <button type="button" class="profile-trigger" onclick="toggleMenu()">
+                    <span class="user-badge" id="top-badge">L</span>
+                    <span id="top-name">Lubaba</span>
+                    <img src="../ICONS/chevron-down.svg" alt="" width="12" height="12">
+                </button>
+
+                <div id="user-menu" class="dropdown-box">
+                    <a href="#" onclick="showProfile(); return false;"><img src="../ICONS/profile.svg" alt="" width="15" height="15"> My Profile</a>
+                    <a href="#" onclick="showPassPage(); return false;"><img src="../ICONS/lock.svg" alt="" width="15" height="15"> Change Password</a>
+                    <div class="menu-divider"></div>
+                    <a href="#" class="danger-text" onclick="logOut(); return false;"><img src="../ICONS/logout.svg" alt="" width="15" height="15"> Log Out</a>
                 </div>
             </div>
         </div>
 
+        <!-- Confirmation message -->
+        <p class="message" id="message" aria-live="polite"></p>
+
         <!-- 1. Dashboard -->
         <div id="dash-page">
             <div class="banner-box">
-                <h2>Customer Dashboard</h2>
-                <p class="sub-text">A quick overview of your orders, cart and activity on NovaCart.</p>
+                <span class="banner-icon"><img src="../ICONS/dashboard.svg" alt="" width="24" height="24"></span>
+                <div class="banner-text">
+                    <h2>Customer Dashboard</h2>
+                    <p class="sub-text">A quick overview of your orders, cart and activity on NovaCart.</p>
+                </div>
             </div>
 
             <div class="stats-row">
@@ -66,7 +92,7 @@
                 </div>
                 <div class="stat-box">
                     <p class="sub-text">Unread Notifications</p>
-                    <p class="stat-num">2</p>
+                    <p class="stat-num" id="dash-unread">2</p>
                 </div>
             </div>
 
@@ -114,99 +140,112 @@
         <!-- 2. Shop -->
         <div id="shop-page" class="hide">
             <div class="banner-box">
-                <h2>Shop Products</h2>
+                <span class="banner-icon"><img src="../ICONS/search.svg" alt="" width="24" height="24"></span>
+                <div class="banner-text">
+                    <h2>Shop Products</h2>
                 <p class="sub-text">Browse products from NovaCart sellers and add them to your cart.</p>
+                </div>
             </div>
 
             <div class="filter-bar">
-                <button onclick="filterItems('All')">All</button>
-                <button class="btn-light" onclick="filterItems('Clothing')">Clothing</button>
-                <button class="btn-light" onclick="filterItems('Electronics')">Electronics</button>
-                <button class="btn-light" onclick="filterItems('Furniture')">Furniture</button>
-                <button class="btn-light" onclick="filterItems('Others')">Others</button>
+                <button id="shop-filter-All" onclick="filterItems('All')">All</button>
+                <button class="btn-light" id="shop-filter-Clothing" onclick="filterItems('Clothing')">Clothing</button>
+                <button class="btn-light" id="shop-filter-Electronics" onclick="filterItems('Electronics')">Electronics</button>
+                <button class="btn-light" id="shop-filter-Furniture" onclick="filterItems('Furniture')">Furniture</button>
+                <button class="btn-light" id="shop-filter-Others" onclick="filterItems('Others')">Others</button>
             </div>
 
             <input type="text" id="search-box" class="search-box" onkeyup="searchItems()" placeholder="Search product...">
 
-            <div>
+            <div class="product-grid" id="product-grid">
                 <div class="product-card" data-category="Clothing">
+                    <div class="product-thumb"><img src="../ICONS/order.svg" alt="" width="26" height="26"></div>
                     <h3>Kurti Set</h3>
                     <p class="seller-name">Fashion Mart</p>
                     <p class="price-text">Tk 1650</p>
                     <button onclick="addItem('Kurti Set', 'Fashion Mart', 1650)">Add to Cart</button>
-                    <button class="btn-light" onclick="alert('Kurti Set | Seller: Fashion Mart | Price: Tk 1650')">Details</button>
+                    <button class="btn-light" onclick="showMessage('Kurti Set | Seller: Fashion Mart | Price: Tk 1650')">Details</button>
                 </div>
 
                 <div class="product-card" data-category="Clothing">
+                    <div class="product-thumb"><img src="../ICONS/order.svg" alt="" width="26" height="26"></div>
                     <h3>Floral Tops</h3>
                     <p class="seller-name">Tailor Fit</p>
                     <p class="price-text">Tk 850</p>
                     <button onclick="addItem('Floral Tops', 'Tailor Fit', 850)">Add to Cart</button>
-                    <button class="btn-light" onclick="alert('Floral Tops | Seller: Tailor Fit | Price: Tk 850')">Details</button>
+                    <button class="btn-light" onclick="showMessage('Floral Tops | Seller: Tailor Fit | Price: Tk 850')">Details</button>
                 </div>
 
                 <div class="product-card" data-category="Electronics">
+                    <div class="product-thumb"><img src="../ICONS/order.svg" alt="" width="26" height="26"></div>
                     <h3>Mouse</h3>
                     <p class="seller-name">Gadget Hub</p>
                     <p class="price-text">Tk 1200</p>
                     <button onclick="addItem('Mouse', 'Gadget Hub', 1200)">Add to Cart</button>
-                    <button class="btn-light" onclick="alert('Mouse | Seller: Gadget Hub | Price: Tk 1200')">Details</button>
+                    <button class="btn-light" onclick="showMessage('Mouse | Seller: Gadget Hub | Price: Tk 1200')">Details</button>
                 </div>
 
                 <div class="product-card" data-category="Electronics">
+                    <div class="product-thumb"><img src="../ICONS/order.svg" alt="" width="26" height="26"></div>
                     <h3>Keyboard</h3>
                     <p class="seller-name">Gadget Hub</p>
                     <p class="price-text">Tk 2800</p>
                     <button onclick="addItem('Keyboard', 'Gadget Hub', 2800)">Add to Cart</button>
-                    <button class="btn-light" onclick="alert('Keyboard | Seller: Gadget Hub | Price: Tk 2800')">Details</button>
+                    <button class="btn-light" onclick="showMessage('Keyboard | Seller: Gadget Hub | Price: Tk 2800')">Details</button>
                 </div>
 
                 <div class="product-card" data-category="Electronics">
+                    <div class="product-thumb"><img src="../ICONS/order.svg" alt="" width="26" height="26"></div>
                     <h3>Smart Watch</h3>
                     <p class="seller-name">Gadget Hub</p>
                     <p class="price-text">Tk 3200</p>
                     <button onclick="addItem('Smart Watch', 'Gadget Hub', 3200)">Add to Cart</button>
-                    <button class="btn-light" onclick="alert('Smart Watch | Seller: Gadget Hub | Price: Tk 3200')">Details</button>
+                    <button class="btn-light" onclick="showMessage('Smart Watch | Seller: Gadget Hub | Price: Tk 3200')">Details</button>
                 </div>
 
                 <div class="product-card" data-category="Electronics">
+                    <div class="product-thumb"><img src="../ICONS/order.svg" alt="" width="26" height="26"></div>
                     <h3>Wireless Earbuds</h3>
                     <p class="seller-name">Gadget Hub</p>
                     <p class="price-text">Tk 1850</p>
                     <button onclick="addItem('Wireless Earbuds', 'Gadget Hub', 1850)">Add to Cart</button>
-                    <button class="btn-light" onclick="alert('Wireless Earbuds | Seller: Gadget Hub | Price: Tk 1850')">Details</button>
+                    <button class="btn-light" onclick="showMessage('Wireless Earbuds | Seller: Gadget Hub | Price: Tk 1850')">Details</button>
                 </div>
 
                 <div class="product-card" data-category="Furniture">
+                    <div class="product-thumb"><img src="../ICONS/order.svg" alt="" width="26" height="26"></div>
                     <h3>Study Desk</h3>
                     <p class="seller-name">Home Mart</p>
                     <p class="price-text">Tk 5400</p>
                     <button onclick="addItem('Study Desk', 'Home Mart', 5400)">Add to Cart</button>
-                    <button class="btn-light" onclick="alert('Study Desk | Seller: Home Mart | Price: Tk 5400')">Details</button>
+                    <button class="btn-light" onclick="showMessage('Study Desk | Seller: Home Mart | Price: Tk 5400')">Details</button>
                 </div>
 
                 <div class="product-card" data-category="Furniture">
+                    <div class="product-thumb"><img src="../ICONS/order.svg" alt="" width="26" height="26"></div>
                     <h3>Chair</h3>
                     <p class="seller-name">Home Mart</p>
                     <p class="price-text">Tk 6900</p>
                     <button onclick="addItem('Chair', 'Home Mart', 6900)">Add to Cart</button>
-                    <button class="btn-light" onclick="alert('Chair | Seller: Home Mart | Price: Tk 6900')">Details</button>
+                    <button class="btn-light" onclick="showMessage('Chair | Seller: Home Mart | Price: Tk 6900')">Details</button>
                 </div>
 
                 <div class="product-card" data-category="Others">
+                    <div class="product-thumb"><img src="../ICONS/order.svg" alt="" width="26" height="26"></div>
                     <h3>Handbag</h3>
                     <p class="seller-name">Urban Fit</p>
                     <p class="price-text">Tk 1450</p>
                     <button onclick="addItem('Handbag', 'Urban Fit', 1450)">Add to Cart</button>
-                    <button class="btn-light" onclick="alert('Handbag | Seller: Urban Fit | Price: Tk 1450')">Details</button>
+                    <button class="btn-light" onclick="showMessage('Handbag | Seller: Urban Fit | Price: Tk 1450')">Details</button>
                 </div>
 
                 <div class="product-card" data-category="Others">
+                    <div class="product-thumb"><img src="../ICONS/order.svg" alt="" width="26" height="26"></div>
                     <h3>Notebook</h3>
                     <p class="seller-name">Pen House</p>
                     <p class="price-text">Tk 250</p>
                     <button onclick="addItem('Notebook', 'Pen House', 250)">Add to Cart</button>
-                    <button class="btn-light" onclick="alert('Notebook | Seller: Pen House | Price: Tk 250')">Details</button>
+                    <button class="btn-light" onclick="showMessage('Notebook | Seller: Pen House | Price: Tk 250')">Details</button>
                 </div>
             </div>
         </div>
@@ -214,8 +253,11 @@
         <!-- 3. Cart -->
         <div id="cart-page" class="hide">
             <div class="banner-box">
-                <h2>My Cart</h2>
+                <span class="banner-icon"><img src="../ICONS/order.svg" alt="" width="24" height="24"></span>
+                <div class="banner-text">
+                    <h2>My Cart</h2>
                 <p class="sub-text">Review your items, then add your delivery details to place the order.</p>
+                </div>
             </div>
 
             <div class="panel">
@@ -276,8 +318,11 @@
         <!-- 4. My Orders -->
         <div id="orders-page" class="hide">
             <div class="banner-box">
-                <h2>My Orders</h2>
+                <span class="banner-icon"><img src="../ICONS/report.svg" alt="" width="24" height="24"></span>
+                <div class="banner-text">
+                    <h2>My Orders</h2>
                 <p class="sub-text">Track your orders, update the delivery address or cancel an order.</p>
+                </div>
             </div>
 
             <div class="panel">
@@ -310,7 +355,7 @@
                             <td>Nagad</td>
                             <td><span class="badge-purple" id="st-1003">Placed</span></td>
                             <td>
-                                <button class="btn-light" onclick="alert('Order NC-1003 | Address: Bashundhara R/A')">View</button>
+                                <button class="btn-light" onclick="showMessage('Order NC-1003 | Address: Bashundhara R/A')">View</button>
                                 <button class="btn-light" onclick="updateOrderAddress('1003')">Edit Address</button>
                                 <button class="btn-danger" onclick="cancelOrderRow('1003', 'st-1003')">Cancel</button>
                             </td>
@@ -323,7 +368,7 @@
                             <td>Cash on Delivery</td>
                             <td><span class="badge-purple">Shipped</span></td>
                             <td>
-                                <button class="btn-light" onclick="alert('Order NC-1002 is Shipped')">View</button>
+                                <button class="btn-light" onclick="showMessage('Order NC-1002 is Shipped')">View</button>
                             </td>
                         </tr>
                         <tr id="row-1001" data-status="Delivered">
@@ -334,7 +379,7 @@
                             <td>bKash</td>
                             <td><span class="badge-green">Delivered</span></td>
                             <td>
-                                <button class="btn-light" onclick="alert('Order NC-1001 Delivered')">View</button>
+                                <button class="btn-light" onclick="showMessage('Order NC-1001 Delivered')">View</button>
                             </td>
                         </tr>
                     </tbody>
@@ -345,8 +390,11 @@
         <!-- 5. Offers & Coupons -->
         <div id="offers-page" class="hide">
             <div class="banner-box">
-                <h2>Student Discount & Offers</h2>
+                <span class="banner-icon"><img src="../ICONS/campaign.svg" alt="" width="24" height="24"></span>
+                <div class="banner-text">
+                    <h2>Student Discount &amp; Offers</h2>
                 <p class="sub-text">Verify your student status and use coupons on your cart.</p>
+                </div>
             </div>
 
             <div class="two-col">
@@ -414,7 +462,7 @@
                             <td>Tk 100</td>
                             <td>2025-06-30</td>
                             <td><span class="badge-red">Expired</span></td>
-                            <td><button class="btn-light" onclick="alert('This coupon is expired!')">Apply</button></td>
+                            <td><button class="btn-light" onclick="showMessage('This coupon is expired!')">Apply</button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -423,12 +471,15 @@
         <!-- 6. Notifications -->
         <div id="notif-page" class="hide">
             <div class="banner-box">
-                <h2>Notifications</h2>
+                <span class="banner-icon"><img src="../ICONS/notification_bell.svg" alt="" width="24" height="24"></span>
+                <div class="banner-text">
+                    <h2>Notifications</h2>
                 <p class="sub-text">Updates about your orders, offers and account.</p>
-                <button onclick="markAllRead()">Mark All Read</button>
+                </div>
             </div>
 
             <div class="panel">
+                <button onclick="markAllRead()">Mark All Read</button>
                 <table>
                     <tr>
                         <th>Notification</th>
@@ -467,11 +518,13 @@
             </div>
         </div>
 <!-- 7. My Profile -->
-    <!-- 7. My Profile -->
         <div id="profile-page" class="hide">
             <div class="banner-box">
-                <h2>My Profile</h2>
+                <span class="banner-icon"><img src="../ICONS/profile.svg" alt="" width="24" height="24"></span>
+                <div class="banner-text">
+                    <h2>My Profile</h2>
                 <p class="sub-text">View, create, update or delete profile information.</p>
+                </div>
             </div>
 
             <div class="two-col">
@@ -538,8 +591,11 @@
         <!-- 8. Change Password -->
         <div id="pass-page" class="hide">
             <div class="banner-box">
-                <h2>Change Password</h2>
+                <span class="banner-icon"><img src="../ICONS/lock.svg" alt="" width="24" height="24"></span>
+                <div class="banner-text">
+                    <h2>Change Password</h2>
                 <p class="sub-text">Keep your account secure by changing your password.</p>
+                </div>
             </div>
 
             <div class="two-col">
