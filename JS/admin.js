@@ -237,8 +237,7 @@ function toggleProfile() {
 
 function logOut() {
   hide("profileMenu");
-  alert("You have been logged out.");
-  window.location.href = "../LOGIN/HTML/Login.html";
+  window.location.href = "../LOGIN/HTML/login.html";
 }
 
 // The bell opens the Notifications tab
@@ -1526,7 +1525,7 @@ onClick("editProfileBtn", openProfileForm);
 onClick("cancelProfileBtn", function () { closeModal("profileModal"); });
 onClick("changePictureBtn", function () { document.getElementById("pictureInput").click(); });
 onClick("removePictureBtn", removePicture);
-onClick("folderPictureBtn", function () { useFolderPicture(true); });
+// onClick("folderPictureBtn", function () { useFolderPicture(true); });
 document.getElementById("pictureInput").addEventListener("change", savePicture);
 document.getElementById("showPasswords").addEventListener("change", togglePasswords);
 
