@@ -13,96 +13,148 @@
 
         <!-- Sidebar -->
         <div class="sidebar">
-            <div class="logo">NovaCart</div>
-            <a href="sellerdashboard.html">Dashboard</a>
-            <a href="sellerproducts.html">Products &amp; Inventory</a>
-            <a href="sellerorders.html">Orders</a>
-            <a href="sellerpromotions.html">Sales &amp; Promotion</a>
-            <a href="sellerprofile.html" class="active">My Profile</a>
+            <div class="sidebar-header">
+                <div class="brand-title">
+                    <img src="../icons/logo.svg" alt="" width="34" height="34">
+                    NovaCart
+                </div>
+                <div class="brand-subtitle">Seller Panel</div>
+            </div>
+
+            <div class="sidebar-menu">
+                <a href="sellerdashboard.html" class="menu-item"><img src="../icons/dashboard.svg" alt="" width="18" height="18"><span>Dashboard</span></a>
+                <a href="sellerproducts.html" class="menu-item"><span class="menu-emoji">📦</span><span>Products &amp; Inventory</span></a>
+                <a href="sellerorders.html" class="menu-item"><span class="menu-emoji">🛒</span><span>Orders</span></a>
+                <a href="sellerpromotions.html" class="menu-item"><span class="menu-emoji">🏷️</span><span>Sales &amp; Promotion</span></a>
+                <a href="sellerprofile.html" class="menu-item active"><span class="menu-emoji">👤</span><span>My Profile</span></a>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="seller-meta">
+                    <strong id="sidebarName">Mahir</strong>
+                    <span>Seller Account</span>
+                </div>
+                <button type="button" class="logout-btn" id="logoutBtn" title="Log out">
+                    <img src="../icons/logout.svg" alt="Logout" width="16" height="16">
+                </button>
+            </div>
         </div>
 
         <!-- Main content -->
         <main class="main">
-           <h1>My Profile</h1>
-<p class="muted">Manage your personal details, store information and account security.</p>
 
-            <!-- Store information -->
-            <!-- Personal details -->
-<section class="panel">
-    <h2>Personal Details</h2>
+            <!-- Top bar -->
+            <div class="topbar">
+                <div class="welcome-msg">Welcome back, <span id="welcomeName">Mahir</span>!</div>
 
-    <div class="profile-top">
-        <div class="avatar" id="profileAvatar"></div>
-        <div>
-            <h3 id="profileName"></h3>
-            <p class="muted" id="profileStore"></p>
-            <input type="file" id="photoInput" accept="image/*">
-            <button type="button" class="secondary small" id="removePhoto">Remove Photo</button>
-        </div>
-    </div>
+                <div class="top-right">
+                    <div class="notif-wrap">
+                        <button type="button" class="icon-btn" id="notifBtn" title="Notifications">
+                            <img src="../icons/notification_bell.svg" alt="Notifications" width="18" height="18">
+                            <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+                        </button>
+                        <div class="notif-panel" id="notifPanel">
+                            <h3>Notifications</h3>
+                            <div id="notifList"></div>
+                        </div>
+                    </div>
 
-    <form id="profileForm">
-        <div class="form-grid">
-            <div>
-                <label>Full Name</label>
-                <input id="ownerName" required>
+                    <a href="sellerprofile.html" class="icon-btn" title="Settings">
+                        <img src="../icons/settings_icon.svg" alt="Settings" width="18" height="18">
+                    </a>
+                    <a href="sellerprofile.html" class="avatar small" id="headerAvatar" title="My Profile"></a>
+                </div>
             </div>
-            <div>
-                <label>Email</label>
-                <input id="storeEmail" type="email" required>
-            </div>
-            <div>
-                <label>Phone</label>
-                <input id="storePhone" required>
-            </div>
-            <div>
-                <label>Store Name</label>
-                <input id="storeName" required>
-            </div>
-            <div>
-                <label>Address</label>
-                <input id="storeAddress" required>
-            </div>
-            <div>
-                <label>About My Store</label>
-                <textarea id="storeDescription"></textarea>
-            </div>
-        </div>
-        <button>Save Profile</button>
-        <button type="button" class="danger" id="resetProfile">Reset Profile</button>
-    </form>
 
-    <p id="profileMessage" class="message"></p>
-</section>
+            <h1>My Profile</h1>
+            <p class="muted">Manage your personal details, store information and account security.</p>
 
-<!-- Change password -->
-<section class="panel">
-    <h2>Change Password</h2>
+            <!-- Profile photo -->
+            <section class="panel profile-card">
+                <div class="avatar" id="profileAvatar"></div>
+                <div class="profile-info">
+                    <h2 id="profileName"></h2>
+                    <p class="muted" id="profileStore"></p>
+                    <span class="role-tag">Seller Account</span>
 
-    <form id="passwordForm">
-        <div class="form-grid">
-            <div>
-                <label>Current Password</label>
-                <input id="currentPassword" type="password" autocomplete="current-password" required>
-            </div>
-            <div>
-                <label>New Password</label>
-                <input id="newPassword" type="password" autocomplete="new-password" required>
-            </div>
-            <div>
-                <label>Confirm New Password</label>
-                <input id="confirmPassword" type="password" autocomplete="new-password" required>
-            </div>
-        </div>
-        <button>Update Password</button>
-    </form>
+                    <div class="photo-actions">
+                        <label for="photoInput" class="file-btn">📷 Choose Photo</label>
+                        <input type="file" id="photoInput" accept="image/*" hidden>
+                        <button type="button" class="secondary" id="removePhoto">Remove Photo</button>
+                    </div>
+                    <p class="muted">JPG or PNG, up to 500 KB.</p>
+                </div>
+            </section>
 
-    <p id="passwordMessage" class="message"></p>
-</section>
+            <div class="two-columns">
+
+                <!-- Personal details -->
+                <section class="panel">
+                    <h2>👤 Personal Details</h2>
+
+                    <form id="profileForm">
+                        <div class="form-grid">
+                            <div>
+                                <label>Full Name</label>
+                                <input id="ownerName" required>
+                            </div>
+                            <div>
+                                <label>Email</label>
+                                <input id="storeEmail" type="email" required>
+                            </div>
+                            <div>
+                                <label>Phone</label>
+                                <input id="storePhone" required>
+                            </div>
+                            <div>
+                                <label>Store Name</label>
+                                <input id="storeName" required>
+                            </div>
+                            <div class="full-width">
+                                <label>Address</label>
+                                <input id="storeAddress" required>
+                            </div>
+                            <div class="full-width">
+                                <label>About My Store</label>
+                                <textarea id="storeDescription"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit">Save Profile</button>
+                        <button type="button" class="danger" id="resetProfile">Reset Profile</button>
+                    </form>
+
+                    <p id="profileMessage" class="message"></p>
+                </section>
+
+                <!-- Change password -->
+                <section class="panel">
+                    <h2>🔒 Change Password</h2>
+
+                    <form id="passwordForm">
+                        <div class="form-grid">
+                            <div>
+                                <label>Current Password</label>
+                                <input id="currentPassword" type="password" autocomplete="current-password" required>
+                            </div>
+                            <div>
+                                <label>New Password</label>
+                                <input id="newPassword" type="password" autocomplete="new-password" required>
+                            </div>
+                            <div>
+                                <label>Confirm New Password</label>
+                                <input id="confirmPassword" type="password" autocomplete="new-password" required>
+                            </div>
+                        </div>
+                        <button type="submit">Update Password</button>
+                    </form>
+
+                    <p id="passwordMessage" class="message"></p>
+                </section>
+            </div>
 
             <!-- Store policies -->
             <section class="panel">
-                <h2>Store Policies</h2>
+                <h2>📜 Store Policies</h2>
 
                 <form id="policyForm">
                     <div class="form-grid">
@@ -136,6 +188,7 @@
 
     </div>
 
+    <script src="../JS/sellertopbar.js"></script>
     <script src="../JS/sellerprofile.js"></script>
 </body>
 

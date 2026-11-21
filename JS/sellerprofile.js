@@ -17,10 +17,27 @@ let profile = {
     description: defaultProfile.description
 };
 
-let photoData = "";                 // uploaded photo (empty = show first letter)
+let photoData = localStorage.getItem("seller_photo") || "";   // uploaded photo (empty = show first letter)
 let password = "seller123";         // demo password
 const policies = [];
 let editIndex = -1;
+
+// ----- Remember the profile between pages (plain text, no JSON) -----
+const profileKeys = ["name", "owner", "email", "phone", "address", "description"];
+
+function saveProfile() {
+    for (let i = 0; i < profileKeys.length; i++) {
+        localStorage.setItem("seller_" + profileKeys[i], profile[profileKeys[i]]);
+    }
+}
+
+// Use the saved values if there are any
+for (let i = 0; i < profileKeys.length; i++) {
+    const saved = localStorage.getItem("seller_" + profileKeys[i]);
+    if (saved !== null) {
+        profile[profileKeys[i]] = saved;
+    }
+}
 
 // ----- Get HTML elements -----
 const profileForm = document.getElementById("profileForm");
@@ -72,6 +89,11 @@ function showAvatar() {
 
     profileName.innerHTML = profile.owner;
     profileStore.innerHTML = profile.name;
+
+    // Update the name and photo in the top bar too
+    if (typeof refreshTopbar == "function") {
+        refreshTopbar();
+    }
 }
 
 // Save profile
@@ -85,6 +107,7 @@ profileForm.addEventListener("submit", function(event) {
     profile.address = storeAddress.value;
     profile.description = storeDescription.value;
 
+    saveProfile();
     showAvatar();
     profileMessage.innerHTML = "Profile saved successfully.";
 });
@@ -101,6 +124,7 @@ resetProfile.addEventListener("click", function() {
         profile.address = defaultProfile.address;
         profile.description = defaultProfile.description;
 
+        saveProfile();
         loadProfile();
         showAvatar();
         profileMessage.innerHTML = "Sample profile restored.";
@@ -124,6 +148,7 @@ photoInput.addEventListener("change", function() {
     const reader = new FileReader();
     reader.onload = function() {
         photoData = reader.result;
+        localStorage.setItem("seller_photo", photoData);
         showAvatar();
         profileMessage.innerHTML = "Photo updated.";
     };
@@ -132,6 +157,7 @@ photoInput.addEventListener("change", function() {
 
 removePhoto.addEventListener("click", function() {
     photoData = "";
+    localStorage.removeItem("seller_photo");
     photoInput.value = "";
     showAvatar();
     profileMessage.innerHTML = "Photo removed.";
@@ -145,6 +171,8 @@ passwordForm.addEventListener("submit", function(event) {
     const newPass = document.getElementById("newPassword").value;
     const confirmPass = document.getElementById("confirmPassword").value;
 
+    passwordMessage.className = "message error";
+
     if (current != password) {
         passwordMessage.innerHTML = "Current password is incorrect.";
     } else if (newPass.length < 6) {
@@ -153,6 +181,7 @@ passwordForm.addEventListener("submit", function(event) {
         passwordMessage.innerHTML = "New passwords do not match.";
     } else {
         password = newPass;
+        passwordMessage.className = "message";
         passwordMessage.innerHTML = "Password changed successfully.";
         passwordForm.reset();
     }
