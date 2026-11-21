@@ -13,6 +13,10 @@ function saveOrders() {
     }
 
     localStorage.setItem("sellerOrders", lines.join("\n"));
+        // Update the bell in the top bar
+    if (typeof refreshNotifications == "function") {
+        refreshNotifications();
+    }
 }
 
 // Load orders (returns null if nothing was saved yet)
@@ -122,7 +126,7 @@ function displayOrders() {
             "<td>" + orders[i].customer + "</td>" +
             "<td>" + orders[i].product + "</td>" +
             "<td>" + orders[i].amount + "</td>" +
-            "<td>" + orders[i].status + "</td>" +
+            '<td><span class="status status-' + statusClass(orders[i].status) + '">' + orders[i].status + "</span></td>" + 
             "<td>" + statusDropdown(i) +
             '<button class="small" onclick="editOrder(' + i + ')">Edit</button>' +
             '<button class="small danger" onclick="deleteOrder(' + i + ')">Delete</button></td>' +
@@ -140,6 +144,17 @@ function displayOrders() {
     completedCount.innerHTML = completed;
 }
 
+// Colour class for the status pill
+function statusClass(status) {
+    if (status == "Pending") {
+        return "pending";
+    } else if (status == "Processing") {
+        return "processing";
+    } else if (status == "Ready for Dispatch") {
+        return "ready";
+    }
+    return "completed";
+}
 // Build the status dropdown for one order
 function statusDropdown(index) {
     const statuses = ["Pending", "Processing", "Ready for Dispatch", "Completed"];
