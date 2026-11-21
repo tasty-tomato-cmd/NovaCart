@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Delivery Partner Dashboard | NovaCart</title>
+  <link rel="icon" type="image/svg+xml" href="../ICONS/logo.svg">
   <link rel="stylesheet" href="../CSS/delivery.css">
 </head>
 
@@ -11,30 +12,37 @@
 
   <div class="layout">
 
-    <!-- SIDEBAR  -->
+    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
 
-      <div class="brand">
-        <span aria-hidden="true">&#128722;</span>
-        <span class="brand-name">NovaCart</span>
-        <span class="role-badge">Delivery Partner</span>
-
+      <div class="sidebar-header">
+        <div class="brand-title">
+          <img src="../ICONS/logo.svg" alt="" width="34" height="34">
+          NovaCart
+        </div>
+        <div class="brand-subtitle">Delivery Partner</div>
       </div>
 
-      <nav aria-label="Delivery partner menu">
-        <ul class="nav-list">
-          <li><a href="#assignedSection" id="navDeliveries" class="nav-link active">My Deliveries</a></li>
-          <li><a href="#historyPanel" id="navHistory" class="nav-link">Delivery History</a></li>
-          <li><a href="#reportPanel" id="navReport" class="nav-link">Report Issue</a></li>
-        </ul>
+      <nav aria-label="Delivery partner menu" class="sidebar-menu">
+        <a href="#assignedSection" id="navDeliveries" class="menu-item active"><img src="../ICONS/order.svg" alt="" width="18" height="18"><span>My Deliveries</span></a>
+        <a href="#historyPanel" id="navHistory" class="menu-item"><img src="../ICONS/report.svg" alt="" width="18" height="18"><span>Delivery History</span></a>
+        <a href="#reportPanel" id="navReport" class="menu-item"><img src="../ICONS/campaign.svg" alt="" width="18" height="18"><span>Report Issue</span></a>
       </nav>
 
-      <button type="button" class="btn-logout" id="logoutBtn">Log Out</button>
+      <div class="sidebar-footer">
+        <div class="partner-meta">
+          <strong id="sidebarName"></strong>
+          <span>Delivery Partner</span>
+        </div>
+        <button type="button" class="logout-btn" id="logoutBtn" title="Log out">
+          <img src="../ICONS/logout.svg" alt="Logout" width="16" height="16">
+        </button>
+      </div>
     </aside>
 
     <div class="content">
 
-      <!-- TOP BAR -->
+      <!-- Top bar -->
       <header class="topbar">
         <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle menu">&#9776;</button>
 
@@ -43,8 +51,8 @@
           <p class="muted">Deliver smiles, one package at a time.</p>
         </div>
 
-        <button type="button" class="notif-btn" id="notifBtn" aria-label="Notifications">
-          <span aria-hidden="true">&#128276;</span>
+        <button type="button" class="icon-btn" id="notifBtn" aria-label="Notifications" title="Notifications">
+          <img src="../ICONS/notification_bell.svg" alt="" width="18" height="18">
           <span class="badge" id="notifCount">0</span>
         </button>
 
@@ -64,7 +72,7 @@
               <p class="muted">View and manage your assigned orders.</p>
             </div>
             <div class="button-group">
-              <button type="button" class="btn btn-primary" id="addDeliveryBtn">Add Delivery</button>
+              <button type="button" class="btn btn-primary" id="addDeliveryBtn"><img src="../ICONS/plus.svg" alt="" width="14" height="14" class="icon-white">Add Delivery</button>
               <button type="button" class="btn btn-outline" id="refreshBtn">Refresh</button>
             </div>
           </div>
@@ -91,7 +99,7 @@
           <!-- Search and filter -->
           <div class="filters">
             <label for="searchInput" class="visually-hidden">Search deliveries</label>
-            <input type="search" id="searchInput" placeholder="Search by order ID, customer or address">
+            <input type="search" id="searchInput" class="search-input" placeholder="Search by order ID, customer or address">
 
             <label for="statusFilter" class="visually-hidden">Filter by status</label>
             <select id="statusFilter">

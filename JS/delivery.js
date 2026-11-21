@@ -210,6 +210,7 @@ const formatDate = iso => new Date(iso).toLocaleDateString('en-GB', {
 function renderProfile(name) {
   document.getElementById('partnerName').textContent = name;
   document.getElementById('profileName').textContent = name;
+  document.getElementById('sidebarName').textContent = name;
   document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
 }
 
@@ -219,6 +220,7 @@ function renderStats(stats, activeCount) {
   document.getElementById('statProgress').textContent = stats.inProgress;
   document.getElementById('statIssues').textContent = stats.issues;
   document.getElementById('notifCount').textContent = activeCount;
+  document.getElementById('notifCount').hidden = activeCount === 0;
 }
 
 //Deliveries table 
@@ -838,8 +840,7 @@ function bindEvents() {
   });
   document.getElementById('closeDialog').addEventListener('click', () => document.getElementById('detailsDialog').close());
   document.getElementById('logoutBtn').addEventListener('click', () => {
-  alert("You have been logged out.");
-    window.location.href = "../LOGIN/HTML/login.html";
+    window.location.href = '../LOGIN/HTML/login.html';
   });
 }
 
