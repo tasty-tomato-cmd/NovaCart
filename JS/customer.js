@@ -23,7 +23,7 @@ function showCart() { showPage("cart-page", "link-cart"); }
 function showOrders() { showPage("orders-page", "link-orders"); }
 function showOffers() { showPage("offers-page", "link-offers"); }
 
-// Confirmation message under the top bar (same pattern as the other portals)
+// Confirmation message under the top bar 
 let messageTimer;
 function showMessage(text, isError) {
     let box = document.getElementById("message");
@@ -59,42 +59,77 @@ function searchItems() {
 }
 
 // Cart & Order Summary 
+let cartItems = [];
 let cartCount = 0;
 let subtotal = 0;
 let discountRate = 0;
 let couponCode = "None";
-let cartRowsHtml = "";
 let itemSummary = "";
 
 function addItem(name, seller, price) {
-    cartCount = cartCount + 1;
-    subtotal = subtotal + price;
-    itemSummary = itemSummary + name + " x 1, ";
+    let found = false;
+    for (let i = 0; i < cartItems.length; i++) {
+        if (cartItems[i].name === name && cartItems[i].seller === seller) {
+            cartItems[i].qty = cartItems[i].qty + 1;
+            found = true;
+            break;
+        }
+    }
 
-    cartRowsHtml = cartRowsHtml +
-        "<tr>" +
-        "<td>" + name + "</td>" +
-        "<td>" + seller + "</td>" +
-        "<td>Tk " + price + "</td>" +
-        "<td>1</td>" +
-        "<td>Tk " + price + "</td>" +
-        "<td><button class='btn-danger' onclick='clearCartTable()'>Delete</button></td>" +
-        "</tr>";
+    if (!found) {
+        cartItems.push({
+            name: name,
+            seller: seller,
+            price: price,
+            qty: 1
+        });
+    }
 
     refreshCart();
     showMessage(name + " added to cart!");
 }
 
+function deleteCartItem(index) {
+    cartItems.splice(index, 1);
+    refreshCart();
+    showMessage("Item removed from cart.");
+}
+
 function clearCartTable() {
-    cartCount = 0;
-    subtotal = 0;
-    itemSummary = "";
-    cartRowsHtml = "<tr><td colspan='6' class='sub-text'>Your cart is empty.</td></tr>";
+    cartItems = [];
     refreshCart();
 }
 
 function refreshCart() {
-    document.getElementById("cart-table-body").innerHTML = cartRowsHtml;
+    cartCount = 0;
+    subtotal = 0;
+    itemSummary = "";
+    let rowsHtml = "";
+
+    if (cartItems.length === 0) {
+        rowsHtml = "<tr><td colspan='6' class='sub-text'>Your cart is empty.</td></tr>";
+    } else {
+        for (let i = 0; i < cartItems.length; i++) {
+            let item = cartItems[i];
+            let itemSubtotal = item.price * item.qty;
+
+            cartCount = cartCount + item.qty;
+            subtotal = subtotal + itemSubtotal;
+            itemSummary = itemSummary + item.name + " x " + item.qty + ", ";
+
+            rowsHtml = rowsHtml +
+                "<tr>" +
+                "<td>" + item.name + "</td>" +
+                "<td>" + item.seller + "</td>" +
+                "<td>Tk " + item.price + "</td>" +
+                "<td>" + item.qty + "</td>" +
+                "<td>Tk " + itemSubtotal + "</td>" +
+                "<td><button class='btn-danger' onclick='deleteCartItem(" + i + ")'>Delete</button></td>" +
+                "</tr>";
+        }
+    }
+
+    document.getElementById("cart-table-body").innerHTML = rowsHtml;
     document.getElementById("cart-qty-text").innerText = cartCount;
     document.getElementById("nav-cart-count").innerText = cartCount;
     document.getElementById("dash-cart").innerText = cartCount;
@@ -106,7 +141,6 @@ function refreshCart() {
     document.getElementById("sum-disc").innerText = discTk;
     document.getElementById("sum-total").innerText = finalTk;
 }
-
 // Student Verification & Coupons
 let studentVerified = false;
 
